@@ -1,4 +1,4 @@
-% Version: v4 (2026-10-16), the sentences that mention Lean are removed, as the owner rule of 2026-10-15 asks; the Lean file lives in the public repository of the paper. No claim changes.
+% Version: v5 (2026-10-16), every result recalled from a reference is stated as the source gives it: the source's own kind (proposition, lemma, theorem, corollary, definition), its whole statement, one environment per result, nothing merged or specialized. No claim changes.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -88,8 +88,19 @@ zero product determined algebra; braided-symmetric product; Jordan product; dual
 
 This section states the question and the answers.
 Let $K$ be a field and let $A$ be a unital associative $K$-algebra.
-\citet[Definition 1.1]{Bresar2021} calls $A$ \emph{zero product determined} (zpd) if every bilinear functional $\varphi$ with $\varphi(x,y) = 0$ whenever $xy = 0$ has the form $\varphi(x,y) = \tau(xy)$ for a linear functional $\tau$.
-The same book studies the Jordan product $x \circ y = xy + yx$ in place of $xy$ \citep[Definition 3.14]{Bresar2021}.
+We recall two definitions of Bre\v{s}ar.
+
+\begin{definition}[{\citep[Definition 1.1]{Bresar2021}}]\label{def:bresar-zpd}
+A nonassociative algebra $A$ over a field $F$ is said to be \emph{zero product determined} if, for every bilinear functional $\varphi \colon A \times A \to F$ satisfying $\varphi(x,y) = 0$ whenever $x, y \in A$ are such that $xy = 0$, there exists a linear functional $\tau$ on $A$ such that $\varphi(x,y) = \tau(xy)$ for all $x, y \in A$.
+\end{definition}
+
+We abbreviate \emph{zero product determined} to zpd, as Bre\v{s}ar does.
+
+\begin{definition}[{\citep[Definition 3.14]{Bresar2021}}]\label{def:bresar-zjpd}
+An associative algebra $A$ is \emph{zero Jordan product determined} if the Jordan algebra $A^+$ is zero product determined.
+\end{definition}
+
+Here $A^+$ has the Jordan product $x \circ y = xy + yx$ in place of $xy$. % claim-ok: the Jordan algebra A^+ of the cited definition
 
 Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
 In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$.
@@ -122,16 +133,16 @@ The algebra $A$ is \emph{determined by} $\mu$ if, for every vector space $V$ and
 \end{definition}
 
 For $\mu(x,y) = xy$ and $V = K$ this is the definition of a zpd algebra, and \citet[Proposition 1.3(iv)]{Bresar2021} shows that allowing any $V$ gives the same class.
-For $\mu = \circ$ it is the zJpd property: an associative algebra is \emph{zero Jordan product determined} (zJpd) if its Jordan algebra $A^+$ is zpd \citep[Definition 3.14]{Bresar2021}. The same proposition, applied to $A^+$, shows that allowing any $V$ gives the same class.
+For $\mu = \circ$ it is the zJpd property of Definition~\ref{def:bresar-zjpd}. The same proposition, applied to $A^+$, shows that allowing any $V$ gives the same class.
 
-\begin{theorem}[{\citep[Proposition 1.3]{Bresar2021}}]\label{thm:bresar-zpd}
+\begin{proposition}[{\citep[Proposition 1.3]{Bresar2021}}]\label{prop:bresar-zpd}
 Let $A$ be a nonassociative algebra over a field $F$.
 The following conditions are equivalent.
 (i) $A$ is zpd.
 (ii) If a bilinear functional $\varphi \colon A \times A \to F$ satisfies $\varphi(x,y) = 0$ whenever $xy = 0$, then $\sum_i \varphi(x_i, y_i) = 0$ whenever $\sum_i x_i y_i = 0$.
 (iii) If $\sum_i z_i w_i = 0$, then $\sum_i z_i \otimes w_i$ lies in $\operatorname{span}\{x \otimes y \in A \otimes A \mid xy = 0\}$.
 (iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
-\end{theorem}
+\end{proposition}
 
 The criterion uses the linear map $\bar\mu \colon A \otimes A \to A$ with $\bar\mu(x \otimes y) = \mu(x,y)$.
 Let $\Zs_\mu$ be the subspace of $A \otimes A$ spanned by the tensors $x \otimes y$ with $\mu(x,y) = 0$.
@@ -155,7 +166,7 @@ Put $\psi = \hat\varphi \circ g$.
 Then $\psi(\mu(x,y)) = \hat\varphi(g(q_\mu(x \otimes y + \Zs_\mu))) = \varphi(x,y)$.
 \end{proof}
 
-For $\mu(x,y) = xy$ the proposition is the equivalence of (i) and (iii) in Theorem~\ref{thm:bresar-zpd}.
+For $\mu(x,y) = xy$ the proposition is the equivalence of (i) and (iii) in Proposition~\ref{prop:bresar-zpd}.
 There $q_\mu$ is onto because $x = x \cdot 1$, and the proof can invert $q_\mu$.
 A symmetrized product need not be onto, and the left inverse replaces the inverse. % claim-ok: comment on the proof above
 
@@ -171,7 +182,7 @@ Then $A$ is determined by $\mu$.
 \begin{proof}
 Let $\varphi$ vanish on the pairs with $\mu(x,y) = 0$.
 If $xy = 0$ then $\mu(x,y) = 0$, so $\varphi$ vanishes on zero products.
-Since $A$ is zpd, there is a linear $\psi_0$ with $\varphi(x,y) = \psi_0(xy)$ by Theorem~\ref{thm:bresar-zpd}(iv).
+Since $A$ is zpd, there is a linear $\psi_0$ with $\varphi(x,y) = \psi_0(xy)$ by Proposition~\ref{prop:bresar-zpd}(iv).
 Let $b \in \ker f$.
 Then $\mu(b,1) = f(b) = 0$, so $\psi_0(b) = \varphi(b,1) = 0$.
 Hence $\ker f \subseteq \ker \psi_0$, and $\psi_0$ induces a linear map on $A/\ker f$, which is isomorphic to the image of $f$.
@@ -242,11 +253,15 @@ Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
 
 We use a result of Bre\v{s}ar on matrix algebras.
 
-\begin{theorem}[{\citep[Corollary 2.17(a)]{Bresar2021}}]\label{thm:bresar-matrix}
-Let $B$ be a unital algebra over a field and let $n \geq 2$. Then $M_n(B)$ is zpd.
-\end{theorem}
+For a unital algebra $A_1$, a unital algebra $A_2$ and a unital $(A_1, A_2)$-bimodule $M$, the matrices $\left[\begin{smallmatrix} r_1 & m \\ 0 & r_2 \end{smallmatrix}\right]$ with $r_1 \in A_1$, $m \in M$ and $r_2 \in A_2$ form an algebra under the usual matrix operations, which Bre\v{s}ar denotes by $\mathrm{Tri}(A_1, M, A_2)$ \citep[Section 2.1]{Bresar2021}.
 
-By Theorem~\ref{thm:bresar-matrix} with $B = K$, the matrix algebra $M_n(K)$ is zpd for $n \geq 2$.
+\begin{corollary}[{\citep[Corollary 2.17]{Bresar2021}}]\label{cor:bresar-matrix}
+The following algebras are zpd:
+(a) The algebra $M_n(B)$, where $n \geq 2$ and $B$ is any unital algebra.
+(b) The algebra $\mathrm{Tri}(A_1, M, A_2)$, where $A_1$ and $A_2$ are unital algebras generated by idempotents and $M$ is a unital $(A_1, A_2)$-bimodule.
+\end{corollary}
+
+By Corollary~\ref{cor:bresar-matrix}(a) with $B = K$, the matrix algebra $M_n(K)$ is zpd for $n \geq 2$.
 The transpose reverses products. % claim-ok: the identity $(xy)^T = y^Tx^T$
 So $M_n(K)$ is determined by $xy + y^{\mathsf T} x^{\mathsf T}$.
 

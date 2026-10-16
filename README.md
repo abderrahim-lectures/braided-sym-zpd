@@ -1,7 +1,7 @@
 # Algebras Determined by a Braided-Symmetric Product
 
 Author: Abderrahim Adrabi, Mohammed V University in Rabat.  
-Current version: **v4**.
+Current version: **v5**.
 
 ## The idea of the paper
 
@@ -29,6 +29,7 @@ Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. Build the L
 
 One entry per released version, newest first. Each version is also a tag of this repository.
 
+- **v5** (2026-10-16): every result recalled from a reference is stated as the source gives it: the source's own kind (proposition, lemma, theorem, corollary, definition), its whole statement, one environment per result, nothing merged or specialized. No claim changes.
 - **v4** (2026-10-16): the sentences that mention Lean are removed, as the owner rule of 2026-10-15 asks; the Lean file lives in the public repository of the paper. No claim changes.
 - **v3** (2026-10-16): Bresar Corollary 2.17(a), Theorem 2.27 and Definition 3.14 are stated before use. No claim changes.
 - **v1** (2026-09-25): first version
