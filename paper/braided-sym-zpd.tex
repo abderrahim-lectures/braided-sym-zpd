@@ -1,0 +1,322 @@
+% Version: v3 (2026-10-16), Bresar Corollary 2.17(a), Theorem 2.27 and Definition 3.14 are stated before use. No claim changes.
+\documentclass[]{interact}
+\usepackage[utf8]{inputenc}
+
+\usepackage{mathtools}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{amsfonts}
+\usepackage{enumerate}
+\usepackage{enumitem}
+
+\usepackage[hidelinks,pagebackref=false]{hyperref}
+\usepackage[all]{hypcap}
+\hypersetup{linktoc=all}
+
+\usepackage{quiver}
+\usepackage{tikz-cd}
+\usepackage[yyyymmdd,hhmmss]{datetime}
+\usepackage{float}
+
+\usepackage[numbers,sort&compress]{natbib}
+\bibpunct[, ]{[}{]}{,}{n}{,}{,}
+\renewcommand\bibfont{\fontsize{10}{12}\selectfont}
+\makeatletter
+\def\NAT@def@citea{\def\@citea{\NAT@separator}}
+\makeatother
+
+\theoremstyle{plain}
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{example}[theorem]{Example}
+\newtheorem{question}[theorem]{Question}
+
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{notation}{Notation}
+
+\allowdisplaybreaks
+
+\newcommand{\Der}{\mathrm{Der}}
+\newcommand{\Inn}{\mathrm{Inn}}
+\newcommand{\Hom}{\operatorname{Hom}}
+\newcommand{\JDer}{\mathrm{JDer}}
+\newcommand{\BSDer}{\mathrm{BSDer}}
+\newcommand{\ADer}{\mathrm{Der}_\alpha}
+\newcommand{\LDer}{\mathrm{LDer}}
+\newcommand{\Zs}{\mathcal{Z}}
+
+\newcommand{\paperversion}{2}
+
+
+\begin{document}
+\title{Algebras Determined by a Braided-Symmetric Product}
+
+\author{
+\name{Abderrahim Adrabi\textsuperscript{a,b}\thanks{CONTACT A. Adrabi. Email: abderrahim.adrabi@um5r.ac.ma}}
+	\affil{\textsuperscript{a}Faculty of Sciences, Mohammed V University in Rabat, Morocco;\\ \textsuperscript{b}Faculty of Educational Sciences, Mohammed V University in Rabat, Morocco}
+}
+
+\history{Preprint version \paperversion, compiled \today}
+
+\maketitle
+
+\begin{abstract}
+An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
+We replace the product by any bilinear map $\mu$ and ask the same question.
+The answer is a quotient criterion that needs no surjectivity hypothesis.
+For the symmetrized products of three braidings on a commutative algebra, $\mu$ has the form $f(xy)$ with $f$ linear.
+The same holds on any algebra when the twist reverses products, as the transpose does on matrices.
+Every unital zero product determined algebra is determined by every such $\mu$.
+The converse holds when $f$ is injective, so the identity braiding gives nothing new in characteristic other than $2$.
+The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined.
+All results are proved in Lean 4.
+\end{abstract}
+
+\begin{keywords}
+zero product determined algebra; braided-symmetric product; Jordan product; dual numbers; Lean 4
+\end{keywords}
+
+\begin{amscode}
+16W10; 15A86; 18M05
+\end{amscode}
+
+\section{Introduction}
+
+This section states the question and the answers.
+Let $K$ be a field and let $A$ be a unital associative $K$-algebra.
+\citet[Definition 1.1]{Bresar2021} calls $A$ \emph{zero product determined} (zpd) if every bilinear functional $\varphi$ with $\varphi(x,y) = 0$ whenever $xy = 0$ has the form $\varphi(x,y) = \tau(xy)$ for a linear functional $\tau$.
+The same book studies the Jordan product $x \circ y = xy + yx$ in place of $xy$ \citep[Definition 3.14]{Bresar2021}.
+
+Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
+In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$.
+Its symmetrized product is $\mu_\sigma(x,y) = m(x \otimes y + \sigma(x \otimes y))$.
+We use three braidings.
+The first is the identity. % claim-ok: definition of the first braiding
+The second is the swap $x \otimes y \mapsto y \otimes x$. % claim-ok: definition of the second braiding
+The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alpha(x)$, for a linear map $\alpha \colon A \to A$.
+Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
+This paper asks which algebras are determined by each of these products, in the sense of Brešar. % claim-ok: statement of the question of the paper
+
+We treat a general bilinear map $\mu$.
+Section~\ref{sec:criterion} proves that $A$ is determined by $\mu$ if and only if a quotient map is injective (Proposition~\ref{prop:criterion}).
+Section~\ref{sec:fxy} treats products of the form $\mu(x,y) = f(xy)$.
+Theorem~\ref{thm:zpd-fxy} shows that every unital zpd algebra is determined by every such $\mu$, and Proposition~\ref{prop:injective} proves the converse for injective $f$.
+The identity braiding has this form. % claim-ok: follows from the definition just given
+The twisted braiding has it when $A$ is commutative (Corollary~\ref{cor:twisted}) or when $\alpha$ reverses products (Corollary~\ref{cor:anti}).
+Section~\ref{sec:beyond} shows that the converse fails for non-injective $f$.
+Theorem~\ref{thm:codim} gives a sufficient condition, and Example~\ref{ex:dual} applies it to the dual numbers.
+By Corollary~\ref{cor:anti}, the matrix algebra with the transpose is determined by its twisted product.
+Question~\ref{q:noncomm} asks the same for an automorphism.
+
+Every numbered result is proved in Lean 4 on top of Mathlib, in the file \texttt{BraidedSymZpd.lean} that accompanies this paper. % claim-ok: recorded in formalization-debt.md
+
+\section{Determined by a bilinear map}\label{sec:criterion}
+
+This section gives the definition and the criterion that later proofs use.
+Throughout, $A$ is a unital associative algebra over a field $K$, and $\mu \colon A \times A \to A$ is $K$-bilinear.
+
+\begin{definition}\label{def:determined}
+The algebra $A$ is \emph{determined by} $\mu$ if, for every vector space $V$ and every bilinear map $\varphi \colon A \times A \to V$ with $\varphi(x,y) = 0$ whenever $\mu(x,y) = 0$, there is a linear map $\psi \colon A \to V$ with $\varphi(x,y) = \psi(\mu(x,y))$ for all $x, y \in A$.
+\end{definition}
+
+For $\mu(x,y) = xy$ and $V = K$ this is the definition of a zpd algebra, and \citet[Proposition 1.3(iv)]{Bresar2021} shows that allowing any $V$ gives the same class.
+For $\mu = \circ$ it is the zJpd property: an associative algebra is \emph{zero Jordan product determined} (zJpd) if its Jordan algebra $A^+$ is zpd \citep[Definition 3.14]{Bresar2021}. The same proposition, applied to $A^+$, shows that allowing any $V$ gives the same class.
+
+\begin{theorem}[{\citep[Proposition 1.3]{Bresar2021}}]\label{thm:bresar-zpd}
+Let $A$ be a nonassociative algebra over a field $F$.
+The following conditions are equivalent.
+(i) $A$ is zpd.
+(ii) If a bilinear functional $\varphi \colon A \times A \to F$ satisfies $\varphi(x,y) = 0$ whenever $xy = 0$, then $\sum_i \varphi(x_i, y_i) = 0$ whenever $\sum_i x_i y_i = 0$.
+(iii) If $\sum_i z_i w_i = 0$, then $\sum_i z_i \otimes w_i$ lies in $\operatorname{span}\{x \otimes y \in A \otimes A \mid xy = 0\}$.
+(iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
+\end{theorem}
+
+The criterion uses the linear map $\bar\mu \colon A \otimes A \to A$ with $\bar\mu(x \otimes y) = \mu(x,y)$.
+Let $\Zs_\mu$ be the subspace of $A \otimes A$ spanned by the tensors $x \otimes y$ with $\mu(x,y) = 0$.
+Then $\Zs_\mu \subseteq \ker \bar\mu$, so $\bar\mu$ induces a linear map $q_\mu \colon (A \otimes A)/\Zs_\mu \to A$.
+
+\begin{proposition}\label{prop:criterion}
+The algebra $A$ is determined by $\mu$ if and only if $q_\mu$ is injective, that is, if and only if $\Zs_\mu = \ker \bar\mu$.
+\end{proposition}
+
+\begin{proof}
+Suppose first that $A$ is determined by $\mu$.
+Apply Definition~\ref{def:determined} to the map $\varphi(x,y) = x \otimes y + \Zs_\mu$ with values in $V = (A \otimes A)/\Zs_\mu$.
+It gives $\psi$ with $\psi(\mu(x,y)) = x \otimes y + \Zs_\mu$.
+By linearity $\psi(\bar\mu(t)) = t + \Zs_\mu$ for every $t \in A \otimes A$.
+So $\bar\mu(t) = 0$ implies $t \in \Zs_\mu$.
+
+Conversely, suppose that $q_\mu$ is injective, and let $\varphi$ be as in Definition~\ref{def:determined}.
+The linear map $\bar\varphi \colon A \otimes A \to V$ vanishes on $\Zs_\mu$, so it induces $\hat\varphi$ on the quotient.
+Over a field an injective linear map has a linear left inverse $g$ with $g \circ q_\mu = \mathrm{id}$.
+Put $\psi = \hat\varphi \circ g$.
+Then $\psi(\mu(x,y)) = \hat\varphi(g(q_\mu(x \otimes y + \Zs_\mu))) = \varphi(x,y)$.
+\end{proof}
+
+For $\mu(x,y) = xy$ the proposition is the equivalence of (i) and (iii) in Theorem~\ref{thm:bresar-zpd}.
+There $q_\mu$ is onto because $x = x \cdot 1$, and the proof can invert $q_\mu$.
+A symmetrized product need not be onto, and the left inverse replaces the inverse. % claim-ok: comment on the proof above
+
+\section{Products of the form \texorpdfstring{$f(xy)$}{f(xy)}}\label{sec:fxy}
+
+This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings.
+
+\begin{theorem}\label{thm:zpd-fxy}
+Let $A$ be zpd, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
+Then $A$ is determined by $\mu$.
+\end{theorem}
+
+\begin{proof}
+Let $\varphi$ vanish on the pairs with $\mu(x,y) = 0$.
+If $xy = 0$ then $\mu(x,y) = 0$, so $\varphi$ vanishes on zero products.
+Since $A$ is zpd, there is a linear $\psi_0$ with $\varphi(x,y) = \psi_0(xy)$ by Theorem~\ref{thm:bresar-zpd}(iv).
+Let $b \in \ker f$.
+Then $\mu(b,1) = f(b) = 0$, so $\psi_0(b) = \varphi(b,1) = 0$.
+Hence $\ker f \subseteq \ker \psi_0$, and $\psi_0$ induces a linear map on $A/\ker f$, which is isomorphic to the image of $f$.
+This gives a linear map on the image of $f$, and we extend it to a linear map $\psi$ on $A$.
+Then $\psi(f(z)) = \psi_0(z)$ for every $z$, so $\varphi(x,y) = \psi(\mu(x,y))$.
+\end{proof}
+
+The next proposition gives the converse for injective $f$.
+
+\begin{proposition}\label{prop:injective}
+Let $f \colon A \to A$ be linear and injective, and let $\mu(x,y) = f(xy)$.
+If $A$ is determined by $\mu$, then $A$ is zpd.
+\end{proposition}
+
+\begin{proof}
+Since $f$ is injective, $\mu(x,y) = 0$ if and only if $xy = 0$.
+Let $\varphi$ vanish on zero products.
+Then $\varphi$ vanishes on the pairs with $\mu(x,y) = 0$, and we get $\psi$ with $\varphi(x,y) = \psi(f(xy))$.
+So $\varphi(x,y) = (\psi \circ f)(xy)$.
+\end{proof}
+
+The identity braiding gives $\mu(x,y) = xy + xy = 2xy$, so we take $f = 2\,\mathrm{id}$.
+
+\begin{corollary}\label{cor:identity}
+Let $\mu(x,y) = 2xy$.
+\begin{enumerate}[label=(\roman*)]
+\item If $A$ is zpd, then $A$ is determined by $\mu$.
+\item If $\operatorname{char} K \neq 2$, then $A$ is determined by $\mu$ if and only if $A$ is zpd.
+\end{enumerate}
+\end{corollary}
+
+\begin{proof}
+Part (i) is Theorem~\ref{thm:zpd-fxy} with $f = 2\,\mathrm{id}$.
+If $\operatorname{char} K \neq 2$ this $f$ is injective, and Proposition~\ref{prop:injective} gives the other direction of (ii).
+\end{proof}
+
+In characteristic $2$ the map $\mu$ is zero, every $\varphi$ in Definition~\ref{def:determined} is zero, and every algebra is determined by $\mu$.
+
+The standard braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
+When $\operatorname{char} K \neq 2$ the map $q_\circ$ is onto, because $x \circ \tfrac12 = x$.
+So Proposition~\ref{prop:criterion} recovers the usual form of the zJpd criterion.
+It is not of the form $f(xy)$ on a noncommutative algebra, and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
+
+The twisted braiding has the form $f(xy)$ when $A$ is commutative. % claim-ok: shown by the next lines
+Let $\alpha$ be an algebra endomorphism of $A$.
+Then $\alpha(y)\alpha(x) = \alpha(yx) = \alpha(xy)$, so $xy + \alpha(y)\alpha(x) = (\mathrm{id} + \alpha)(xy)$.
+
+\begin{corollary}\label{cor:twisted}
+Let $A$ be commutative and zpd, and let $\alpha$ be an algebra endomorphism of $A$.
+Then $A$ is determined by $\mu_\alpha(x,y) = xy + \alpha(y)\alpha(x)$.
+\end{corollary}
+
+\begin{proof}
+Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
+\end{proof}
+
+The same holds on a noncommutative algebra when $\alpha$ reverses products. % claim-ok: shown by the next lines
+
+\begin{corollary}\label{cor:anti}
+Let $A$ be zpd, and let $\alpha \colon A \to A$ be linear with $\alpha(xy) = \alpha(y)\alpha(x)$ for all $x, y$.
+Then $A$ is determined by $\mu_\alpha(x,y) = xy + \alpha(y)\alpha(x)$.
+\end{corollary}
+
+\begin{proof}
+Here $\alpha(y)\alpha(x) = \alpha(xy)$, so $\mu_\alpha(x,y) = (\mathrm{id} + \alpha)(xy)$.
+Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
+\end{proof}
+
+We use a result of Bre\v{s}ar on matrix algebras.
+
+\begin{theorem}[{\citep[Corollary 2.17(a)]{Bresar2021}}]\label{thm:bresar-matrix}
+Let $B$ be a unital algebra over a field and let $n \geq 2$. Then $M_n(B)$ is zpd.
+\end{theorem}
+
+By Theorem~\ref{thm:bresar-matrix} with $B = K$, the matrix algebra $M_n(K)$ is zpd for $n \geq 2$.
+The transpose reverses products. % claim-ok: the identity $(xy)^T = y^Tx^T$
+So $M_n(K)$ is determined by $xy + y^{\mathsf T} x^{\mathsf T}$.
+
+When $\alpha$ is an involution and $\operatorname{char} K \neq 2$, the map $\mathrm{id} + \alpha$ is twice the projection onto the fixed points of $\alpha$.
+It is injective only for $\alpha = \mathrm{id}$, so Proposition~\ref{prop:injective} gives no converse.
+The next section shows that the converse is false.
+
+\section{Determined but not zpd}\label{sec:beyond}
+
+This section gives a sufficient condition that does not assume zpd, and applies it to the dual numbers.
+
+\begin{theorem}\label{thm:codim}
+Let $f \colon A \to A$ be linear, let $N = \ker f$, and let $\mu(x,y) = f(xy)$.
+Suppose that $f(1) \neq 0$, that $bn, nb \in N$ for all $n \in N$ and $b \in A$, and that there is a linear functional $c$ on $A$ with $x - c(x)1 \in N$ for every $x$.
+Then $A$ is determined by $\mu$.
+\end{theorem}
+
+\begin{proof}
+Let $\varphi$ vanish on the pairs with $\mu(x,y) = 0$.
+If $n \in N$ then $ny$ and $xn$ lie in $N$, so $\mu(n,y) = \mu(x,n) = 0$ and $\varphi(n,y) = \varphi(x,n) = 0$.
+Write $x = (x - c(x)1) + c(x)1$ and do the same for $y$.
+Bilinearity gives $\varphi(x,y) = c(x)c(y)\varphi(1,1)$.
+The same splitting gives $f(y) = c(y) f(1)$, and then $f(xy) = c(x) f(y) = c(x)c(y) f(1)$.
+Since $f(1) \neq 0$, the map $a \mapsto a f(1)$ from $K$ to $A$ has a linear left inverse $g$.
+Put $\psi(z) = g(z)\varphi(1,1)$.
+Then $\psi(f(xy)) = c(x)c(y)\varphi(1,1) = \varphi(x,y)$.
+\end{proof}
+
+In words, the hypotheses say that $N$ is a two-sided ideal of codimension $1$ that does not contain $1$. % claim-ok: restatement of the hypotheses of the theorem
+The next example meets them. % claim-ok: checked in the example
+
+We also use the characterization of finite-dimensional zpd algebras by \citet{Bresar2021}.
+
+\begin{theorem}[{\citep[Theorem 2.27]{Bresar2021}}]\label{thm:bresar-idempotents}
+A finite-dimensional unital algebra is zpd if and only if it is generated by idempotents.
+\end{theorem}
+
+\begin{example}[Dual numbers]\label{ex:dual}
+Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$.
+The map $\alpha(a + b\varepsilon) = a - b\varepsilon$ is an involutive automorphism.
+Since $A$ is commutative, $\mu_\alpha(x,y) = f(xy)$ with $f = \mathrm{id} + \alpha$, and $f(a + b\varepsilon) = 2a$.
+So $N = K\varepsilon$, which is an ideal, $f(1) = 2 \neq 0$, and $c(a + b\varepsilon) = a$ satisfies the last hypothesis.
+By Theorem~\ref{thm:codim}, $A$ is determined by $\mu_\alpha$.
+The only idempotents of $A$ are $0$ and $1$, so $A$ is not generated by idempotents.
+By Theorem~\ref{thm:bresar-idempotents}, $A$ is not zpd.
+\end{example}
+
+So the twisted braiding determines a class of algebras strictly larger than the zpd ones, even among commutative algebras.
+When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$, and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
+
+\begin{question}\label{q:noncomm}
+Let $A = M_2(\mathbb{F}_3)$ and let $\alpha$ be conjugation by $\operatorname{diag}(1,-1)$, an involutive automorphism.
+Is $A$ determined by $\mu_\alpha(x,y) = xy + \alpha(yx)$?
+More generally, which noncommutative algebras with an involutive automorphism are determined by their twisted product? % claim-ok: open question
+\end{question}
+
+By Proposition~\ref{prop:criterion}, the first part of the question is a rank computation in a space of dimension $16$.
+
+\section*{Acknowledgments}
+
+This work was supported by research infrastructure at Mohammed V University in Rabat. % claim-ok: acknowledgement
+
+\begin{thebibliography}{9}
+
+\bibitem[Bre\v{s}ar(2021)]{Bresar2021}
+Bre\v{s}ar, M.: Zero Product Determined Algebras. Frontiers in Mathematics. Birkh\"auser, Cham (2021).
+
+\end{thebibliography}
+
+\end{document}
