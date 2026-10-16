@@ -1,4 +1,4 @@
-% Version: v3 (2026-10-16), Bresar Corollary 2.17(a), Theorem 2.27 and Definition 3.14 are stated before use. No claim changes.
+% Version: v4 (2026-10-16), the sentences that mention Lean are removed, as the owner rule of 2026-10-15 asks; the Lean file lives in the public repository of the paper. No claim changes.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -74,11 +74,10 @@ The same holds on any algebra when the twist reverses products, as the transpose
 Every unital zero product determined algebra is determined by every such $\mu$.
 The converse holds when $f$ is injective, so the identity braiding gives nothing new in characteristic other than $2$.
 The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined.
-All results are proved in Lean 4.
 \end{abstract}
 
 \begin{keywords}
-zero product determined algebra; braided-symmetric product; Jordan product; dual numbers; Lean 4
+zero product determined algebra; braided-symmetric product; Jordan product; dual numbers
 \end{keywords}
 
 \begin{amscode}
@@ -112,8 +111,6 @@ Section~\ref{sec:beyond} shows that the converse fails for non-injective $f$.
 Theorem~\ref{thm:codim} gives a sufficient condition, and Example~\ref{ex:dual} applies it to the dual numbers.
 By Corollary~\ref{cor:anti}, the matrix algebra with the transpose is determined by its twisted product.
 Question~\ref{q:noncomm} asks the same for an automorphism.
-
-Every numbered result is proved in Lean 4 on top of Mathlib, in the file \texttt{BraidedSymZpd.lean} that accompanies this paper. % claim-ok: recorded in formalization-debt.md
 
 \section{Determined by a bilinear map}\label{sec:criterion}
 

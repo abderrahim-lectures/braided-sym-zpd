@@ -1,11 +1,11 @@
 # Algebras Determined by a Braided-Symmetric Product
 
 Author: Abderrahim Adrabi, Mohammed V University in Rabat.  
-Current version: **v3**.
+Current version: **v4**.
 
 ## The idea of the paper
 
-An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. The answer is a quotient criterion that needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, has the form f(xy) with f linear. The same holds on any algebra when the twist reverses products, as the transpose does on matrices. Every unital zero product determined algebra is determined by every such . The converse holds when f is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined. All results are proved in Lean 4.
+An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. The answer is a quotient criterion that needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, has the form f(xy) with f linear. The same holds on any algebra when the twist reverses products, as the transpose does on matrices. Every unital zero product determined algebra is determined by every such . The converse holds when f is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined.
 
 ### Contents
 
@@ -29,6 +29,7 @@ Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. Build the L
 
 One entry per released version, newest first. Each version is also a tag of this repository.
 
+- **v4** (2026-10-16): the sentences that mention Lean are removed, as the owner rule of 2026-10-15 asks; the Lean file lives in the public repository of the paper. No claim changes.
 - **v3** (2026-10-16): Bresar Corollary 2.17(a), Theorem 2.27 and Definition 3.14 are stated before use. No claim changes.
 - **v1** (2026-09-25): first version
 - **v2** (2026-09-27): introduction defines the three braidings directly and no longer cites braided-sym-deriv; Corollary 3.5 (anti-endomorphism twist) answers the transpose case of Question 4.3; the question is restated for the automorphism conjugation by diag(1,-1)
