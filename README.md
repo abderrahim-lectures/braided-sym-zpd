@@ -14,7 +14,6 @@ An algebra is zero product determined when every bilinear map that vanishes on t
 3. Determined by a bilinear map
 4. Products of the form f(xy)
 5. Determined but not zpd
-6. Acknowledgments
 
 ## Repository layout
 
