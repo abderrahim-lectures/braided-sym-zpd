@@ -1,4 +1,4 @@
-% Version: v5 (2026-10-16), every result recalled from a reference is stated as the source gives it: the source's own kind (proposition, lemma, theorem, corollary, definition), its whole statement, one environment per result, nothing merged or specialized. No claim changes.
+% Version: v6 (2026-10-17), the layout follows braided-sym-deriv: a Preliminaries section recalls the definitions and the equivalent forms of Bresar, the Introduction points to every section, the citation of Bresar Theorem 2.27 carries its locator and the dual numbers example has a linking sentence. No claim changes.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -88,7 +88,33 @@ zero product determined algebra; braided-symmetric product; Jordan product; dual
 
 This section states the question and the answers.
 Let $K$ be a field and let $A$ be a unital associative $K$-algebra.
-We recall two definitions of Bre\v{s}ar.
+Bre\v{s}ar defined the zero product determined (zpd) algebras \citep[Definition 1.1]{Bresar2021}, and the zero Jordan product determined algebras \citep[Definition 3.14]{Bresar2021}.
+Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
+In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$.
+Its symmetrized product is $\mu_\sigma(x,y) = m(x \otimes y + \sigma(x \otimes y))$.
+We use three braidings.
+The first is the identity. % claim-ok: definition of the first braiding
+The second is the swap $x \otimes y \mapsto y \otimes x$. % claim-ok: definition of the second braiding
+The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alpha(x)$, for a linear map $\alpha \colon A \to A$.
+Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
+This paper asks which algebras are determined by each of these products, in the sense of Brešar. % claim-ok: statement of the question of the paper
+
+We treat a general bilinear map $\mu$.
+Section~\ref{sec:prelim} recalls the definitions and the equivalent forms of Bre\v{s}ar and contains no new results.
+Section~\ref{sec:criterion} proves that $A$ is determined by $\mu$ if and only if a quotient map is injective (Proposition~\ref{prop:criterion}).
+Section~\ref{sec:fxy} treats products of the form $\mu(x,y) = f(xy)$.
+Theorem~\ref{thm:zpd-fxy} shows that every unital zpd algebra is determined by every such $\mu$, and Proposition~\ref{prop:injective} proves the converse for injective $f$.
+The identity braiding has this form. % claim-ok: follows from the definition just given
+The twisted braiding has it when $A$ is commutative (Corollary~\ref{cor:twisted}) or when $\alpha$ reverses products (Corollary~\ref{cor:anti}).
+Section~\ref{sec:beyond} shows that the converse fails for non-injective $f$.
+Theorem~\ref{thm:codim} gives a sufficient condition, and Example~\ref{ex:dual} applies it to the dual numbers.
+By Corollary~\ref{cor:anti}, the matrix algebra with the transpose is determined by its twisted product.
+Question~\ref{q:noncomm} asks the same for an automorphism.
+
+\section{Preliminaries}\label{sec:prelim}
+
+This section recalls the notions of Bre\v{s}ar that we need, and none of it is new.
+We recall two definitions and then the equivalent forms of the first.
 
 \begin{definition}[{\citep[Definition 1.1]{Bresar2021}}]\label{def:bresar-zpd}
 A nonassociative algebra $A$ over a field $F$ is said to be \emph{zero product determined} if, for every bilinear functional $\varphi \colon A \times A \to F$ satisfying $\varphi(x,y) = 0$ whenever $x, y \in A$ are such that $xy = 0$, there exists a linear functional $\tau$ on $A$ such that $\varphi(x,y) = \tau(xy)$ for all $x, y \in A$.
@@ -102,26 +128,16 @@ An associative algebra $A$ is \emph{zero Jordan product determined} if the Jorda
 
 Here $A^+$ has the Jordan product $x \circ y = xy + yx$ in place of $xy$. % claim-ok: the Jordan algebra A^+ of the cited definition
 
-Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
-In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$.
-Its symmetrized product is $\mu_\sigma(x,y) = m(x \otimes y + \sigma(x \otimes y))$.
-We use three braidings.
-The first is the identity. % claim-ok: definition of the first braiding
-The second is the swap $x \otimes y \mapsto y \otimes x$. % claim-ok: definition of the second braiding
-The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alpha(x)$, for a linear map $\alpha \colon A \to A$.
-Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
-This paper asks which algebras are determined by each of these products, in the sense of Brešar. % claim-ok: statement of the question of the paper
+The next result gives equivalent forms of the first definition.
 
-We treat a general bilinear map $\mu$.
-Section~\ref{sec:criterion} proves that $A$ is determined by $\mu$ if and only if a quotient map is injective (Proposition~\ref{prop:criterion}).
-Section~\ref{sec:fxy} treats products of the form $\mu(x,y) = f(xy)$.
-Theorem~\ref{thm:zpd-fxy} shows that every unital zpd algebra is determined by every such $\mu$, and Proposition~\ref{prop:injective} proves the converse for injective $f$.
-The identity braiding has this form. % claim-ok: follows from the definition just given
-The twisted braiding has it when $A$ is commutative (Corollary~\ref{cor:twisted}) or when $\alpha$ reverses products (Corollary~\ref{cor:anti}).
-Section~\ref{sec:beyond} shows that the converse fails for non-injective $f$.
-Theorem~\ref{thm:codim} gives a sufficient condition, and Example~\ref{ex:dual} applies it to the dual numbers.
-By Corollary~\ref{cor:anti}, the matrix algebra with the transpose is determined by its twisted product.
-Question~\ref{q:noncomm} asks the same for an automorphism.
+\begin{proposition}[{\citep[Proposition 1.3]{Bresar2021}}]\label{prop:bresar-zpd}
+Let $A$ be a nonassociative algebra over a field $F$.
+The following conditions are equivalent.
+(i) $A$ is zpd.
+(ii) If a bilinear functional $\varphi \colon A \times A \to F$ satisfies $\varphi(x,y) = 0$ whenever $xy = 0$, then $\sum_i \varphi(x_i, y_i) = 0$ whenever $\sum_i x_i y_i = 0$.
+(iii) If $\sum_i z_i w_i = 0$, then $\sum_i z_i \otimes w_i$ lies in $\operatorname{span}\{x \otimes y \in A \otimes A \mid xy = 0\}$.
+(iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
+\end{proposition}
 
 \section{Determined by a bilinear map}\label{sec:criterion}
 
@@ -135,14 +151,6 @@ The algebra $A$ is \emph{determined by} $\mu$ if, for every vector space $V$ and
 For $\mu(x,y) = xy$ and $V = K$ this is the definition of a zpd algebra, and \citet[Proposition 1.3(iv)]{Bresar2021} shows that allowing any $V$ gives the same class.
 For $\mu = \circ$ it is the zJpd property of Definition~\ref{def:bresar-zjpd}. The same proposition, applied to $A^+$, shows that allowing any $V$ gives the same class.
 
-\begin{proposition}[{\citep[Proposition 1.3]{Bresar2021}}]\label{prop:bresar-zpd}
-Let $A$ be a nonassociative algebra over a field $F$.
-The following conditions are equivalent.
-(i) $A$ is zpd.
-(ii) If a bilinear functional $\varphi \colon A \times A \to F$ satisfies $\varphi(x,y) = 0$ whenever $xy = 0$, then $\sum_i \varphi(x_i, y_i) = 0$ whenever $\sum_i x_i y_i = 0$.
-(iii) If $\sum_i z_i w_i = 0$, then $\sum_i z_i \otimes w_i$ lies in $\operatorname{span}\{x \otimes y \in A \otimes A \mid xy = 0\}$.
-(iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
-\end{proposition}
 
 The criterion uses the linear map $\bar\mu \colon A \otimes A \to A$ with $\bar\mu(x \otimes y) = \mu(x,y)$.
 Let $\Zs_\mu$ be the subspace of $A \otimes A$ spanned by the tensors $x \otimes y$ with $\mu(x,y) = 0$.
@@ -293,11 +301,13 @@ Then $\psi(f(xy)) = c(x)c(y)\varphi(1,1) = \varphi(x,y)$.
 In words, the hypotheses say that $N$ is a two-sided ideal of codimension $1$ that does not contain $1$. % claim-ok: restatement of the hypotheses of the theorem
 The next example meets them. % claim-ok: checked in the example
 
-We also use the characterization of finite-dimensional zpd algebras by \citet{Bresar2021}.
+We also use the characterization of finite-dimensional zpd algebras by \citet[Theorem 2.27]{Bresar2021}.
 
 \begin{theorem}[{\citep[Theorem 2.27]{Bresar2021}}]\label{thm:bresar-idempotents}
 A finite-dimensional unital algebra is zpd if and only if it is generated by idempotents.
 \end{theorem}
+
+The next example uses this characterization to show that the class of algebras determined by the twisted product is strictly larger. % claim-ok: linking sentence for the example that follows
 
 \begin{example}[Dual numbers]\label{ex:dual}
 Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$.
