@@ -467,3 +467,79 @@ theorem dualNumbers_determined_not_zpd (h2 : (2 : K) ≠ 0) :
   ⟨dualNumbers_mapDetermined K h2, not_zeroProductDetermined_dualNumbers K⟩
 end Dual
 end Research.BraidedSymZpd
+
+/-!
+## Proposition `prop:matrix`: `M₂(𝔽₃)` is determined by `xy + α(yx)`
+
+`α` is conjugation by `diag(1,-1)`. By the criterion `Z_μ = ker μ̄` the algebra is
+determined exactly when the tensors `x ⊗ y` with `μ(x,y) = 0` span a subspace of
+`A ⊗ A` of dimension `16 - rank μ̄`. The program below lists the 417 pairs with
+`μ(x,y) = 0` among the 81 · 81 pairs, finds the dimension of the span of their
+tensors over `𝔽₃` by Gaussian elimination, and finds the rank of `μ̄`.
+-/
+namespace M2F3Check
+
+abbrev Mat2 := Array Nat  -- [a,b,c,d] entries mod p
+
+def p : Nat := 3
+def md (a : Nat) : Nat := a % p
+def neg (a : Nat) : Nat := (p - a % p) % p
+
+def mul (x y : Mat2) : Mat2 :=
+  #[md (x[0]! * y[0]! + x[1]! * y[2]!), md (x[0]! * y[1]! + x[1]! * y[3]!),
+    md (x[2]! * y[0]! + x[3]! * y[2]!), md (x[2]! * y[1]! + x[3]! * y[3]!)]
+
+def alpha (x : Mat2) : Mat2 := #[x[0]!, neg x[1]!, neg x[2]!, x[3]!]
+
+def mu (x y : Mat2) : Mat2 :=
+  let u := mul x y
+  let v := alpha (mul y x)
+  #[md (u[0]! + v[0]!), md (u[1]! + v[1]!), md (u[2]! + v[2]!), md (u[3]! + v[3]!)]
+
+def allM : List Mat2 := Id.run do
+  let mut l := []
+  for a in [0:p] do for b in [0:p] do for c in [0:p] do for d in [0:p] do
+    l := #[a,b,c,d] :: l
+  return l
+
+def inv (a : Nat) : Nat := (List.range p).find? (fun t => (a * t) % p == 1) |>.getD 0
+
+/-- rank over F_p of a list of row vectors, by Gaussian elimination -/
+def rank (rows : List (Array Nat)) (n : Nat) : Nat := Id.run do
+  let mut basis : Array (Array Nat) := #[]   -- reduced rows with pivots
+  let mut pivots : Array Nat := #[]
+  for r0 in rows do
+    let mut r := r0
+    for i in [0:basis.size] do
+      let pv := pivots[i]!
+      let f := r[pv]!
+      if f != 0 then
+        let b := basis[i]!
+        r := (List.range n).toArray.map fun j => md (r[j]! + (p - f) * b[j]!)
+    match (List.range n).find? (fun j => r[j]! != 0) with
+    | none => pure ()
+    | some pv =>
+      let s := inv r[pv]!
+      r := r.map fun t => md (t * s)
+      basis := basis.push r
+      pivots := pivots.push pv
+  return basis.size
+
+def tensor (x y : Mat2) : Array Nat :=
+  (List.range 16).toArray.map fun k => md (x[k / 4]! * y[k % 4]!)
+
+def zeroPairs : List (Array Nat) :=
+  allM.foldl (fun acc x => allM.foldl (fun acc y => if mu x y == #[0,0,0,0] then tensor x y :: acc else acc) acc) []
+
+def basisE : List Mat2 := [#[1,0,0,0], #[0,1,0,0], #[0,0,1,0], #[0,0,0,1]]
+
+/-- columns of mu-bar: row k = mu(e_i, e_j) for k = 4i+j; rank = dim image -/
+def rankMu : Nat :=
+  rank (basisE.foldl (fun acc x => basisE.foldl (fun acc y => acc ++ [mu x y]) acc) []) 4
+
+
+#guard zeroPairs.length == 417
+#guard rank zeroPairs 16 == 12
+#guard rankMu == 4
+
+end M2F3Check
