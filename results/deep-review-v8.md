@@ -273,3 +273,35 @@ Multiplicativity of α is sufficient but not necessary: 48 of the 81 linear α o
 α(a,b) = (b, −a−b) gives dim Z = 0 and dim ker μ̄ = 2, so not determined (note α(1) = (0,−1), so this is
 *not* an example of a unital α failing). And the zpd hypothesis cannot be dropped either: `ex:dual` with
 α_τ(ε) = τε is determined exactly when τ = −1, so α = id fails on an algebra that is not zpd.
+
+### 7.5 A third non-unital counterexample, and why unitality is exactly right
+
+Taken from the last adversarial report and recomputed here (my first attempt disagreed only because I
+mis-encoded `f`):
+
+* A = 𝔽₂{a,b,c} with a·a = a, a·c = c, b·a = b and all other products zero is associative, not unital,
+  and zpd (dim Z = dim ker = 6). With f(a) = a, f(b) = f(c) = b and μ = f(xy): dim Z = 6 < 7 = dim ker μ̄.
+  Definition-level witness: β(x,y) = x_b·y_a vanishes on every μ-zero pair, but β(b,a) = 1 while
+  β(a,c) = 0 although μ(b,a) = μ(a,c) = b, so no linear ψ factors β. (Verified; two independent methods
+  for dim Z agree, and β's vanishing was checked pair by pair.)
+* A second codimension-2 example: A = K[x,y]/(x,y)², f(1) = y, f(x) = 0, f(y) = x has ker f = Kx an
+  ideal of codimension 2, f(1) ≠ 0, and dim Z = 6 < 7 = dim ker. A/ker f is again the dual numbers,
+  which is not zpd — consistent with the structure of §7.1.
+* **Lemma** (the best explanation of why unitality is the right hypothesis): for zpd A, A is determined by
+  f(xy) iff N ∩ A² is spanned by the products lying in N, where N = ker f. A one-sided identity settles
+  this through n = n·1; without one it can fail, and it fails only in dimension ≥ 3.
+
+---
+
+## 8. The adversarial swarm's board (eight members, all accepted)
+
+| Direction | What it contributed |
+|---|---|
+| line 413, abstract, 292/395 | 12/13 confirmed with the naming load-bearing; the general identity dim ker μ̄ = n⁴ − n² + dim ker(id + T) for the transpose twist; **found that my "in characteristic other than 2" at line 292 was a regression**; injectivity at 395 shown to be sharp |
+| criterion, codim, dual numbers, prop:matrix | the inner-automorphism identity of §5b — the pass's most consequential finding; prop:matrix extended to 𝔽₅, 𝔽₇, M₃(𝔽₂), M₃(𝔽₃) |
+| primary structures | Smith normal form of μ̄: 12 = 12 for every odd p, 13/15 for the transpose twist; ex:dual with α_τ(ε) = τε determined iff τ = −1; codimension 1 needed |
+| thm:codim | **rank μ ≤ 1 determines A**, making three of the theorem's four hypotheses superfluous; codimension 1 sharp; ker f an ideal ⟹ determined ⟺ A/ker f zpd (§7.1) |
+| exhaustive small algebras | every unital algebra of dimension ≤ 3 over 𝔽₂ and ≤ 2 over 𝔽₃, 𝔽₅ against every linear f; unitality necessary (𝔽₂³) |
+| Lean | **machine check of the core** (12 theorems, no `sorry`, standard axioms only), plus the right-identity and f(1)-irrelevance refinements (§6) |
+| kernel reduction, closure | determined by f(xy) depends on f only through ker f, so all subspaces suffice; zpd passes to products and quotients but not to subalgebras; ex:dual = prop:matrix on a subalgebra (§7.2) |
+| structural theorems | a third non-unital counterexample; a second codimension-2 example; the lemma of §7.5 |
