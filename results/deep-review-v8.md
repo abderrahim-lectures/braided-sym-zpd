@@ -224,3 +224,52 @@ does not depend on them.
 * The zpd hypothesis of `cor:twisted` is necessary even for a unital α: the dual numbers with
   α = id give μ = 2xy with dim Z = 1 < 2 = dim ker, so A is not determined.
 * Line 326: `§2.2` is the correction of a locator I could not read in the book itself.
+
+---
+
+## 7. Later adversarial findings (all recomputed here)
+
+### 7.1 `thm:codim` is true but far weaker than it needs to be
+
+**Lemma (rank one suffices).** If μ : A × A → A is bilinear with dim(im μ) ≤ 1 then A is determined by
+μ — no associativity, no unit, no ideal hypothesis. Verified exhaustively on A = 𝔽₃²: of the 6561
+bilinear forms, all 320 of rank 1 (and the single one of rank 0) determine A, while 2400 of the 6240 of
+rank 2 do not. Since codim(ker f) = 1 ⟺ rank f = 1, three of `thm:codim`'s four hypotheses are
+superfluous: "N a two-sided ideal", "f(1) ≠ 0" and the unitality of A. (Independently found by two
+members.)
+
+**Codimension one is nevertheless sharp.** A = K[x]/x³, f(a+bx+cx²) = a+bx: ker f = (x²) is an ideal,
+f(1) = 1 ≠ 0, codim 2 — and A is *not* determined, dim Z = 6 < 7 = dim ker μ̄ over 𝔽₃ and 𝔽₅.
+
+**Structure behind it.** If ker f is a two-sided ideal, of any codimension, then A is determined by
+f(xy) iff A/ker f is zpd. The example above is consistent: A/ker f is the dual numbers, which is not
+zpd.
+
+**Proposal (not applied):** §5 would be sharper with rank f = 1 as the hypothesis, with the codimension-2
+example showing sharpness. That restates the author's theorem, so it is theirs to decide.
+
+### 7.2 The paper's two examples are one construction
+
+`ex:dual` is `prop:matrix` restricted to a subalgebra. In M₂(𝔽₃) with α = conjugation by diag(1,−1), the
+subalgebra K·I + K·E₁₂ = {[[a,b],[0,a]]} is closed, contains I, is α-invariant, and is isomorphic to
+K[ε]/ε² with α acting by ε ↦ −ε; on it μ(x,y) = 2ac·I = f(xy). So the same product, on a nested pair of
+algebras, is determining in both cases (12 = 12 on M₂, 3 = 3 on the subalgebra) and zpd only on M₂
+(1 versus 2 on the subalgebra). This also illustrates the closure behaviour: zpd passes to products and
+quotients but not to subalgebras, unitalisations or degree ≥ 2 field extensions (𝔽₄, 𝔽₉ are not zpd
+while M₂(𝔽₄) is).
+
+### 7.3 The numbers of `prop:matrix` are an identity, not a coincidence
+
+The linearisation μ̄ for M₂ with this α has Smith invariants [1,1,1,2] over an odd field, so rank 4 and
+dim ker 12 for **every** odd p (this explains the 𝔽₅ and 𝔽₇ agreement without recomputation); for the
+transpose twist the invariants are [1,2,2,0], giving 13 = 13 over odd fields and 15 = 15 in
+characteristic 2. In characteristic 2 the given α is the identity, the product is 2xy = 0, and everything
+is determined vacuously.
+
+### 7.4 Sharpness of `cor:twisted`
+
+Multiplicativity of α is sufficient but not necessary: 48 of the 81 linear α on 𝔽₃ × 𝔽₃ violate
+α(y)α(x) = α(xy) and still determine. It cannot be dropped altogether — A = 𝔽₃ × 𝔽₃ with
+α(a,b) = (b, −a−b) gives dim Z = 0 and dim ker μ̄ = 2, so not determined (note α(1) = (0,−1), so this is
+*not* an example of a unital α failing). And the zpd hypothesis cannot be dropped either: `ex:dual` with
+α_τ(ε) = τε is determined exactly when τ = −1, so α = id fails on an algebra that is not zpd.
