@@ -146,5 +146,24 @@ does not depend on them.
 * The abstract's sentence on three braidings: true as now written, including for endomorphisms that
   are **not** unital — α(y)α(x) = α(yx) = α(xy) never uses α(1) = 1.
 * Line 292 and line 395: the added one-line arguments are valid (from x = 1 respectively y = 1).
+
+  **But the qualifier "in characteristic other than 2" that v8 inserted at line 292 was
+  unnecessary, and that was my regression.** In characteristic 2 the Jordan product is *not*
+  identically zero — x∘y = xy + yx with the plus sign — and x = 1 gives f = 2·id = 0, so
+  x∘y = 0 for all x, y, which fails as soon as xy ≠ yx. So the Jordan product of a noncommutative
+  algebra is not of the form f(xy) in any characteristic, by a two-case argument. Checked on
+  M₂(𝔽₂): E₁₂∘E₂₁ = E₁₁ + E₂₂ ≠ 0, and f must be 0. The qualifier is now removed and the two-case
+  argument is given in the text.
 * Line 413: 13 is right for the braiding xy + yᵀxᵀ (recomputed), and 12 is right for xy + α(yx).
+  It is also an instance of an identity, not just of a computation: for the transpose twist
+  μ = (id + T)∘m with m surjective, so dim ker μ̄ = n⁴ − n² + dim ker(id + T) — 12 + 1 = 13 for
+  n = 2 over an odd field, 72 + 6 = 78 for n = 3 over 𝔽₂, 72 + 3 = 75 for n = 3 over an odd field,
+  all confirmed.
+* Line 395's use of injectivity is sharp, not incidental: with a multiplicative but non-injective
+  endomorphism the conclusion fails. Example: A = M₂(𝔽₃) × 𝔽₃, α(X,c) = (0,c) is multiplicative,
+  A is non-commutative, and α(yx) = α(xy) = (0, cd) makes μ = (id + α)(xy) — verified over all
+  59 049 pairs, and μ is then a function of xy. So "automorphism", not "endomorphism", is the right
+  hypothesis.
+* The zpd hypothesis of `cor:twisted` is necessary even for a unital α: the dual numbers with
+  α = id give μ = 2xy with dim Z = 1 < 2 = dim ker, so A is not determined.
 * Line 326: `§2.2` is the correction of a locator I could not read in the book itself.
