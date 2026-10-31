@@ -47,7 +47,7 @@ index 58c9351..7951407 100644
  ## References
  
 diff --git a/lean/Research/BraidedSymZpd/BraidedSymZpd.lean b/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
-index afd2d50..47dc7f0 100644
+index afd2d50..fbcd6c1 100644
 --- a/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
 +++ b/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
 @@ -23,8 +23,9 @@ a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
@@ -89,7 +89,22 @@ index afd2d50..47dc7f0 100644
  -/
  
  namespace Research.BraidedSymZpd
-@@ -99,7 +106,7 @@ set_option maxHeartbeats 0 in
+@@ -57,7 +64,13 @@ variable (k : Type u) (B : Type v) [Field k] [Ring B] [Algebra k B]
+ `μ` — every `k`-bilinear map vanishing on pairs with `μ x y = 0` factors
+ through `μ`. `Research.Zpd.Basic.ZeroProductDetermined` is the special case
+ `μ = LinearMap.mul' k B`; this file's whole point is to run its argument
+-again with `μ` the σ-symmetrized product instead. -/
++again with `μ` the σ-symmetrized product instead.
++
++The target `V` ranges over `Type v`, the universe of `B` — the quantifier used by
++`Research.Zpd.ZeroProductDetermined`, with which this definition has to compose. The paper's
++`def:determined` quantifies over every vector space, so this is a technical restriction inherited
++from the shared definition rather than a mathematical one; removing it means widening that
++definition as well. -/
+ def mapDetermined (μ : B →ₗ[k] B →ₗ[k] B) : Prop :=
+   ∀ (V : Type v) [AddCommGroup V] [Module k V] (φ : B →ₗ[k] B →ₗ[k] V),
+     (∀ x y : B, μ x y = 0 → φ x y = 0) →
+@@ -99,7 +112,7 @@ set_option maxHeartbeats 0 in
  `mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
  via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
  a general `μ` this is a hypothesis, discharged case by case — see
@@ -98,7 +113,7 @@ index afd2d50..47dc7f0 100644
  `mapDetermined k B μ` holds iff `mapOfQuot k B μ` is injective. -/
  theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
      (hsurj : Function.Surjective (mapOfQuot k B μ)) :
-@@ -122,6 +129,7 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
+@@ -122,6 +135,7 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
          ψ (TensorProduct.lift μ t') := by
        intro t'
        induction t' with
@@ -106,7 +121,7 @@ index afd2d50..47dc7f0 100644
        | tmul x y =>
          rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
            TensorProduct.mk_apply, Submodule.mkQ_apply]
-@@ -150,8 +158,9 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
+@@ -150,8 +164,9 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
  
  /-! ## Standard braiding: reduction to Brešar's zJpd -/
  
@@ -118,7 +133,7 @@ index afd2d50..47dc7f0 100644
  ring `B` directly, without a cross-package `require`, so the transport lemma
  below connects to the earlier paper's own notation rather than reproving
  something disconnected from it under a different name. -/
-@@ -169,9 +178,9 @@ def jordanProd : B →ₗ[k] B →ₗ[k] B where
+@@ -169,9 +184,9 @@ def jordanProd : B →ₗ[k] B →ₗ[k] B where
  @[simp] theorem jordanProd_apply (x y : B) : jordanProd k B x y = x * y + y * x := rfl
  
  /-- The two definitions agree pointwise: `jordanProd`'s underlying function
@@ -130,7 +145,7 @@ index afd2d50..47dc7f0 100644
  re-derived here against this file's independent `symProdStd`. -/
  theorem jordanProd_eq_symProdStd (x y : B) : jordanProd k B x y = symProdStd B x y := rfl
  
-@@ -231,6 +240,7 @@ theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
+@@ -231,6 +246,7 @@ theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
          ψ (TensorProduct.lift μ s) := by
        intro s
        induction s with
@@ -138,6 +153,27 @@ index afd2d50..47dc7f0 100644
        | tmul x y =>
          rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
            TensorProduct.mk_apply, Submodule.mkQ_apply]
+@@ -354,13 +370,15 @@ theorem mapDetermined_identityBraiding_iff_zpd (h2 : (2 : k) ≠ 0)
+   · intro hB
+     exact mapDetermined_identityBraiding_of_zpd k B hB μ hμ
+ 
+-/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`. -/
++/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`.
++This is the paper's `cor:twisted`, which assumes only that `α` is multiplicative (no unitality),
++so `α` is taken here as a linear map with `α (x * y) = α x * α y` rather than as an `AlgHom`. -/
+ theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
+-    (hB : Research.Zpd.ZeroProductDetermined k B) (α : B →ₐ[k] B)
++    (hB : Research.Zpd.ZeroProductDetermined k B)
++    (α : B →ₗ[k] B) (hα : ∀ x y : B, α (x * y) = α x * α y)
+     (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + α y * α x) : mapDetermined k B μ :=
+-  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α.toLinearMap) μ (fun x y => by
+-    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, AlgHom.toLinearMap_apply, ← map_mul,
+-      hcomm y x])
++  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α) μ (fun x y => by
++    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, ← hα y x, hcomm y x])
+ 
+ /-- **Corollary 3.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
+ then the twisted product is `(id + α)(xy)` on any algebra, commutative or not, so
 diff --git a/paper/braided-sym-zpd.tex b/paper/braided-sym-zpd.tex
 index 17cae99..1016ba3 100644
 --- a/paper/braided-sym-zpd.tex

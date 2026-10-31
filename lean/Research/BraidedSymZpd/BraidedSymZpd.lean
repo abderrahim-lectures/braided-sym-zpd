@@ -64,7 +64,13 @@ variable (k : Type u) (B : Type v) [Field k] [Ring B] [Algebra k B]
 `μ` — every `k`-bilinear map vanishing on pairs with `μ x y = 0` factors
 through `μ`. `Research.Zpd.Basic.ZeroProductDetermined` is the special case
 `μ = LinearMap.mul' k B`; this file's whole point is to run its argument
-again with `μ` the σ-symmetrized product instead. -/
+again with `μ` the σ-symmetrized product instead.
+
+The target `V` ranges over `Type v`, the universe of `B` — the quantifier used by
+`Research.Zpd.ZeroProductDetermined`, with which this definition has to compose. The paper's
+`def:determined` quantifies over every vector space, so this is a technical restriction inherited
+from the shared definition rather than a mathematical one; removing it means widening that
+definition as well. -/
 def mapDetermined (μ : B →ₗ[k] B →ₗ[k] B) : Prop :=
   ∀ (V : Type v) [AddCommGroup V] [Module k V] (φ : B →ₗ[k] B →ₗ[k] V),
     (∀ x y : B, μ x y = 0 → φ x y = 0) →
@@ -364,13 +370,15 @@ theorem mapDetermined_identityBraiding_iff_zpd (h2 : (2 : k) ≠ 0)
   · intro hB
     exact mapDetermined_identityBraiding_of_zpd k B hB μ hμ
 
-/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`. -/
+/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`.
+This is the paper's `cor:twisted`, which assumes only that `α` is multiplicative (no unitality),
+so `α` is taken here as a linear map with `α (x * y) = α x * α y` rather than as an `AlgHom`. -/
 theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
-    (hB : Research.Zpd.ZeroProductDetermined k B) (α : B →ₐ[k] B)
+    (hB : Research.Zpd.ZeroProductDetermined k B)
+    (α : B →ₗ[k] B) (hα : ∀ x y : B, α (x * y) = α x * α y)
     (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + α y * α x) : mapDetermined k B μ :=
-  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α.toLinearMap) μ (fun x y => by
-    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, AlgHom.toLinearMap_apply, ← map_mul,
-      hcomm y x])
+  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α) μ (fun x y => by
+    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, ← hα y x, hcomm y x])
 
 /-- **Corollary 3.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
 then the twisted product is `(id + α)(xy)` on any algebra, commutative or not, so

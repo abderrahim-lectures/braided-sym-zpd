@@ -65,6 +65,17 @@ Baseline for the defect numbers: `results/deep-review-v7.md` (audit of commit `9
 - **The released PDF.** `pdf/braided-sym-zpd-v7.pdf` still says "Preprint version 2" and still contains
   the old abstract. It is the v7 artifact, so I did not overwrite it; a v8 build is needed.
 
+## Second pass on the Lean file (after the paper was corrected)
+
+* `cor:twisted` was formalised as `mapDetermined_twisted_of_comm_zpd` for `α : B →ₐ[k] B`, i.e. a
+  **unital** endomorphism, whereas the paper assumes only that `α` is multiplicative and never requires
+  `α(1) = 1`. The statement now takes `α : B →ₗ[k] B` with `hα : ∀ x y, α (x*y) = α x * α y`, matching
+  the source; the proof is unchanged apart from `← hα y x` in place of `AlgHom.map_mul`.
+* The docstring of that theorem says which hypothesis is used and why, and the docstring of
+  `mapDetermined` records the quantifier restriction below.
+* Validated by elaboration on Lean 4.33.1 with `Research.Zpd.Basic` stubbed and the `Dual` section
+  excluded: the file elaborates. The `Dual` section remains unchecked (see above).
+
 ## One further observation, recorded rather than changed
 
 `mapDetermined` in the Lean file quantifies its target `V : Type v`, i.e. at the universe of `B`, whereas
