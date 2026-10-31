@@ -6,6 +6,12 @@
 % in the definition of the symmetrized product; Theorem thm:zpd-fxy states "unital", without which it is
 % false; the 13 = 13 remark names its product; one-line proofs are added for the two "not of the form
 % f(xy)" assertions. No claim changes except the abstract and Theorem thm:zpd-fxy, which were too strong.
+% Commits after the first v8 one on this branch: the framework and the criterion are credited to
+% Brice and Huang (Theorem 2.3 of their 2015 paper), which is a claim-level attribution change; the
+% Jordan-product sentence is strengthened to every characteristic; a stress and novelty pass is
+% recorded in results/deep-review-v8.md; and lean/ZpdCore machine-checks the paper's core without
+% the unpublished modules. The "No claim changes" sentence two lines above described only the first
+% v8 commit, and is kept for that reason.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -239,7 +245,7 @@ The algebra $A$ is determined by $\mu$ if and only if $\Zs_\mu = \ker \bar\mu$.
 
 \noindent
 The criterion is stated for an arbitrary bilinear $\mu$, over a commutative ring, by Brice and Huang
-\citep[Theorem 2.3]{BriceHuang2015}; for $\mu$ the product it is Proposition~\ref{prop:bresar-zpd}.
+\citep[Theorem 2.3]{BriceHuang2015}; for $\mu$ the product it is Proposition 1.3 of Bre\v{s}ar, recalled as Proposition~\ref{prop:bresar-zpd}.
 
 \begin{proof}
 Apply the equivalence of (i) and (iii) in Proposition~\ref{prop:bresar-zpd} to the nonassociative algebra $(A,\mu)$.
@@ -302,7 +308,7 @@ When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \o
 So Corollary~\ref{cor:criterion} recovers the usual form of the zJpd criterion.
 It is not of the form $f(xy)$ on a noncommutative algebra (indeed $x = 1$ forces $f = 2\,\mathrm{id}$: if $\operatorname{char} K \neq 2$ then $xy + yx = 2xy$ gives $yx = xy$, while if $\operatorname{char} K = 2$ then $f = 0$, so $xy + yx = 0$ for all $x, y$, which fails as soon as $xy \neq yx$), and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
 
-The twisted braiding has the form $f(xy)$ when $A$ is commutative. % claim-ok: shown by the next lines
+The twisted braiding has the form $f(xy)$ when $A$ is commutative and $\alpha$ is an endomorphism. % claim-ok: shown by the next lines (commutativity alone is not enough: a merely linear alpha need not give a function of xy)
 Let $\alpha$ be an algebra endomorphism of $A$.
 Then $\alpha(y)\alpha(x) = \alpha(yx) = \alpha(xy)$, so $xy + \alpha(y)\alpha(x) = (\mathrm{id} + \alpha)(xy)$.
 
@@ -338,7 +344,7 @@ The following algebras are zpd:
 \end{corollary}
 
 By Corollary~\ref{cor:bresar-matrix}(a) with $B = K$, the matrix algebra $M_n(K)$ is zpd for $n \geq 2$.
-The transpose reverses products \citep[0.2.5]{HornJohnson2013}.
+The transpose reverses products \citep[\S 0.2.5]{HornJohnson2013}.
 So Corollary~\ref{cor:anti} applies to $M_n(K)$ and to the transpose, and to every linear map $\alpha$ of $M_n(K)$ that reverses products.
 
 Part (b) of the same corollary gives a second family, the triangular algebras.

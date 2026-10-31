@@ -63,7 +63,7 @@ variable (k : Type u) (B : Type v) [Field k] [Ring B] [Algebra k B]
 /-- `mapDetermined k B μ` : `B` is determined, over `k`, by the bilinear map
 `μ` — every `k`-bilinear map vanishing on pairs with `μ x y = 0` factors
 through `μ`. `Research.Zpd.Basic.ZeroProductDetermined` is the special case
-`μ = LinearMap.mul' k B`; this file's whole point is to run its argument
+`μ = LinearMap.mul k B`; this file's whole point is to run its argument
 again with `μ` the σ-symmetrized product instead.
 
 The target `V` ranges over `Type v`, the universe of `B` — the quantifier used by
@@ -108,7 +108,7 @@ theorem mapOfQuot_mk (μ : B →ₗ[k] B →ₗ[k] B) (x y : B) :
   rw [mapOfQuot, Submodule.liftQ_apply, TensorProduct.lift.tmul]
 
 /-- **The working criterion, for an arbitrary bilinear `μ`.** Given that
-`mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
+`mapOfQuot k B μ` is surjective (automatic for the product on a unital ring
 via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
 a general `μ` this is a hypothesis, discharged case by case — see
 `mapOfQuot_jordanProd_surjective` below for the standard-braiding case),
@@ -225,7 +225,7 @@ namespace Research.BraidedSymZpd
 open scoped TensorProduct
 variable (k : Type*) (B : Type*) [Field k] [Ring B] [Algebra k B]
 
-/-- Theorem A: no surjectivity hypothesis. -/
+/-- **Corollary 3.4** (the criterion): no surjectivity hypothesis. -/
 theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
     mapDetermined k B μ ↔ Function.Injective (mapOfQuot k B μ) := by
   constructor
@@ -269,7 +269,7 @@ theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
       ← LinearMap.comp_apply g, hg, LinearMap.id_apply,
       Submodule.liftQ_apply, TensorProduct.lift.tmul]
 
-/-- Theorem B. -/
+/-- **Theorem 4.1** (`thm:zpd-fxy`): a unital zpd algebra is determined by `f (x * y)`. -/
 theorem mapDetermined_comp_mul_of_zpd (hB : Research.Zpd.ZeroProductDetermined k B)
     (f : B →ₗ[k] B) (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = f (x * y)) :
     mapDetermined k B μ := by
@@ -296,7 +296,7 @@ theorem mapDetermined_comp_mul_of_zpd (hB : Research.Zpd.ZeroProductDetermined k
     Submodule.mkQ_apply, Submodule.liftQ_apply] at this
   exact this.symm
 
-/-- Theorem D: an injective `f` changes nothing. -/
+/-- **Proposition 4.2** (`prop:injective`): an injective `f` changes nothing. -/
 theorem zpd_of_mapDetermined_comp_mul (f : B →ₗ[k] B) (hf : Function.Injective f)
     (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = f (x * y)) (h : mapDetermined k B μ) :
     Research.Zpd.ZeroProductDetermined k B := by
@@ -308,7 +308,7 @@ theorem zpd_of_mapDetermined_comp_mul (f : B →ₗ[k] B) (hf : Function.Injecti
   refine ⟨ψ ∘ₗ f, fun x y => ?_⟩
   rw [hψ x y, hμ, LinearMap.comp_apply]
 
-/-- Theorem E. -/
+/-- **Theorem 5.1** (`thm:codim`). -/
 theorem mapDetermined_comp_mul_of_codim_one (f : B →ₗ[k] B) (h1 : f 1 ≠ 0)
     (hL : ∀ n b : B, f n = 0 → f (b * n) = 0) (hR : ∀ n b : B, f n = 0 → f (n * b) = 0)
     (c : B →ₗ[k] k) (hc : ∀ x : B, f (x - c x • 1) = 0)
@@ -370,8 +370,9 @@ theorem mapDetermined_identityBraiding_iff_zpd (h2 : (2 : k) ≠ 0)
     exact mapDetermined_identityBraiding_of_zpd k B hB μ hμ
 
 /-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`.
-This is the paper's `cor:twisted`, which assumes only that `α` is multiplicative (no unitality),
-so `α` is taken here as a linear map with `α (x * y) = α x * α y` rather than as an `AlgHom`. -/
+This is the paper's `cor:twisted` (Corollary 4.4), slightly stronger than as printed there:
+the paper assumes an algebra endomorphism, and only multiplicativity is used, so `α` is taken
+here as a linear map with `α (x * y) = α x * α y` rather than as an `AlgHom`. -/
 theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
     (hB : Research.Zpd.ZeroProductDetermined k B)
     (α : B →ₗ[k] B) (hα : ∀ x y : B, α (x * y) = α x * α y)
@@ -379,7 +380,7 @@ theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
   mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α) μ (fun x y => by
     rw [hμ, LinearMap.add_apply, LinearMap.id_apply, ← hα y x, hcomm y x])
 
-/-- **Corollary 3.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
+/-- **Corollary 4.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
 then the twisted product is `(id + α)(xy)` on any algebra, commutative or not, so
 every zpd algebra is determined by it. The transpose on `M₂(F₃)` is such an `α`. -/
 theorem mapDetermined_twisted_anti_of_zpd

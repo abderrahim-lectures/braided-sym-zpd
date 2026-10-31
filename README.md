@@ -5,7 +5,7 @@ Current version: **v8**.
 
 ## The idea of the paper
 
-An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence when the braided-symmetric derivations of that product can be studied through zero products. The answer is a criterion in terms of the kernel of the induced map $A\otimes A\to A$, and it needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear. The same holds on any algebra when the twist reverses products. Every unital zero product determined algebra is determined by every such $\mu$. The converse holds when f is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined. A computation over F_3 shows that the algebra of $2\times 2$ matrices is determined by a twisted product that has no form f(xy).
+An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence when the braided-symmetric derivations of that product can be studied through zero products. The answer is a criterion in terms of the kernel of the induced map $A\otimes A\to A$, and it needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear. The same holds on any algebra when the twist reverses products. Every unital zero product determined algebra is determined by every such $\mu$. The converse holds when $f$ is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined. A computation over $\mathbb{F}_3$ shows that the algebra of $2\times 2$ matrices is determined by a twisted product that has no form $f(xy)$.
 
 ### Contents
 
@@ -27,7 +27,7 @@ Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. The Lean fi
 
 ## Change log
 
-One entry per released version, newest first. Only the commits for v3 to v7 are in this repository's history, and no tags have been created.
+One entry per released version, newest first. Only the commits for v3 to v8 are in this repository's history, and no tags have been created.
 
 - **v8** (2026-10-31): corrections from an external review, all listed in the header comment of `paper/braided-sym-zpd.tex`: the version stamp, the undefined linearisation of the Jordan product, the hypothesis of the abstract's sentence on the twisted braiding, the `Tri` locator (§2.2), the credit for matrix algebras, `mu` for the product in the definition of the symmetrized product, and one-line proofs for two assertions. Two statements were too strong and are corrected: `thm:zpd-fxy` now assumes $A$ unital (it is false without it), and the abstract's sentence on the twisted braiding now assumes $\alpha$ an endomorphism.
 - **v7** (2026-10-17): the notion is tied to braided-sym-deriv (A is determined by mu exactly when the nonassociative algebra (A, mu) is zpd; braided-symmetric derivations are the derivations of (A, \cdot_sigma), Adrabi2026 Definition 3.1 and Remark 3.4), the criterion is now Corollary cor:criterion of Bresar Proposition 1.3 applied to (A, mu) instead of a reproof, Remark rem:derivations treats derivations through zero products; two claims are added, Corollary `cor:triangular` and Proposition `prop:matrix` (the $\mathbb{F}_3$ computation);
@@ -43,8 +43,9 @@ One entry per released version, newest first. Only the commits for v3 to v7 are 
 Citations of the works the paper uses. The works themselves are not part of this repository.
 
 1. A. Adrabi, Braided-symmetric derivations of algebras, preprint, Mohammed V University in Rabat, 2026.
-2. Brešar, M.: Zero Product Determined Algebras. Frontiers in Mathematics. Birkhäuser, Cham (2021).
-3. Horn, R.A., Johnson, C.R.: Matrix Analysis, 2nd edn. Cambridge University Press, Cambridge (2013).
+2. Brice, D., Huang, H.: On zero product determined algebras. Linear and Multilinear Algebra **63**, 326–342 (2015).
+3. Brešar, M.: Zero Product Determined Algebras. Frontiers in Mathematics. Birkhäuser, Cham (2021).
+4. Horn, R.A., Johnson, C.R.: Matrix Analysis, 2nd edn. Cambridge University Press, Cambridge (2013).
 
 ## About this repository
 

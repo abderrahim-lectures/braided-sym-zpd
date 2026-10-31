@@ -130,12 +130,13 @@ an arbitrary field and an arbitrary bilinear μ:
 | `thm:zpd-fxy` | `determined_comp_of_right_id` | propext, choice, Quot.sound |
 | `prop:injective` | `determined_of_injective_comp` | propext, Quot.sound |
 | `cor:identity` (ii), char-2 remark | `identity_iff`, `determined_zero` | propext, choice, Quot.sound |
-| `cor:twisted`, `cor:anti` | `twisted_determined`, `anti_braiding` | propext, choice, Quot.sound |
+| `cor:twisted` | `twisted_determined` | propext, choice, Quot.sound |
+| `cor:anti` | `anti_braiding` + `anti_twisted_determined` (added by the blind-spot review: as first committed, `anti_braiding` sat inside `section Commutative` and no determination statement was proved — see `results/blind-spot-review-v8.md` §1.5) | propext, choice, Quot.sound |
 | `thm:codim` | `codim_determined`, `codim_determined_of_f_one_zero` | propext, choice, Quot.sound |
 | lines 292 and 395 | `jordan_forces_comm`, `twisted_forces_comm` | propext, Quot.sound |
 | the abstract's sentence | `braidings_commutative` | propext, Quot.sound |
 
-No `sorry`, no added axiom: the twelve `#print axioms` commands report only Lean's three standard
+No `sorry`, no added axiom: the `#print axioms` commands report only Lean's three standard
 axioms. Two refinements fall out of the formalisation:
 
 * `thm:zpd-fxy` needs only a **right** identity (`∀ b, m b e = b`) and no associativity. The

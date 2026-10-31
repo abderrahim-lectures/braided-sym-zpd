@@ -1,5 +1,11 @@
 # Fix pass on the paper — what changed, and what could not be fixed
 
+> Historical note (added later): this file describes the working tree at the time it was written,
+> before anything was committed. The changes it lists were subsequently committed as `4a4bc64`
+> and `8493e8b` on the branch `review/v8-corrections`, together with `pdf/braided-sym-zpd-v8.pdf`
+> (`\paperversion` 8, not 7) and the further commits `93b3871`–`e4d4deb` (Brice–Huang citations,
+> stress/novelty pass, `lean/ZpdCore`).
+
 Working-tree changes only: **nothing is committed**, and the released artifact `pdf/braided-sym-zpd-v7.pdf`
 is untouched. The fixes are unreleased; the author should cut a v8 if they are kept.
 

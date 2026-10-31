@@ -9,7 +9,8 @@ bilinear `μ`, with no unitality, associativity or finiteness assumptions where 
 | `thm:zpd-fxy` | `determined_comp_of_right_id` (the unit used only as a right identity) |
 | `prop:injective` | `determined_of_injective_comp` |
 | `cor:identity` (ii), char-2 remark | `identity_iff`, `determined_zero` |
-| `cor:twisted`, `cor:anti` | `twisted_determined` (α only multiplicative), `anti_braiding` |
+| `cor:twisted` | `twisted_determined` (α only multiplicative) |
+| `cor:anti` | `anti_braiding` + `anti_twisted_determined` (no commutativity; the identity first, then the determination statement) |
 | `thm:codim` | `codim_determined`, `codim_determined_of_f_one_zero` |
 | lines 292 and 395 | `jordan_forces_comm`, `twisted_forces_comm` |
 | the abstract's three-braidings sentence | `braidings_commutative` (α not assumed unital) |
@@ -20,7 +21,7 @@ Check it with
 lean lean/ZpdCore/Zpd.lean      # with Mathlib on LEAN_PATH
 ```
 
-The file ends with twelve `#print axioms` commands; each reports only `propext`, `Classical.choice`
+The file ends with thirteen `#print axioms` commands; each reports only `propext`, `Classical.choice`
 and `Quot.sound`. There is no `sorry` and no added axiom.
 
 This is **not** part of `lake build`: it is a standalone check, and it is deliberately independent of

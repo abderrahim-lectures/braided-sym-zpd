@@ -15,8 +15,8 @@ What is checked, over an arbitrary field `K` and an arbitrary bilinear `μ` on a
 * `determined_comp_of_right_id` — `thm:zpd-fxy`, with the unit used only through a right identity;
 * `determined_of_injective_comp` — `prop:injective`;
 * `identity_iff` — `cor:identity` (ii), and `determined_zero` for the characteristic-2 remark;
-* `twisted_determined` and `anti_braiding` — `cor:twisted` (with `α` only multiplicative) and
-  `cor:anti`;
+* `twisted_determined` — `cor:twisted` (with `α` only multiplicative);
+* `anti_braiding` and `anti_twisted_determined` — `cor:anti`, with no commutativity;
 * `codim_determined`, `codim_determined_of_f_one_zero` — `thm:codim`;
 * `jordan_forces_comm`, `twisted_forces_comm` — the two "not of the form `f(xy)`" assertions;
 * `braidings_commutative` — the abstract's sentence on the three braidings.
@@ -25,7 +25,7 @@ Not checked here: the numerical claims of `prop:matrix` and of the remark after 
 rank 4, dimensions 12 and 13). Those are checked in the review report and by the `#guard`s of
 `Research/BraidedSymZpd/BraidedSymZpd.lean`.
 
-The twelve `#print axioms` commands at the end of the file report only `propext`,
+The thirteen `#print axioms` commands at the end of the file report only `propext`,
 `Classical.choice` and `Quot.sound` — there is no `sorry` and no added axiom.
 -/
 
@@ -387,13 +387,6 @@ section Commutative
 
 variable {A : Type u} [CommRing A] [Algebra K A]
 
-/-- The key step of `cor:anti` and of the abstract's "the same holds on any algebra when the twist
-reverses products": if `α` reverses products then the twisted product is `(id + α)(xy)`.  No
-commutativity, no unitality of `α`. -/
-theorem anti_braiding (α : A →ₗ[K] A) (hα : ∀ x y : A, α (x * y) = α y * α x) (x y : A) :
-    x * y + α y * α x = ((LinearMap.id : A →ₗ[K] A) + α) (x * y) := by
-  rw [LinearMap.add_apply, LinearMap.id_apply, ← hα]
-
 /-- `cor:twisted` machine-checked, with `α` only assumed multiplicative (not unital): if `A` is a
 commutative algebra determined by its product, it is determined by `x * y + α y * α x`. -/
 theorem twisted_determined (hzpd : Determined (LinearMap.mul K A)) (α : A →ₗ[K] A)
@@ -408,6 +401,33 @@ theorem twisted_determined (hzpd : Determined (LinearMap.mul K A)) (α : A →�
     (fun b => by simp)
 
 end Commutative
+
+section Anti
+
+variable {A : Type u} [Ring A] [Algebra K A]
+
+/-- The key step of `cor:anti` and of the abstract's "the same holds on any algebra when the twist
+reverses products": if `α` reverses products then the twisted product is `(id + α)(xy)`.  No
+commutativity (this is the section variable slip that the blind-spot review found: the identity
+holds over any ring), no unitality of `α`. -/
+theorem anti_braiding (α : A →ₗ[K] A) (hα : ∀ x y : A, α (x * y) = α y * α x) (x y : A) :
+    x * y + α y * α x = ((LinearMap.id : A →ₗ[K] A) + α) (x * y) := by
+  rw [LinearMap.add_apply, LinearMap.id_apply, ← hα]
+
+/-- `cor:anti` machine-checked, with **no** commutativity: if a (possibly noncommutative) algebra
+is determined by its product and `α` is linear with `α (xy) = α(y)α(x)`, then it is determined by
+the twisted product `x * y + α y * α x`. -/
+theorem anti_twisted_determined (hzpd : Determined (LinearMap.mul K A)) (α : A →ₗ[K] A)
+    (hα : ∀ x y : A, α (x * y) = α y * α x) :
+    Determined (twistMu α) := by
+  have heq : twistMu α = compMu (LinearMap.mul K A) (LinearMap.id + α) := by
+    ext x y
+    exact anti_braiding α hα x y
+  rw [heq]
+  exact determined_comp_of_right_id (LinearMap.mul K A) hzpd (LinearMap.id + α) 1
+    (fun b => mul_one b)
+
+end Anti
 
 end ZpdPaper
 
@@ -424,4 +444,5 @@ end ZpdPaper
 #print axioms ZpdPaper.codim_determined
 #print axioms ZpdPaper.codim_determined_of_f_one_zero
 #print axioms ZpdPaper.anti_braiding
+#print axioms ZpdPaper.anti_twisted_determined
 #print axioms ZpdPaper.twisted_determined
