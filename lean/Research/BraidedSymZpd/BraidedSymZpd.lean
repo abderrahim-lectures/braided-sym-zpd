@@ -107,7 +107,6 @@ theorem mapOfQuot_mk (μ : B →ₗ[k] B →ₗ[k] B) (x y : B) :
     mapOfQuot k B μ (Submodule.Quotient.mk (x ⊗ₜ[k] y)) = μ x y := by
   rw [mapOfQuot, Submodule.liftQ_apply, TensorProduct.lift.tmul]
 
-set_option maxHeartbeats 0 in
 /-- **The working criterion, for an arbitrary bilinear `μ`.** Given that
 `mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
 via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
