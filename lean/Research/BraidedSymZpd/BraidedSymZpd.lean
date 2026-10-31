@@ -23,8 +23,9 @@ a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
 * `mapDetermined k B μ` : the `Research.Zpd.Basic.ZeroProductDetermined`
   property, generalized from the fixed product `*` to an arbitrary bilinear
   map `μ`.
-* `symProdLinear σ` : the σ-symmetrized product, repackaged as a genuine
-  `k`-bilinear map `B →ₗ[k] B →ₗ[k] B`, given `σ` itself `k`-bilinear.
+* `symProdStd B` and `jordanProd k B` : the standard braiding's symmetrized
+  product `x * y + y * x`, first as a plain function and then as a genuine
+  `k`-bilinear map `B →ₗ[k] B →ₗ[k] B`.
 
 ## Main results
 
@@ -32,17 +33,23 @@ a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
   `Research.Zpd.zeroProductDetermined_iff_injective`, for an arbitrary
   bilinear `μ`, given a surjectivity hypothesis in place of the original's
   built-in `mul_one` unital trick.
-* `mapDetermined_symProd_std_iff_zJpd` : for the standard braiding, "zero
+* `mapDetermined_iff_injective'` : the same criterion with the surjectivity
+  hypothesis removed.
+* `jordanProd_eq_symProdStd` : for the standard braiding, "zero
   braided-symmetric-product determined" literally *is* zero-Jordan-product-
   determined (Brešar–Alaminos–Extremera–Villena's zJpd, arXiv:1902.04846) —
   not an analogy, a substitution, since `x ·_σ y = xy + yx` on the nose.
+  Turning that into an *iff* with a zJpd predicate would need the predicate
+  itself, which lives in `Research.Zpd`.
 
 ## Twisted braiding
 
 For a commutative algebra the twisted product is `f(xy)` with `f = 1 + α`,
 so `mapDetermined_comp_mul_of_zpd` and `mapDetermined_comp_mul_of_codim_one`
-below cover it. The noncommutative case (for example `M₂(F₃)` with the
-transpose) is open and is logged in `formalization-debt.md`.
+below cover it. The noncommutative case is settled for `M₂(F₃)` by the
+computation in `M2F3Check` at the end of this file, and a product-reversing
+`α` (the transpose on `M₂`, for instance) is covered by
+`mapDetermined_twisted_anti_of_zpd`.
 -/
 
 namespace Research.BraidedSymZpd
@@ -99,7 +106,7 @@ set_option maxHeartbeats 0 in
 `mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
 via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
 a general `μ` this is a hypothesis, discharged case by case — see
-`mapDetermined_symProd_std_iff_zJpd` below for the standard-braiding case),
+`mapOfQuot_jordanProd_surjective` below for the standard-braiding case),
 `mapDetermined k B μ` holds iff `mapOfQuot k B μ` is injective. -/
 theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
     (hsurj : Function.Surjective (mapOfQuot k B μ)) :
@@ -122,6 +129,7 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
         ψ (TensorProduct.lift μ t') := by
       intro t'
       induction t' with
+      | zero => simp
       | tmul x y =>
         rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
           TensorProduct.mk_apply, Submodule.mkQ_apply]
@@ -150,8 +158,9 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
 
 /-! ## Standard braiding: reduction to Brešar's zJpd -/
 
-/-- `BraidedSymmetric.lean`'s `standardBraiding` (`σ x y := y`) and
-`symmetrizedProduct` (`x ·_σ y := x*y + σ(x,y)*σ(y,x)`), restated here on the
+/-- The earlier paper's `standardBraiding` (`σ x y := y`) and
+`symmetrizedProduct` (`x ·_σ y := x*y + σ(x,y)*σ(y,x)`), restated here (that
+development is not part of this repository) on the
 ring `B` directly, without a cross-package `require`, so the transport lemma
 below connects to the earlier paper's own notation rather than reproving
 something disconnected from it under a different name. -/
@@ -169,9 +178,9 @@ def jordanProd : B →ₗ[k] B →ₗ[k] B where
 @[simp] theorem jordanProd_apply (x y : B) : jordanProd k B x y = x * y + y * x := rfl
 
 /-- The two definitions agree pointwise: `jordanProd`'s underlying function
-is exactly `symProdStd`, i.e. exactly `BraidedSymmetric.lean`'s
+is exactly `symProdStd`, i.e. exactly the earlier paper's
 `symmetrizedProduct standardBraiding`. Not `rfl` by accident — it is the
-literal content of `symmetrizedProduct_std` in the earlier paper's own file,
+literal content of `symmetrizedProduct_std` in that development,
 re-derived here against this file's independent `symProdStd`. -/
 theorem jordanProd_eq_symProdStd (x y : B) : jordanProd k B x y = symProdStd B x y := rfl
 
@@ -231,6 +240,7 @@ theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
         ψ (TensorProduct.lift μ s) := by
       intro s
       induction s with
+      | zero => simp
       | tmul x y =>
         rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
           TensorProduct.mk_apply, Submodule.mkQ_apply]
