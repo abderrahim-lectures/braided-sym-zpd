@@ -66,7 +66,46 @@ The direct quotation (m2, confirmed by the judge through the search index of the
 copy) settles it. This is recorded as this review's own corrected error, and as the method
 lesson of the pass: **structural inference must yield to direct quotation.**
 
+### 1.1b `cor:anti` is FALSE as stated — the second false theorem found in this paper (fixed)
+
+`cor:anti` (Corollary 4.5) read: *"Let $A$ be zpd, and let $\alpha\colon A\to A$ be linear with
+$\alpha(xy) = \alpha(y)\alpha(x)$ for all $x,y$. Then $A$ is determined by
+$\mu_\alpha(x,y) = xy + \alpha(y)\alpha(x)$."* No unitality — and its proof applies
+`thm:zpd-fxy`, which v8 had just repaired by adding "unital". The corollary that needs the
+hypothesis most never got it (m8, direction d2; **verified by the judge with an independent
+implementation over F₂, F₃, F₅, F₇**, and by m8 exactly over ℚ):
+
+> Take the first review's counterexample algebra ($e_0^2 = e_0$, $e_0e_1 = e_0e_2 = e_2$,
+> $e_1e_0 = e_1 - e_2$, all other products 0): associative, noncommutative, **non-unital, zpd**
+> ($\dim Z = \dim\ker\bar m = 6$). Define $\alpha(e_0) = e_0$, $\alpha(e_1) = e_1$,
+> $\alpha(e_2) = e_1 - e_2$ (characteristic ≠ 2; in characteristic 2 take $\alpha(e_0) = e_0+e_2$,
+> $\alpha(e_2) = e_1+e_2$). Then $\alpha$ is a bijective anti-homomorphism, but $A$ is **not**
+> determined by $\mu_\alpha$: $\dim Z_{\mu_\alpha} = 6 < 7 = \dim\ker\bar\mu_\alpha$. The witness
+> $\varphi(x,y) = x_0(y_1+y_2)$ vanishes on every $\mu_\alpha$-zero pair (all 32/189/1625/6517
+> of them over F₂/F₃/F₅/F₇) yet $\mu_\alpha(e_1,e_0) = \mu_\alpha(e_0,e_2)$ with
+> $\varphi = 0$ vs $1$.
+
+**Fixed in this pass**: `cor:anti` now reads "Let $A$ be a **unital** zpd algebra". Related GAP,
+recorded because it is the mirror image: `cor:twisted` and `cor:identity` also do not restate
+unitality, but there **no counterexample is known** — m8 searched every linear $f$ on 434
+commutative non-unital zpd algebras and 1571 sampled dimension-4 algebras over F₂ without
+finding one — so those corollaries are empirically safe as literally stated, resting on the
+Introduction's global standing hypothesis. Whether `cor:twisted` really survives without a unit
+is an open question.
+
+**m8's other findings**: the §4 topic sentence "includes two of the three braidings" failed for a
+merely linear α (fourth occurrence of the overstatement family; fixed with a parenthetical naming
+the two braidings and their hypotheses); a **sharp form of `thm:zpd-fxy`**: for zpd $A$,
+$A$ is determined by $f(xy)$ for *every* linear $f$ if and only if
+$\operatorname{span}\{xy : xy \in \ker f\} = A^2 \cap \ker f$ (proved; a right identity suffices —
+consistent with `lean/ZpdCore/determined_comp_of_right_id`); and machine confirmation of the
+char-2 paths (8451 pairs for `thm:zpd-fxy`), `thm:codim` (868 cases, no associativity used,
+$f(1)\ne 0$ redundant — the third independent confirmation), `rem:derivations`' "if and only if"
+(27 maps, 24 non-derivations, 0 violations), the numbers, and a characteristic-2 analogue of
+`prop:matrix`.
+
 ### 1.2 The body still overstates the twisted braiding (the abstract's old defect, unfixed in one place)
+
 
 Section 4, line 305:
 
@@ -346,6 +385,9 @@ and drop the dependence — both statements are self-contained (the second is tr
 
 ---
 
-*Swarm `smvwyrz4y`, eight members, directions d1–d8; reports under `.ultramath/smvwyrz4y/m*/report.md`.
-Every accepted finding above was re-verified by the judge (elaboration, re-execution, or
-independent recomputation) before it entered this document.*
+*Swarm `smvwyrz4y`, eight members, directions d1–d8, all resolved: reports under
+`.ultramath/smvwyrz4y/m*/report.md`. Seven reports were accepted on first submission; one was
+rejected (it contained the false "μ̄ onto" lemma of §1.4(d)) and accepted after correction; one
+accepted finding (the Example 1.10 "miscitation" of §1.1) was overturned by a later member and
+corrected. Every accepted finding above was re-verified by the judge (elaboration, re-execution,
+independent recomputation, or hand proof) before it entered this document.*

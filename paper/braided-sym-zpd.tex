@@ -12,6 +12,11 @@
 % recorded in results/deep-review-v8.md; and lean/ZpdCore machine-checks the paper's core without
 % the unpublished modules. The "No claim changes" sentence two lines above described only the first
 % v8 commit, and is kept for that reason.
+% Blind-spot pass (third review): the topic sentence of section 4 names the two braidings it covers;
+% cor:anti states "unital" — without it the corollary is false (the counterexample algebra of the
+% first review, with an anti-multiplicative bijection alpha, is zpd but not determined by
+% xy + alpha(y)alpha(x): dim Z = 6 < 7 = dim ker, verified over F_2, F_3, F_5, F_7); the
+% Introduction's twisted-braiding sentence carries the endomorphism hypothesis.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -254,7 +259,7 @@ Condition (iii) says that $\sum_i z_i \otimes w_i \in \Zs_\mu$ whenever $\sum_i 
 
 \section{Products of the form \texorpdfstring{$f(xy)$}{f(xy)}}\label{sec:fxy}
 
-This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings.
+This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings: the identity braiding, and the twisted braiding when $\alpha$ is an endomorphism or reverses products (Corollaries~\ref{cor:twisted} and~\ref{cor:anti}).
 
 \begin{theorem}\label{thm:zpd-fxy}
 Let $A$ be a unital zpd algebra, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
@@ -324,7 +329,7 @@ Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
 The same holds on a noncommutative algebra when $\alpha$ reverses products. % claim-ok: shown by the next lines
 
 \begin{corollary}\label{cor:anti}
-Let $A$ be zpd, and let $\alpha \colon A \to A$ be linear with $\alpha(xy) = \alpha(y)\alpha(x)$ for all $x, y$.
+Let $A$ be a unital zpd algebra, and let $\alpha \colon A \to A$ be linear with $\alpha(xy) = \alpha(y)\alpha(x)$ for all $x, y$.
 Then $A$ is determined by $\mu_\alpha(x,y) = xy + \alpha(y)\alpha(x)$.
 \end{corollary}
 
