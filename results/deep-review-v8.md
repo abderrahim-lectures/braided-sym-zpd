@@ -112,9 +112,39 @@ brute-force enumeration and the Lean guards.
 | Prop. `prop:matrix` | `M2F3Check` | **numbers only**: three `#guard`s check 417, rank 12, rank μ̄ 4; nothing links them to `mapDetermined`, so the proposition is not formalised as a proposition |
 | Rem. `rem:preserving`, `rem:derivations` | — | not formalised; the first is a re-reading of the definition, the second uses `Definition def:adrabi-bsder` |
 
-Proof status: no `sorry`, no extra axiom, no `native_decide`. `#print axioms` was not run because the
-file cannot be built from the repository (missing modules); the checks above are elaborations of the
-file with `Research.Zpd.Basic` stubbed.
+Proof status: no `sorry`, no extra axiom, no `native_decide`. `#print axioms` on the author's file was not
+run because it cannot be built from the repository (missing modules); the checks above are elaborations
+of it with `Research.Zpd.Basic` stubbed. The paper's core, however, is now machine-checked in a file
+that needs no unpublished module — see §6.
+
+---
+
+## 6. The paper's core, machine-checked
+
+`lean/ZpdCore/Zpd.lean` (added in this branch, Mathlib only, **not** part of `lake build`) checks, over
+an arbitrary field and an arbitrary bilinear μ:
+
+| Paper | Declaration | Axioms |
+|---|---|---|
+| `cor:criterion` | `determined_iff` | propext, choice, Quot.sound |
+| `thm:zpd-fxy` | `determined_comp_of_right_id` | propext, choice, Quot.sound |
+| `prop:injective` | `determined_of_injective_comp` | propext, Quot.sound |
+| `cor:identity` (ii), char-2 remark | `identity_iff`, `determined_zero` | propext, choice, Quot.sound |
+| `cor:twisted`, `cor:anti` | `twisted_determined`, `anti_braiding` | propext, choice, Quot.sound |
+| `thm:codim` | `codim_determined`, `codim_determined_of_f_one_zero` | propext, choice, Quot.sound |
+| lines 292 and 395 | `jordan_forces_comm`, `twisted_forces_comm` | propext, Quot.sound |
+| the abstract's sentence | `braidings_commutative` | propext, Quot.sound |
+
+No `sorry`, no added axiom: the twelve `#print axioms` commands report only Lean's three standard
+axioms. Two refinements fall out of the formalisation:
+
+* `thm:zpd-fxy` needs only a **right** identity (`∀ b, m b e = b`) and no associativity. The
+  counterexample algebra of D8 has no right identity, so this is a genuine refinement, not a conflict.
+* In `thm:codim`, `f(1) ≠ 0` is not needed: if `f(1) = 0` then `f(x) = f(x − c(x)1) + c(x)f(1) = 0`,
+  so μ ≡ 0, which determines every algebra (and the ideal hypothesis is not even used there).
+
+What is *not* machine-checked: the numerical claims of `prop:matrix` and of the remark after it. Those
+rest on the computations in §2 and on the `#guard`s of the author's file.
 
 ---
 
