@@ -31,6 +31,10 @@ offset in the Brešar file).
 | 16 | Introduction (l. 149) | the twisted swap is attributed to Adrabi §4, whose `α` is involutive; the paper's `α` is only linear. | "Adrabi 2026 takes `α` involutive, and we do not" |
 | 17 | §1 and §2 (l. 173, 180) | "recalls the definitions and results of Brešar" and "two definitions" — §2 also recalls Adrabi's Definition 3.1 and Brešar's 7.1/7.2. | both sentences now name Brešar and Adrabi and count the items |
 | 18 | `def:bresar-zpd` paragraph (l. 187) | "as `\citet[Definition 1.1]{Bresar2021}` does" — the abbreviation is announced in the paragraph after Definition 1.1. | `[§1.1]` |
+| 19 | Introduction (l. 158) | "Our first result is a criterion, which is Proposition 1.3 of Brešar …" — the criterion is Brešar's (i)⇔(iii) applied to `(A,μ)`, not a new result, and the Brice–Huang theorem was named without a citation key. | "We first record the criterion that the later proofs use: … `\citep{BriceHuang2015}`" |
+| 20 | §4, Jordan-product paragraph (l. 326–328) | "`∘̄` is onto … So `cor:criterion` recovers the usual form of the zJpd criterion" — the criterion needs no surjectivity, so the "so" does not follow. | "… so that `A² = A`; with this, `cor:criterion` for `μ = ∘` is the usual form of the zJpd criterion" |
+| 21 | §4, end (l. 385–387) | "It is injective only for `α = id`, so `prop:injective` gives no converse" — for `α = id` the map is `2·id`, injective, and the converse *is* available (`cor:identity`(ii)). | "… injective only for `α = id`, where the converse is `cor:identity`(ii), so for `α ≠ id` `prop:injective` gives no converse" |
+| 22 | `ex:dual` (l. 421–422) | the citation of Brešar's Example 2.23 invites the reader to think it proves the dual numbers are not zpd; what it proves is that they are *symmetrically* zpd (and not zpd, by Proposition 1.19), and its product is not the twisted one. | parenthetical naming both facts and saying the product here is not that one |
 
 None of these changes a theorem's hypotheses or conclusion except items 5 and 6, which correct a
 sentence of the open question, not a numbered result.
