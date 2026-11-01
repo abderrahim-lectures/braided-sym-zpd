@@ -49,8 +49,8 @@ quantifies over `V : Type u` with `K` and `A` in `Type u`. A proposition in Lean
 quantify over a fixed universe, so this is a technical restriction of the formalisation, not a
 mathematical one: the paper's `def:determined` quantifies over every vector space.
 
-No `sorry`, no added axioms; the `#print axioms` block at the end of the file reports only
-`propext`, `Classical.choice` and `Quot.sound`.
+No `sorry`, no added axioms; the `#print axioms` block of `Research.BraidedSymZpd` reports only
+`propext`, `Classical.choice` and `Quot.sound` for every theorem below.
 -/
 
 @[expose] public section

@@ -96,6 +96,14 @@ numerical theorems of `M2F3` depend on no axiom at all (`decide` is a kernel che
 the default limits the kernel cannot finish the `decide`, and the whole file still elaborates in
 about 25 s.
 
+The layout follows the TauCeti project (`github.com/TauCetiProject/TauCeti`, cloned and read for
+this pass): `module` with `public import`, a single `@[expose] public section`, the copyright
+header and the `# Title / ## Main declarations` docstring convention, `globs` in the lakefile with
+`rev = "master"` for Mathlib and the exact pin left to `lake-manifest.json`, every line within 100
+columns, no `sorry`, no `native_decide`, and an explicit axiom audit. TauCeti has no
+zero-product-determined or bilinear-determination material, so nothing of its mathematics could
+be reused — only the conventions.
+
 What is **not** formalised, and why:
 
 * the passage from the three numbers of `prop:matrix` to `Determined μ_α` — the dimension
