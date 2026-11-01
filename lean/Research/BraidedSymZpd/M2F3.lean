@@ -10,13 +10,13 @@ module
 
 The paper proves `prop:matrix` — `M₂(𝔽₃)` is determined by the twisted product
 `μ_α (x, y) = x * y + α (y * x)` for `α` the conjugation by `diag (1, -1)` — by checking the
-criterion `cor:criterion` numerically: `μ̄_α` has rank `4`, so `ker μ̄_α` has dimension `12`, and
-the `417` pairs `(x, y)` with `μ_α (x, y) = 0` span a subspace of dimension `12`.
+criterion `cor:criterion` numerically: `μ̄_α` has rank `4`, so `ker μ̄_α` has dimension
+`12`, and the `417` pairs `(x, y)` with `μ_α (x, y) = 0` span a subspace of dimension `12`.
 
-This file recomputes those three numbers. The matrices of `M₂(𝔽₃)` are encoded as four entries in
-`{0, 1, 2}`; `rank` is Gaussian elimination over `𝔽₃` on lists of vectors. The three theorems at
-the end are proved by `decide`, so the computations are checked by Lean's kernel: they hold
-without `native_decide` and without any axiom.
+This file recomputes those three numbers. The matrices of `M₂(𝔽₃)` are encoded as four
+entries in `{0, 1, 2}`; `rank` is Gaussian elimination over `𝔽₃` on lists of vectors. The three
+theorems at the end are proved by `decide`, so the computations are checked by Lean's kernel:
+they hold without `native_decide` and without any axiom.
 
 ## Main results
 
@@ -112,7 +112,7 @@ def cancel (v row : List Nat) (pivot : Nat) : List Nat :=
 def reduceRows (rows : List (List Nat × Nat)) (v : List Nat) : List Nat :=
   rows.foldl (fun v rp => cancel v rp.1 rp.2) v
 
-/-- Gaussian elimination over `𝔽₃`: the rows of a reduced row-echelon basis, with their pivots. -/
+/-- Gaussian elimination over `𝔽₃`: the rows of a reduced basis, together with their pivots. -/
 def echelon : List (List Nat) → List (List Nat × Nat) → List (List Nat × Nat)
   | [], basis => basis
   | v :: vs, basis =>

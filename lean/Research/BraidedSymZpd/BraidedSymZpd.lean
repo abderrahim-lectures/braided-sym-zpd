@@ -272,7 +272,8 @@ theorem innerPhi_tmul (D : Rˣ) (x y : R) :
   TensorProduct.congr_tmul _ _ x y
 
 theorem innerPhi_symm_tmul (D : Rˣ) (u v : R) :
-    (innerPhi (K := K) D).symm.toLinearMap (u ⊗ₜ[K] v) = (u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v) := by
+    (innerPhi (K := K) D).symm.toLinearMap (u ⊗ₜ[K] v) =
+      (u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v) := by
   apply (innerPhi (K := K) D).injective
   simp only [LinearEquiv.coe_toLinearMap, LinearEquiv.apply_symm_apply, innerPhi_tmul]
   simp [mul_assoc]

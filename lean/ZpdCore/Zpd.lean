@@ -117,8 +117,10 @@ theorem determined_of_ker_le (μ : A →ₗ[K] A →ₗ[K] A)
   let ψ₂ : (muBar μ).range →ₗ[K] V := ψ₁.comp e.symm.toLinearMap
   refine ⟨LinearMap.ofIsCompl hq ψ₂ 0, ?_⟩
   intro x y
-  have h3 : ψ₁ (Submodule.Quotient.mk (x ⊗ₜ[K] y) : A ⊗[K] A ⧸ LinearMap.ker (muBar μ)) =
-      (TensorProduct.lift φ) (x ⊗ₜ[K] y) := rfl
+  have h3 : ψ₁ (Submodule.Quotient.mk (x ⊗ₜ[K] y) :
+        A ⊗[K] A ⧸ LinearMap.ker (muBar μ)) =
+      (TensorProduct.lift φ) (x ⊗ₜ[K] y) :=
+    rfl
   have key : ∀ (hz : muBar μ (x ⊗ₜ[K] y) ∈ (muBar μ).range),
       ψ₂ ⟨muBar μ (x ⊗ₜ[K] y), hz⟩ = φ x y := by
     intro hz
@@ -131,7 +133,8 @@ theorem determined_of_ker_le (μ : A →ₗ[K] A →ₗ[K] A)
   have h4 : LinearMap.ofIsCompl hq ψ₂ 0 (μ x y) =
       ψ₂ ⟨muBar μ (x ⊗ₜ[K] y), LinearMap.mem_range_self _ _⟩ := by
     rw [← muBar_tmul μ x y]
-    exact LinearMap.ofIsCompl_apply_left hq ⟨muBar μ (x ⊗ₜ[K] y), LinearMap.mem_range_self _ _⟩
+    exact LinearMap.ofIsCompl_apply_left hq
+      ⟨muBar μ (x ⊗ₜ[K] y), LinearMap.mem_range_self _ _⟩
   exact (h4.trans (key _)).symm
 
 /-- The other half of `cor:criterion`: an element of `ker μ̄` outside `Z_μ` is separated from
@@ -141,8 +144,8 @@ theorem ker_le_Zmu_of_determined (μ : A →ₗ[K] A →ₗ[K] A) (h : Determine
   intro w hw
   rw [← Subspace.forall_mem_dualAnnihilator_apply_eq_zero_iff (Zmu μ) w]
   intro ℓ hℓ
-  obtain ⟨φ, hφ⟩ : ∃ φ : A →ₗ[K] A →ₗ[K] K, ∀ x y : A, φ x y = ℓ (x ⊗ₜ[K] y) :=
-    ⟨(TensorProduct.mk K A A).compr₂ ℓ, fun x y => by simp⟩
+  let φ : A →ₗ[K] A →ₗ[K] K := (TensorProduct.mk K A A).compr₂ ℓ
+  have hφ : ∀ x y : A, φ x y = ℓ (x ⊗ₜ[K] y) := fun _ _ => by simp [φ]
   have hφ0 : ∀ x y : A, μ x y = 0 → φ x y = 0 := by
     intro x y hxy
     rw [hφ x y, (Submodule.mem_dualAnnihilator ℓ).1 hℓ (x ⊗ₜ[K] y) (tmul_mem_Zmu hxy)]
@@ -165,7 +168,8 @@ theorem determined_iff (μ : A →ₗ[K] A →ₗ[K] A) :
 /-! ## Products of the form `f (m x y)`, and the converse for injective `f` -/
 
 /-- The bilinear map `(x, y) ↦ f (m x y)`, that is, `μ = f ∘ m`. -/
-noncomputable def compMu (m : A →ₗ[K] A →ₗ[K] A) (f : A →ₗ[K] A) : A →ₗ[K] A →ₗ[K] A :=
+noncomputable def compMu (m : A →ₗ[K] A →ₗ[K] A) (f : A →ₗ[K] A) :
+    A →ₗ[K] A →ₗ[K] A :=
   m.compr₂ f
 
 @[simp]
@@ -400,7 +404,8 @@ theorem twistMu_apply (α : A →ₗ[K] A) (x y : A) : twistMu α x y = x * y + 
 
 /-- If `α` reverses products, the twisted product is `(id + α) (x * y)`. No commutativity and no
 unitality of `α` is needed. -/
-theorem twistMu_eq_compMu_of_anti (α : A →ₗ[K] A) (hα : ∀ x y : A, α (x * y) = α y * α x) :
+theorem twistMu_eq_compMu_of_anti (α : A →ₗ[K] A)
+    (hα : ∀ x y : A, α (x * y) = α y * α x) :
     twistMu α = compMu (LinearMap.mul K A) (LinearMap.id + α) := by
   ext x y
   rw [twistMu_apply, compMu_apply, LinearMap.add_apply, LinearMap.id_apply, ← hα]
@@ -415,8 +420,9 @@ theorem anti_twisted_determined (h : ZeroProductDetermined K A) (α : A →ₗ[K
 
 /-- **`cor:twisted`**: if `A` is a commutative zpd algebra and `α` is multiplicative, then `A`
 is determined by the twisted product `x * y + α y * α x`. -/
-theorem twisted_determined (hcomm : ∀ x y : A, x * y = y * x) (h : ZeroProductDetermined K A)
-    (α : A →ₗ[K] A) (hα : ∀ x y : A, α (x * y) = α x * α y) : Determined (twistMu α) := by
+theorem twisted_determined (hcomm : ∀ x y : A, x * y = y * x)
+    (h : ZeroProductDetermined K A) (α : A →ₗ[K] A)
+    (hα : ∀ x y : A, α (x * y) = α x * α y) : Determined (twistMu α) := by
   have hanti : ∀ x y : A, α (x * y) = α y * α x := by
     intro x y
     rw [hα, hcomm (α y) (α x)]
