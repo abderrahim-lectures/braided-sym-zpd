@@ -1,0 +1,7 @@
+M_2(F_3[eps]): idempotents by full enumeration
+n=2, p=3 (enumeration): 110 idempotents, dim span = 7 of 8, eps*E11 in span = False, eps*1 in span = False, dim generated = 8
+M_2(F_5[eps]): idempotents by their Peirce description
+n=2, p=5 (Peirce): 752 idempotents, dim span = 7 of 8, eps*E11 in span = False, eps*1 in span = False, dim generated = 8
+M_3(F_3[eps]): idempotents by their Peirce description
+n=3, p=3 (Peirce): 18956 idempotents, dim span = 17 of 18, eps*E11 in span = False, eps*1 in span = True, dim generated = 18
+EXIT 0
