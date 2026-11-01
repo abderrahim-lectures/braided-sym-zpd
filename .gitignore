@@ -5,3 +5,6 @@ paper/build/
 
 # the reference PDFs are not part of the repository
 braided-sym-zpd-v7-references.zip
+
+# Python caches in the verification scripts
+__pycache__/
