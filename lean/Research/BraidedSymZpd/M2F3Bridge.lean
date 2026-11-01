@@ -76,7 +76,26 @@ theorem diagPM_mul_self : diagPM * diagPM = 1 := by
 theorem alpha_eq (x : A) : alpha x = diagPM * x * diagPM := by
   ext i j
   fin_cases i <;> fin_cases j <;>
-    simp [alpha, diagPM, Matrix.mul_apply, Matrix.vecMul, dotProduct, Fin.sum_univ_two] <;> ring
+    simp [alpha, diagPM, Matrix.mul_apply, Matrix.vecMul, dotProduct, Fin.sum_univ_two]
+
+/-- `alpha` is multiplicative: conjugation by `diag (1, -1)`. -/
+theorem alpha_mul (x y : A) : alpha (x * y) = alpha x * alpha y := by
+  have key : diagPM * x * y * diagPM = (diagPM * x * diagPM) * (diagPM * y * diagPM) := by
+    rw [show (diagPM * x * diagPM) * (diagPM * y * diagPM) =
+      diagPM * x * (diagPM * diagPM) * y * diagPM from by noncomm_ring]
+    rw [diagPM_mul_self]
+    noncomm_ring
+  calc alpha (x * y) = diagPM * (x * y) * diagPM := alpha_eq _
+    _ = diagPM * x * y * diagPM := by noncomm_ring
+    _ = (diagPM * x * diagPM) * (diagPM * y * diagPM) := key
+    _ = alpha x * alpha y := by simp only [alpha_eq]
+
+/-- `alpha` is an involution. -/
+theorem alpha_involutive : Function.Involutive alpha := by
+  intro x
+  calc alpha (alpha x) = diagPM * (diagPM * x * diagPM) * diagPM := by rw [alpha_eq, alpha_eq]
+    _ = (diagPM * diagPM) * x * (diagPM * diagPM) := by noncomm_ring
+    _ = x := by rw [diagPM_mul_self]; simp
 
 def ent (i j : Fin 2) : A →ₗ[K] K where
   toFun x := x i j
@@ -169,6 +188,13 @@ theorem linearIndependent_tensors :
 noncomputable def mu : A →ₗ[K] A →ₗ[K] A := ZpdCore.twistMu alphaLM
 
 @[simp] theorem mu_apply (x y : A) : mu x y = x * y + alphaLM y * alphaLM x := rfl
+
+/-- The paper's form of the twisted product, `μ_α (x, y) = x * y + α (y * x)`: it agrees with
+`twistMu` because `α` is multiplicative. -/
+theorem mu_apply_paper (x y : A) : mu x y = x * y + alpha (y * x) := by
+  rw [mu_apply]
+  show x * y + alpha y * alpha x = x * y + alpha (y * x)
+  rw [alpha_mul]
 
 theorem mu_zero (j : Fin 12) : mu (xT j) (yT j) = 0 := by
   fin_cases j <;> simp [mu_apply, alphaLM] <;> decide
@@ -271,6 +297,9 @@ end BraidedSymZpd
 
 /-! ## Axiom audit -/
 
+#print axioms BraidedSymZpd.M2F3Bridge.alpha_mul
+#print axioms BraidedSymZpd.M2F3Bridge.alpha_involutive
+#print axioms BraidedSymZpd.M2F3Bridge.mu_apply_paper
 #print axioms BraidedSymZpd.M2F3Bridge.linearIndependent_tensors
 #print axioms BraidedSymZpd.M2F3Bridge.w_indep
 #print axioms BraidedSymZpd.M2F3Bridge.finrank_range
