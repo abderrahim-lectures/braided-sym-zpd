@@ -1,0 +1,7 @@
+# local working directories
+.scratch/
+paper/build/
+.skill/
+
+# the reference PDFs are not part of the repository
+braided-sym-zpd-v7-references.zip

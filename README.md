@@ -21,15 +21,23 @@ An algebra is zero product determined when every bilinear map that vanishes on t
 |---|---|
 | `paper/braided-sym-zpd.tex` | LaTeX source (class files in `cls/`) |
 | `pdf/` | the PDFs of the released versions |
-| `lean/Research/BraidedSymZpd/` | Lean 4 file that checks the $\mathbb{F}_3$ computation of `prop:matrix`; it also imports `Research.Zpd.Basic` and `Research.Zpd.DualNumbers` from the author's research repository, which are not published here, so it does not build from this repository alone |
+| `lean/ZpdCore/Zpd.lean` | Lean 4: the general theory of `def:determined`, the criterion `cor:criterion`, `thm:zpd-fxy`, `prop:injective`, `cor:identity`, `thm:codim`, `cor:twisted` and `cor:anti` |
+| `lean/Research/BraidedSymZpd/` | Lean 4: `ex:dual`, `rem:inner`, and `M2F3.lean`, the kernel-checked computation of `prop:matrix` |
 
-Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. The Lean file's `M2F3Check` block is self-contained and can be checked alone (`sed -n '/^namespace M2F3Check/,/^end M2F3Check/p' … > M2F3Check.lean && lean M2F3Check.lean`); a full `cd lean && lake build` needs the two missing modules and a mathlib revision pinned to the toolchain.
+Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`.
+
+The Lean development is self-contained: it imports Mathlib only, with no unpublished module, no
+`sorry` and no added axiom (the `#print axioms` blocks at the end of the two files report only
+`propext`, `Classical.choice` and `Quot.sound`). `cd lean && ./check.sh` elaborates the three
+modules against a built Mathlib on `LEAN_PATH`, in dependency order; that is how the code is
+verified here (Lean v4.33.1). A `lake build` needs a `lake-manifest.json`, which this repository
+does not ship: run `lake update` first, which downloads and builds Mathlib.
 
 ## Change log
 
 One entry per released version, newest first. Only the commits for v3 to v8 are in this repository's history, and no tags have been created.
 
-- **v8** (2026-10-31): corrections from an external review, all listed in the header comment of `paper/braided-sym-zpd.tex`: the version stamp, the undefined linearisation of the Jordan product, the hypothesis of the abstract's sentence on the twisted braiding, the `Tri` locator (§2.2), the credit for matrix algebras, `mu` for the product in the definition of the symmetrized product, and one-line proofs for two assertions. Two statements were too strong and are corrected: `thm:zpd-fxy` now assumes $A$ unital (it is false without it), and the abstract's sentence on the twisted braiding now assumes $\alpha$ an endomorphism.
+- **v8** (2026-10-31): corrections from an external review, all listed in the header comment of `paper/braided-sym-zpd.tex`: the version stamp, the undefined linearisation of the Jordan product, the hypothesis of the abstract's sentence on the twisted braiding, the `Tri` locator (§2.2), the credit for matrix algebras, `mu` for the product in the definition of the symmetrized product, and one-line proofs for two assertions. Two statements were too strong and are corrected: `thm:zpd-fxy` now assumes $A$ unital (it is false without it), and the abstract's sentence on the twisted braiding now assumes $\alpha$ an endomorphism. Corrections of the fourth review on this branch: the locator of `Tri` is §2.1 (where Brešar defines it), the idempotents generating $M_n(B)$ in `rem:inner` are $e_{ii}$ and $e_{ii} + be_{ij}$ rather than their difference, $\Phi$ there is a linear automorphism of $A \otimes A$, and the Lean development was rebuilt so that it compiles from this repository alone.
 - **v7** (2026-10-17): the notion is tied to braided-sym-deriv (A is determined by mu exactly when the nonassociative algebra (A, mu) is zpd; braided-symmetric derivations are the derivations of (A, \cdot_sigma), Adrabi2026 Definition 3.1 and Remark 3.4), the criterion is now Corollary cor:criterion of Bresar Proposition 1.3 applied to (A, mu) instead of a reproof, Remark rem:derivations treats derivations through zero products; two claims are added, Corollary `cor:triangular` and Proposition `prop:matrix` (the $\mathbb{F}_3$ computation);
 - **v6** (2026-10-17): the layout follows braided-sym-deriv (a Preliminaries section recalls the definitions and the equivalent forms of Bresar; the Introduction points to every section), the citation of Bresar Theorem 2.27 carries its locator and the dual numbers example has a linking sentence. No claim changes; sections 2 to 4 are now 3 to 5.
 - **v5** (2026-10-16): every result recalled from a reference is stated as the source gives it: the source's own kind (proposition, lemma, theorem, corollary, definition), its whole statement, one environment per result, nothing merged or specialized. No claim changes.
