@@ -88,6 +88,8 @@ After:
 | `lean/ZpdCore/Zpd.lean` | `muBar`, `Zmu`, `Determined`, `determined_iff` (`cor:criterion`), `determined_comp_of_right_id` (`thm:zpd-fxy`, right identity only), `determined_of_injective_comp` (`prop:injective`), `identity_determined_iff` (`cor:identity`), `codim_determined` (`thm:codim`), `twisted_determined` (`cor:twisted`), `anti_twisted_determined` (`cor:anti`), `jordan_forces_comm`, `twisted_forces_comm`, `three_braidings_commutative` |
 | `lean/Research/BraidedSymZpd/BraidedSymZpd.lean` | `preserving` (`rem:preserving`), `derivation` and `derivation_iff` (`rem:derivations`, both halves), the dual numbers: `dualAlpha`, `dualNumbers_determined_not_zpd` (`ex:dual`), `dualNumbers_not_zpd`, and `rem:inner` in full: the identity `twistMu_conjByUnit`, the tensor automorphism `innerPhi`, and the equivalence `determined_twist_conj_iff` |
 | `lean/Research/BraidedSymZpd/M2F3.lean` | the three numbers of `prop:matrix`, proved by `decide` |
+| `lean/Research/BraidedSymZpd/M2F3Bridge.lean` | the finrank bridge: `finrank Z_μ = 12 = finrank (ker μ̄)`, hence `Z_μ = ker μ̄` and `Determined μ_α` (`prop:matrix`) |
+| `lean/ZpdCore/Triangular.lean` | Brešar's Theorem 2.15, the triangular algebra and his Corollary 2.5, and `cor:triangular` |
 | `lean/check.sh` | builds the three modules in order against a Mathlib on `LEAN_PATH` |
 
 Both theory files import Mathlib only, contain no `sorry` and no added axiom: the `#print axioms`
@@ -107,36 +109,18 @@ be reused — only the conventions.
 
 What is **not** formalised, and why:
 
-* the passage from the three numbers of `prop:matrix` to `Determined μ_α` — the dimension
-  bookkeeping through `cor:criterion` — is not carried out in Lean. The numbers are kernel-checked,
-  and the criterion is proved, but the bridge between them (a `finrank` computation for
-  `Z_{μ_α}` and `ker μ̄_α` inside `M₂(𝔽₃) ⊗ M₂(𝔽₃)`) is not written. `prop:matrix` therefore
-  remains checked by computation, as in the paper.
-* `rem:inner` is formalised as the identity `twistMu (conj D) x y = (xD⁻¹)(Dy) + (Dy)(xD⁻¹)` and the
-  equivalence `determined_twist_conj_iff` (determined by `μ_α` iff determined by the Jordan product,
-  for every unit `D`), with the transport of `Z_μ` and of `ker μ̄` along `Φ`.
-* `cor:triangular` is not formalised: it needs Brešar's Corollary 2.17(b), i.e. the zpd-ness of
-  `Tri(A₁,M,A₂)`, which is not part of this development.
-
-Two implementation notes, recorded so that they are not "fixed" later: `Determined` quantifies over
-`V : Type u` with `K` and `A` in the same universe — a proposition in Lean cannot quantify over
-every universe, so this is a technical restriction, documented in the file; and `twisted_determined`
-assumes only that `α` is multiplicative, not that it is a unital algebra homomorphism, which is
-strictly more general than `cor:twisted`.
-
-## 4. Open points for the author
-
-1. `thm:codim` is true but weak: its three hypotheses force `μ(x,y) = c(x)c(y) f(1)` (the theorem's
-   own proof shows it), so `μ` is a scalar bilinear form times the fixed vector `f(1)`. The criterion
-   of `cor:criterion` applies to every `μ` and decides the question exactly; restating the theorem is
-   the author's decision (a form of it was explored in `results/deep-review-v8.md`).
-2. `rem:inner` is mathematics added by a review pass, not by the author; it is correct as it now
-   stands (and `q:noncomm` depends on it), but the author must either accept it or drop it.
-3. The abstract's clause "and hence when the braided-symmetric derivations of that product can be
-   studied through zero products" promises more than `rem:derivations` delivers. On the dual numbers
-   with `α(a+bε) = a−bε`, the map `D(a+bε) = a` satisfies the hypothesis of `rem:derivations` (its
-   defect vanishes on the `μ_α`-zero pairs) but is not a braided-symmetric derivation:
-   `D(x ·_α y) = 2` against `D(x) ·_α y + x ·_α D(y) = 4` at `x = y = 1`, in characteristic
-   other than `2`. Determination by `μ_α` therefore does not by itself let one recognise
-   derivations; `rem:derivations` only says that the defect factors through the product. A repair
-   was proposed in the earlier review and not applied; the author's decision.
+* the numbers of `prop:matrix` are now connected to the statement. `M2F3Bridge.lean` exhibits
+  twelve zero-pair tensors and proves them independent by a `decide`-checked pivot matrix, giving
+  `finrank Z_μ = 12`, and four independent elements of the range, giving `finrank (range μ̄) = 4`;
+  rank-nullity then gives `finrank (ker μ̄) = 16 - 4 = 12`, so `Z_μ = ker μ̄` by
+  `Submodule.eq_of_le_of_finrank_eq`, and `prop:matrix`, `Determined μ_α`, follows from
+  `cor:criterion`. What is not formalised is only the *enumeration* of the 417 pairs: the bridge
+  needs twelve zero-pair tensors, not all of them, and the numbers `417`, `rank 4`, `span 12` of
+  `M2F3.lean` remain a separate kernel-checked computation.
+* `cor:triangular` is formalised in `ZpdCore/Triangular.lean`: Brešar's Theorem 2.15 (a unital
+  algebra over a field generated by its idempotents is zpd) with his Lemma 2.2 proof, the
+  triangular algebra `Tri A₁ M A₂` with its ring and `K`-algebra structure, his Corollary 2.5
+  (it is generated by idempotents when `A₁` and `A₂` are), and both halves of the corollary —
+  `Determined (compMu (mul) f)` for every linear `f`, and the twisted product for every linear `α`
+  with `α (x * y) = α y * α x`. A small example (`Tri (ZMod 2) (ZMod 2) (ZMod 2)`) checks that
+  the hypotheses are not vacuous.

@@ -22,7 +22,8 @@ An algebra is zero product determined when every bilinear map that vanishes on t
 | `paper/braided-sym-zpd.tex` | LaTeX source (class files in `cls/`) |
 | `pdf/` | the PDFs of the released versions |
 | `lean/ZpdCore/Zpd.lean` | Lean 4: the general theory of `def:determined`, the criterion `cor:criterion`, `thm:zpd-fxy`, `prop:injective`, `cor:identity`, `thm:codim`, `cor:twisted` and `cor:anti` |
-| `lean/Research/BraidedSymZpd/` | Lean 4: `ex:dual`, `rem:inner` with its equivalence with the Jordan product, and `M2F3.lean`, the kernel-checked computation of `prop:matrix` |
+| `lean/ZpdCore/Triangular.lean` | Lean 4: Brešar's Theorem 2.15 (idempotent-generated unital algebras are zpd), the triangular algebra `Tri A₁ M A₂` with its ring and algebra structure, his Corollary 2.5, and `cor:triangular` |
+| `lean/Research/BraidedSymZpd/` | Lean 4: `ex:dual`, `rem:inner` with its equivalence with the Jordan product, `M2F3.lean` (the kernel-checked computation of `prop:matrix`) and `M2F3Bridge.lean` (the finrank bridge from those numbers to `prop:matrix`) |
 
 Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`.
 
