@@ -65,6 +65,19 @@ def alphaLM : A →ₗ[K] A where
     ext i j
     by_cases h : i = j <;> simp [alpha, h]
 
+/-- The matrix `diag (1, -1)`. -/
+def diagPM : A := !![1, 0; 0, -1]
+
+theorem diagPM_mul_self : diagPM * diagPM = 1 := by
+  ext i j
+  fin_cases i <;> fin_cases j <;> decide
+
+/-- `alpha` is the conjugation by `diag (1, -1)`, as in `ex:dual` and `prop:matrix`. -/
+theorem alpha_eq (x : A) : alpha x = diagPM * x * diagPM := by
+  ext i j
+  fin_cases i <;> fin_cases j <;>
+    simp [alpha, diagPM, Matrix.mul_apply, Matrix.vecMul, dotProduct, Fin.sum_univ_two] <;> ring
+
 def ent (i j : Fin 2) : A →ₗ[K] K where
   toFun x := x i j
   map_add' _ _ := rfl
