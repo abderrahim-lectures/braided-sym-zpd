@@ -82,7 +82,7 @@ After:
 | File | Content |
 |---|---|
 | `lean/ZpdCore/Zpd.lean` | `muBar`, `Zmu`, `Determined`, `determined_iff` (`cor:criterion`), `determined_comp_of_right_id` (`thm:zpd-fxy`, right identity only), `determined_of_injective_comp` (`prop:injective`), `identity_determined_iff` (`cor:identity`), `codim_determined` (`thm:codim`), `twisted_determined` (`cor:twisted`), `anti_twisted_determined` (`cor:anti`), `jordan_forces_comm`, `twisted_forces_comm`, `three_braidings_commutative` |
-| `lean/Research/BraidedSymZpd/BraidedSymZpd.lean` | `preserving` (`rem:preserving`), `derivation` (`rem:derivations`), the dual numbers: `dualAlpha`, `dualNumbers_determined_not_zpd` (`ex:dual`), `dualNumbers_not_zpd`, and `rem:inner` in full: the identity `twistMu_conjByUnit`, the tensor automorphism `innerPhi`, and the equivalence `determined_twist_conj_iff` |
+| `lean/Research/BraidedSymZpd/BraidedSymZpd.lean` | `preserving` (`rem:preserving`), `derivation` and `derivation_iff` (`rem:derivations`, both halves), the dual numbers: `dualAlpha`, `dualNumbers_determined_not_zpd` (`ex:dual`), `dualNumbers_not_zpd`, and `rem:inner` in full: the identity `twistMu_conjByUnit`, the tensor automorphism `innerPhi`, and the equivalence `determined_twist_conj_iff` |
 | `lean/Research/BraidedSymZpd/M2F3.lean` | the three numbers of `prop:matrix`, proved by `decide` |
 | `lean/check.sh` | builds the three modules in order against a Mathlib on `LEAN_PATH` |
 

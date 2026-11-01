@@ -70,6 +70,30 @@ theorem derivation (μ : A →ₗ[K] A →ₗ[K] A) (h : Determined μ) (D : A �
     (fun x y₁ y₂ => by simp only [map_add]; abel)
     (fun c x y => by simp only [map_smul]; rw [smul_add])) hD
 
+/-- **`rem:derivations`**, second half: with `μ = μ_σ`, a linear map `D` is a derivation of
+`(A, μ)` exactly when its Leibniz defect factors through `μ` by a map that agrees with `D` on the
+span of the products — the paper's "`S = D` on the span of the products `x ·_σ y`". -/
+theorem derivation_iff (μ : A →ₗ[K] A →ₗ[K] A) (h : Determined μ) (D : A →ₗ[K] A) :
+    (∃ S : A →ₗ[K] A, (∀ x y : A, μ (D x) y + μ x (D y) = S (μ x y)) ∧
+        ∀ z ∈ LinearMap.range (muBar μ), S z = D z) ↔
+      ∀ x y : A, D (μ x y) = μ (D x) y + μ x (D y) := by
+  constructor
+  · rintro ⟨S, hS, hSD⟩ x y
+    rw [hS x y, hSD (μ x y) ⟨x ⊗ₜ[K] y, muBar_tmul μ x y⟩]
+  · intro hD
+    have h0 : ∀ x y : A, μ x y = 0 → μ (D x) y + μ x (D y) = 0 := by
+      intro x y hxy
+      rw [← hD, hxy, map_zero]
+    obtain ⟨S, hS⟩ := derivation μ h D h0
+    refine ⟨S, hS, ?_⟩
+    rintro z ⟨w, rfl⟩
+    induction w using TensorProduct.induction_on with
+    | zero => simp
+    | tmul x y =>
+      show S (μ x y) = D (μ x y)
+      rw [← hS x y, hD x y]
+    | add a b ha hb => simp only [map_add, ha, hb]
+
 /-! ## `ex:dual`: the dual numbers
 
 `A = K[ε]/(ε²)` with `α (a + bε) = a - bε`. By `thm:codim`, `A` is determined by
@@ -372,6 +396,7 @@ Every declaration below is checked to depend only on Lean's three standard axiom
 #print axioms ZpdCore.anti_twisted_determined
 #print axioms BraidedSymZpd.preserving
 #print axioms BraidedSymZpd.derivation
+#print axioms BraidedSymZpd.derivation_iff
 #print axioms BraidedSymZpd.dualAlpha_mul
 #print axioms BraidedSymZpd.dualNumbers_not_zpd
 #print axioms BraidedSymZpd.dualNumbers_determined_not_zpd
