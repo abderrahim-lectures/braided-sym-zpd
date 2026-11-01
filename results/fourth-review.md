@@ -23,6 +23,14 @@ offset in the Brešar file).
 | 8 | remark after `prop:matrix` (l. 435) | "`13 = 13` for the twist by the transpose" — unreadable without the two quantities. | "`\dim \Zs = \dim \ker = 13`" |
 | 9 | §3 (l. 215) | "Throughout, `A` is a unital associative algebra …" — "throughout" is ambiguous; `cor:identity`, `cor:twisted` and `cor:triangular` rely on it. | "Throughout **Sections 3 to 5**, …" |
 | 10 | §4 source comment (l. 149) | the recorded counterexample to "commutativity suffices" used the pairs `(e₁,e₁)` and `(e₁,1)`, which give the same `μ` in characteristic 3, so it is not a counterexample in every characteristic. | `(e₂,e₂)` and `(e₂,1)`: same product `e₂`, values `1` and `e₂ + 2e₁`, different in every characteristic |
+| 11 | note after `cor:criterion` (l. 267) | "for `μ` the product it is Proposition 1.3 of Brešar" — Brešar's proposition is stated for every nonassociative algebra, so it covers an arbitrary `μ` too, as the paper's own proof does. | "Proposition 1.3 of Brešar … is the same statement for the product of a nonassociative algebra, and `cor:criterion` is that statement applied to `(A,μ)`" |
+| 12 | `rem:inner` (l. 451–453) | "what that computation establishes is that `μ_α` has no form `f(xy)`, not the determination itself" — the computation establishes `Z_μ = ker μ̄`, i.e. the determination; "no form `f(xy)`" is the earlier injectivity argument, and the sentence contradicted the Introduction and the abstract. | "its computation checks the criterion of `cor:criterion` directly in a small case, and `μ_α` has no form `f(xy)` by the argument above" |
+| 13 | `rem:inner` (l. 448) | `M_n(B)` without `n ≥ 2` and `B` unital. | "for a unital algebra `B` and `n ≥ 2`" |
+| 14 | `q:noncomm` (l. 458) | the affirmative answer for the triangular algebras is asserted without support; it needs their zJpd-ness. | `\citep[Corollary 3.17]{Bresar2021}` |
+| 15 | `q:noncomm` (l. 458) | after restricting to `M_n(K)`, the conclusion "over a field the question is about algebras other than matrix algebras" ignores characteristic 2, where `M_n(K)` is not known to be zJpd. | "so in characteristic other than `2` the matrix algebras over a field are settled" |
+| 16 | Introduction (l. 149) | the twisted swap is attributed to Adrabi §4, whose `α` is involutive; the paper's `α` is only linear. | "Adrabi 2026 takes `α` involutive, and we do not" |
+| 17 | §1 and §2 (l. 173, 180) | "recalls the definitions and results of Brešar" and "two definitions" — §2 also recalls Adrabi's Definition 3.1 and Brešar's 7.1/7.2. | both sentences now name Brešar and Adrabi and count the items |
+| 18 | `def:bresar-zpd` paragraph (l. 187) | "as `\citet[Definition 1.1]{Bresar2021}` does" — the abbreviation is announced in the paragraph after Definition 1.1. | `[§1.1]` |
 
 None of these changes a theorem's hypotheses or conclusion except items 5 and 6, which correct a
 sentence of the open question, not a numbered result.
