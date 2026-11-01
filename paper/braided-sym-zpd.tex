@@ -32,6 +32,12 @@
 % Skolem-Noether theorem. The Introduction credits the criterion to Brice and Huang as well as to
 % Bresar. The Lean development was rebuilt: it compiles from this repository alone, without the
 % unpublished modules, and the numbers of prop:matrix are checked by kernel evaluation.
+% Version 9: the abstract and the Introduction said that determination by mu_sigma lets one study
+% the braided-symmetric derivations "through zero products".  That is more than rem:derivations
+% gives: on the dual numbers with alpha(a+b eps) = a - b eps the map D(a+b eps) = a vanishes on the
+% mu_alpha-zero pairs and its defect factors through mu_alpha, but D is not a derivation.  Both
+% sentences now state what the remark proves -- the defect factors through the product, and the map
+% is a derivation exactly when the factor is the map itself.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -83,7 +89,7 @@
 \newcommand{\LDer}{\mathrm{LDer}}
 \newcommand{\Zs}{\mathcal{Z}}
 
-\newcommand{\paperversion}{8}
+\newcommand{\paperversion}{9}
 
 
 \begin{document}
@@ -101,7 +107,7 @@
 \begin{abstract}
 An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
 We replace the product by any bilinear map $\mu$ and ask the same question.
-For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when the braided-symmetric derivations of that product can be studied through zero products.
+For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when a linear map $D$ that satisfies $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ on the pairs with $x \cdot_\sigma y = 0$ is a braided-symmetric derivation: its defect then factors through the product, and $D$ is such a derivation exactly when the factor agrees with $D$ on the products.
 The answer is a criterion in terms of the kernel of the induced map $A \otimes A \to A$, and it needs no surjectivity hypothesis.
 For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear.
 The same holds on any algebra when the twist reverses products.
@@ -150,7 +156,8 @@ The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alp
 Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
 For an involution $\sigma$, a \emph{braided-symmetric derivation} is a linear map $D$ with $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ \citep[Definition 3.1]{Adrabi2026}.
 These maps are the derivations of the nonassociative algebra $(A, \cdot_\sigma)$ \citep[Remark 3.4]{Adrabi2026}.
-So an algebra determined by $\mu_\sigma$, for an involution $\sigma$, is one whose braided-symmetric derivations can be studied through zero products, as local derivations are \citep[Example 1.10]{Bresar2021}.
+For an involution $\sigma$, an algebra determined by $\mu_\sigma$ is one on which the following criterion holds: if the Leibniz defect $D(x \cdot_\sigma y) - D(x) \cdot_\sigma y - x \cdot_\sigma D(y)$ of a linear map $D$ vanishes on the pairs with $x \cdot_\sigma y = 0$, then it factors through the product, and $D$ is a braided-symmetric derivation exactly when the factor agrees with $D$ on the products.
+This is the same use of zero products as in the study of local derivations \citep[Example 1.10]{Bresar2021}.
 Remark~\ref{rem:derivations} takes the first step.
 For $T$ with $\mu(x,y) = 0 \Rightarrow T(x)T(y) = 0$, Remark~\ref{rem:preserving} gives the first part of Theorem~\ref{thm:bresar-zpp} on an algebra determined by $\mu$.
 
