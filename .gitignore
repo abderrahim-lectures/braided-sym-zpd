@@ -1,0 +1,12 @@
+# Review reports and verification scripts live outside version control.
+results/
+
+# Reference PDFs and other archives are not part of the repository.
+*.zip
+
+# Build outputs and local working directories.
+paper/build/
+lean/.lake/
+.scratch/
+.ultramath/
+__pycache__/
