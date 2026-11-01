@@ -90,6 +90,7 @@ After:
 | `lean/Research/BraidedSymZpd/M2F3.lean` | the three numbers of `prop:matrix`, proved by `decide` |
 | `lean/Research/BraidedSymZpd/M2F3Bridge.lean` | the finrank bridge: `finrank Z_μ = 12 = finrank (ker μ̄)`, hence `Z_μ = ker μ̄` and `Determined μ_α` (`prop:matrix`) |
 | `lean/ZpdCore/Triangular.lean` | Brešar's Theorem 2.15, the triangular algebra and his Corollary 2.5, and `cor:triangular` |
+| `lean/Research/BraidedSymZpd/ZJpd.lean` | the Jordan analogue (An–Li–He Theorem 2.1 / Brešar Theorem 3.15): an algebra whose idempotents span it linearly is determined by its symmetrised product in characteristic `≠ 2`; hence `rem:inner`'s determination for `M₂(K)` and every inner `α`, which is a second, enumeration-free proof of `prop:matrix` |
 | `lean/check.sh` | builds the three modules in order against a Mathlib on `LEAN_PATH` |
 
 Both theory files import Mathlib only, contain no `sorry` and no added axiom: the `#print axioms`

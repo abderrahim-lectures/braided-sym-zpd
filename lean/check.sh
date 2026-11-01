@@ -17,6 +17,7 @@ export LEAN_PATH="$OUT:${LEAN_PATH:-}"
 lean -o "$OUT/ZpdCore/Zpd.olean" ZpdCore/Zpd.lean
 lean -o "$OUT/ZpdCore/Triangular.olean" ZpdCore/Triangular.lean
 lean -o "$OUT/Research/BraidedSymZpd/BraidedSymZpd.olean" Research/BraidedSymZpd/BraidedSymZpd.lean
+lean -o "$OUT/Research/BraidedSymZpd/ZJpd.olean" Research/BraidedSymZpd/ZJpd.lean
 lean -o "$OUT/Research/BraidedSymZpd/M2F3.olean" Research/BraidedSymZpd/M2F3.lean
 lean -o "$OUT/Research/BraidedSymZpd/M2F3Bridge.olean" Research/BraidedSymZpd/M2F3Bridge.lean
 
