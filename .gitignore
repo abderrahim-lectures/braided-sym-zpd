@@ -1,5 +1,9 @@
-# Review reports and verification scripts live outside version control.
-results/
+# The review trail lives in results/.  Excluded from it: the Python caches, the superseded
+# drafting copies of the formalisation, and a stub that proves nothing.
+results/audit-scripts/__pycache__/
+results/formalization/
+results/localderiv-check.py
+__pycache__/
 
 # Reference PDFs and other archives are not part of the repository.
 *.zip
@@ -9,4 +13,3 @@ paper/build/
 lean/.lake/
 .scratch/
 .ultramath/
-__pycache__/
