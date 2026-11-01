@@ -38,6 +38,7 @@ offset in the Brešar file).
 | 23 | abstract and Introduction (l. 104, 154) | "the braided-symmetric derivations of that product" — the notion is defined only for an involution `σ`, and two of the advertised products come from non-involutions. | "for an involution `σ`" in both sentences |
 | 24 | Introduction (l. 141) | "The main purpose of this paper is to decide which algebras are determined by which `μ`" — the paper gives a criterion, two sufficient conditions, one counterexample and one computation; it does not decide the general question. | "to give a criterion for determination by `μ` and to settle the question for several classes of algebras and products" |
 | 25 | §4 (l. 327) | "`x ∘ ½ = x`" — `½` is a scalar and `x` an element. | "`x ∘ (½·1) = x`" |
+| 26 | §5 (l. 433) | "The next proposition uses it on the smallest case" — `M₂(𝔽₂)` with `α` = conjugation by `[[1,1],[0,1]]` is smaller and gives the same conclusion (checked: `dim ker = 13`, zero pairs span 13, 88 zero pairs). | "the smallest case over a field of odd characteristic", with the `M₂(𝔽₂)` instance named |
 
 None of these changes a theorem's hypotheses or conclusion except items 5 and 6, which correct a
 sentence of the open question, not a numbered result.
