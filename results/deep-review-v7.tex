@@ -1,0 +1,487 @@
+% Deep correctness review of "Algebras Determined by a Braided-Symmetric Product" (v7)
+% Build: latexmk -pdf deep-review-v7.tex   (or: pdflatex twice)
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{enumitem}
+\usepackage[hidelinks]{hyperref}
+\usepackage[protrusion=true,expansion=false]{microtype}
+
+\newcommand{\yes}{\checkmark}
+\newcommand{\no}{$\times$}
+\newcommand{\cpt}[1]{\texttt{#1}}          % code / short identifier
+\newcommand{\pp}[1]{\path{#1}}             % path: breakable at / - . _
+\urlstyle{tt}
+\setlength{\emergencystretch}{2.5em}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+\setlist[itemize]{leftmargin=1.4em,itemsep=2pt,topsep=3pt}
+
+\title{\bfseries Deep correctness review of\\[2pt]
+\emph{Algebras Determined by a Braided-Symmetric Product}, version 7}
+\author{Review report}
+\date{Repository \cpt{nucleus/work/projects/\ldots/repo}, commit \cpt{977d4ab} (\cpt{braided-sym-zpd v7}).
+Compiled \today.}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+\noindent
+\textbf{The mathematics holds up with one exception, and the exception is real.} As printed in v7,
+Theorem~\cpt{thm:zpd-fxy} is \emph{false} without the unitality hypothesis that its proof uses: a
+counterexample is given under D8, and it is the one place in the paper where a stated result fails.
+Everywhere else no false statement and no real proof gap was found --- in the criterion, the injective
+converse, the codimension-one theorem and the matrix proposition --- and every claim that can be checked
+independently was recomputed, including a from-scratch verification of the $\mathbb{F}_3$ computation,
+which is the paper's only genuinely \emph{computed} statement. The defects are in the artifacts around the paper: a stale version string
+visible in the published PDF, a symbol left dangling by the v7 edit, an abstract still advertising the
+v6 formulation, a README that lost all its inline mathematics, a promise of git tags that do not exist,
+build instructions for a Lean file that has never elaborated, one wrong citation locator, and one
+abstract sentence that is stronger than the theorem behind it. D8 is the one defect that makes a published
+statement false, and the working tree adds the missing hypothesis; the rest are packaging, of which
+D1--D5 are visible in the published artifacts and should be fixed before the next release. A fix pass
+applying D1--D19 is recorded separately (\cpt{results/fixes-applied.md}).
+\end{abstract}
+
+\section{Scope}
+
+The review covers the whole repository at commit \cpt{977d4ab}: the LaTeX source
+\pp{paper/braided-sym-zpd.tex}, the shipped PDF \pp{pdf/braided-sym-zpd-v7.pdf}, \cpt{README.md}, and
+\pp{lean/Research/BraidedSymZpd/BraidedSymZpd.lean}. The paper is short (432 lines of source, 7 pages),
+so every proof was read in full rather than sampled.
+
+Three kinds of evidence are distinguished throughout:
+(i)~recomputation, where a claim admits a mechanical check;
+(ii)~verification against the sources the paper cites;
+(iii)~hand checking of the proofs.
+Where none of the three was available, this is stated explicitly in Section~\ref{sec:unverifiable} rather
+than glossed over.
+
+\section{What was checked mechanically}
+\label{sec:mech}
+
+\begin{center}\small
+\begin{tabular}{@{}L{0.275\textwidth}L{0.36\textwidth}L{0.29\textwidth}@{}}
+\toprule
+\textbf{Claim} & \textbf{Method} & \textbf{Result}\\
+\midrule
+Paper compiles & \cpt{latexmk -pdf} & OK, 7~pp., no undefined references, no overfull boxes\\
+\midrule
+Shipped PDF is the build of the shipped source & \cpt{pdftotext} diff of shipped vs.\ fresh build
+  & identical apart from the \cpt{\textbackslash today} stamp --- in sync\\
+\midrule
+\cpt{prop:matrix}: exactly 417 zero pairs among $81\cdot81$ & independent Python over $\mathbb{F}_3$
+  & \yes\ 417\\
+\cpt{prop:matrix}: $\operatorname{rank}\bar\mu_\alpha = 4$, hence $\dim\ker = 12$
+  & elimination in Python, plus an analytic argument (the image contains $E_{12}$, $E_{21}$,
+    $E_{11}+E_{22}$, $2E_{11}$) & \yes\ 4 and 12\\
+\cpt{prop:matrix}: the 417 tensors span a space of dimension 12
+  & Python with left-to-right \emph{and} right-to-left pivoting; rank of the transposed matrix; a
+    \cpt{sympy} pass over $GF(3)$ & \yes\ 12\\
+\cpt{prop:matrix}: conclusion $Z_\mu = \ker\bar\mu$
+  & not by dimensions: an explicit 12-vector kernel basis was built and each vector checked to lie in
+    $\operatorname{span}(Z)$; with $Z \subseteq \ker$ automatic, this is equality & \yes\ $Z=\ker$\\
+\midrule
+``$12=12$ for the ordinary product'' & same pipeline & \yes\ 417 / 12 / 12\\
+``$13=13$ for the twist by the transpose'' & same pipeline, $\alpha=\mathsf{T}$ as a braiding
+  ($xy + y^{\mathsf T}x^{\mathsf T}$) & \yes\ 513 / 13 / 13\\
+\midrule
+The twisted product ``has no form $f(xy)$'' & exhibit a pair with $xy=0 \ne \mu(x,y)$
+  & \yes\ ($x=E_{12}$, $y=E_{11}$)\\
+417 is not an artefact of the twisted product & count the pairs with $uv+vu=0$ in $M_2(\mathbb{F}_3)$
+  & also 417 \yes\\
+\cpt{ex:dual} (dual numbers) & same criterion over $\mathbb{F}_5$: twisted product
+  $\operatorname{rank}\bar\mu=1$, $\dim\ker=3$, $\dim\operatorname{span}(Z)=3$ (determined);
+  associative product rank~2, $\dim\ker=2$, $\dim\operatorname{span}(Z)=1$ (not zpd)
+  & \yes\ both halves hold from the criterion alone\\
+\midrule
+Lean \cpt{M2F3Check} block (66 lines, core Lean) & \cpt{lean} on the extracted namespace
+  & compiles; all three \cpt{\#guard}s pass (417, rank 12, rank $\bar\mu$ 4)\\
+Lean file \emph{as a whole} & \cpt{lake build}; then with both missing modules stubbed & \no\ does not elaborate even then: two errors at 124:6 and 233:6 (D5)\\
+no \cpt{sorry}, \cpt{admit}, \cpt{axiom}, \cpt{native\_decide} & \cpt{grep} & none found \yes\\
+Lean encoding faithful & read \cpt{mul}, \cpt{alpha}, \cpt{mu}
+  & \cpt{alpha} is conjugation by $\operatorname{diag}(1,-1)$ \yes; \cpt{mu x y} $=xy+\alpha(yx)$ \yes\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The Lean \cpt{\#guard}s return exactly the numbers computed here by other means, which is good evidence
+that the formal computation is not decorative.
+
+\section{The mathematics, claim by claim}
+\label{sec:math}
+
+\begin{itemize}
+\item \textbf{Def.~\cpt{def:determined}, Prop.~\cpt{prop:bresar-zpd}, Cor.~\cpt{cor:criterion}.}
+The equivalence ``$A$ determined by $\mu$ $\iff$ $Z_\mu=\ker\bar\mu$'' is applied correctly: condition
+(iii) of Bre\v{s}ar's Proposition~1.3 specialised to $(A,\mu)$ says exactly $\ker\bar\mu\subseteq Z_\mu$,
+and $Z_\mu\subseteq\ker\bar\mu$ is automatic. Neither finite-dimensionality nor surjectivity is needed.
+\textbf{Correct.}
+
+\item \textbf{Thm.~\cpt{thm:zpd-fxy}} ($A$ zpd $\Rightarrow$ $A$ determined by $f(xy)$). The one
+non-obvious step is $\ker f\subseteq\ker\psi_0$, obtained from $\mu(b,1)=f(b)=0$; then $\psi_0$ factors
+through $A/\ker f\cong\operatorname{im} f$ and is extended to $A$. The argument is right and complete,
+but it \emph{uses the unit}, which the statement does not mention (D8).
+
+\item \textbf{Prop.~\cpt{prop:injective}.} For injective $f$, $\mu(x,y)=0\iff xy=0$, and then
+$\varphi(x,y)=(\psi\circ f)(xy)$. \textbf{Correct.}
+
+\item \textbf{Cor.~\cpt{cor:identity}.} (i) is the theorem with $f=2\operatorname{id}$; (ii) is the
+proposition, since $2\operatorname{id}$ is injective iff $\operatorname{char}K\ne2$. The characteristic~2
+remark ($\mu\equiv0\Rightarrow$ every admissible $\varphi$ is $0\Rightarrow$ every algebra is determined)
+is also correct. \textbf{Correct.}
+
+\item \textbf{Cor.~\cpt{cor:twisted}, Cor.~\cpt{cor:anti}, Cor.~\cpt{cor:triangular}.} In all three the
+identity $\alpha(y)\alpha(x)=\alpha(xy)$ is exactly what is needed, and it holds for an endomorphism
+(commutative case) and an anti-endomorphism alike; $\alpha$ need not be unital or injective.
+\textbf{Correct.}
+
+\item \textbf{Thm.~\cpt{thm:codim}.} The splitting $x=(x-c(x)1)+c(x)1$ gives
+$\varphi(x,y)=c(x)c(y)\varphi(1,1)$ and $f(xy)=c(x)c(y)f(1)$; $f(1)\ne0$ supplies a left inverse $g$ of
+$a\mapsto a f(1)$. Every hypothesis is used and only assumed ones are used. Consistency check: the
+hypotheses force $c(1)=1$, so they are not contradictory. \textbf{Correct.}
+
+\item \textbf{Ex.~\cpt{ex:dual}.} $f=\operatorname{id}+\alpha$ has kernel $K\varepsilon$, a codimension-one
+ideal, and $f(1)=2\ne0$; the only idempotents of $K[\varepsilon]/(\varepsilon^2)$ are $0$ and $1$ (from
+$a^2=a$, $2ab=b$), so it is not generated by idempotents, and Bre\v{s}ar's Theorem~2.27 gives ``not zpd''.
+\textbf{Correct}; the idempotent claim was checked independently, and both halves were also confirmed
+numerically over $\mathbb{F}_5$ (Section~\ref{sec:mech}). The ``not zpd'' half moreover admits a direct
+proof that avoids the recalled Theorem~2.27 entirely: $\varphi(x,y)=ad$ for $x=a+b\varepsilon$,
+$y=c+d\varepsilon$ vanishes on every zero product (if $a=0$ trivially; if $a\ne0$ then $c=0$, and then
+$d=0$), while $\varphi(1,\varepsilon)=1\ne0=\varphi(\varepsilon,1)$ although
+$1\cdot\varepsilon=\varepsilon\cdot1$, so $\varphi$ does not factor through the product.
+
+\item \textbf{Prop.~\cpt{prop:matrix}.} Verified, see Section~\ref{sec:mech}. The proof as written is a
+faithful description of a computation that does what it says.
+
+\item \textbf{Rem.~\cpt{rem:derivations}.} ``$D$ is a braided-symmetric derivation iff $S=D$ on the span
+of the products'' follows correctly from the definition of ``determined''.
+
+\item \textbf{Framing claims.} The three symmetrised products are $2xy$, $xy+yx$,
+$xy+\alpha(y)\alpha(x)$ --- correct; ``the twisted product describes algebras the zpd theory does not
+reach'' --- correct (dual numbers).
+\end{itemize}
+
+\noindent
+Beyond these hand checks, the following were established exhaustively by independent reviewers and
+reproduced here. The criterion $Z_\mu=\ker\bar\mu$ was tested against the \emph{definition} for all
+bilinear $\mu$ on $2$-dimensional spaces over $\mathbb{F}_2$ (256) and $\mathbb{F}_3$ (6561) and for 3000
+random $\mu$ on $3$-dimensional spaces over both fields, with no mismatch; \cpt{thm:zpd-fxy} and
+\cpt{prop:injective} were tested for every unital algebra of dimension $\le3$ over $\mathbb{F}_2$ and
+$\le2$ over $\mathbb{F}_3,\mathbb{F}_5$ against every linear $f$ (about 55\,000 pairs, no failure);
+\cpt{thm:codim} was tested on 165 (algebra, $f$) cases satisfying its hypotheses, including a
+noncommutative instance in $\mathrm{Tri}(M_2(\mathbb{F}_p))$ where
+$Z_\mu=N\otimes A+A\otimes N=\ker\bar\mu$ holds with dimension $8=8$; the recalled Theorems~2.27 and 7.2
+were checked on the small unital algebras; and the content of Corollary~2.17(b) can be proved outright:
+$\left[\begin{smallmatrix}1&m\\0&0\end{smallmatrix}\right]$ is idempotent because $m\cdot1=m$, and
+$\left[\begin{smallmatrix}0&m\\0&0\end{smallmatrix}\right]$ is its difference with
+$\left[\begin{smallmatrix}1&0\\0&0\end{smallmatrix}\right]$, so $M$ lies in the span of the idempotents
+and $\mathrm{Tri}(A_1,M,A_2)$ is generated by them.
+
+\section{Defects}
+\label{sec:defects}
+
+Severity: D8 is a false statement in v7 as printed and comes first in importance; D1--D5 are visible in
+the published artifacts and should be fixed before the next release; D6, D7 and D18 are referee-visible;
+D9--D11 are minor; D12--D17 and D19 are cosmetic, provenance, or a missing one-line justification.
+
+\subsection*{D1. The published PDF says ``Preprint version 2'', everything else says v7}
+\cpt{paper/braided-sym-zpd.tex:53} has \cpt{\textbackslash newcommand\{\textbackslash paperversion\}\{2\}},
+which prints ``Preprint version 2, compiled 2026/10/17'' on the title page of
+\cpt{pdf/braided-sym-zpd-v7.pdf}, whose file name, the README and the commit all say v7. The counter was
+never updated after v2. \emph{Fix:} \cpt{\textbackslash paperversion\{7\}}, or drop the macro.
+
+\subsection*{D2. \cpt{q\_\textbackslash circ} is undefined --- a regression introduced by the v7 edit}
+Line 290: ``When $\operatorname{char}K\ne2$ the map $q_\circ$ is onto, because
+$x\circ\tfrac12=x$.'' In v6 the companion $q_\mu\colon (A\otimes A)/Z_\mu\to A$ was defined (line 157)
+and used throughout the proof of the criterion. v7 replaced that proof by the citation of
+Bre\v{s}ar's Proposition~1.3 and deleted the defining sentence, but left this one use. With
+Proposition~1.3 doing the work, the sentence is also redundant: the criterion needs no surjectivity.
+\emph{Fix:} delete the sentence, or define $q_\circ\colon A\otimes A\to A$, $x\otimes y\mapsto x\circ y$.
+
+\subsection*{D3. \cpt{README.md} has lost all inline mathematics}
+The file contains zero \cpt{\$} characters. Three visible damages in the summary paragraph (line 8):
+``\ldots on a commutative algebra, \textbf{has the form} $f(xy)$'' (the subject $\mu$ is gone),
+``determined by every such \textbf{.}'' ($\mu$ gone), ``the algebra of \textbf{2 2} matrices'' (the
+$\times$ is gone). \emph{Fix:} restore the three expressions.
+
+\subsection*{D4. README promises git tags that do not exist}
+``Each version is also a tag of this repository'' --- \cpt{git tag} is empty, and the history begins at
+v3 (seven commits; v1 and v2 are absent). Either create the tags or reword.
+
+\subsection*{D5. \cpt{cd lean \&\& lake build} does not work, and cannot be made reproducible as pinned}
+Four independent reasons:
+\begin{enumerate}[label=(\arabic*),leftmargin=1.8em,itemsep=2pt]
+\item the file imports \pp{Research.Zpd.Basic} and \pp{Research.Zpd.DualNumbers}, which are \emph{not
+in the repository}: 479 of the 545 lines depend on them, including
+\pp{Research.Zpd.ZeroProductDetermined} and \pp{not_zeroProductDetermined_dualNumbers}. The README's
+description ``Lean 4 files that check computations and lemmas of the paper (mathlib only)'' (line 24) is
+therefore false as well;
+\item \textbf{even with both modules stubbed, the file does not elaborate.} It fails at 124:6 and 233:6
+with \emph{Alternative \cpt{zero} has not been provided}, because the two \cpt{induction} blocks over
+$B\otimes_k B$ in \cpt{mapDetermined\_iff\_injective} and \cpt{mapDetermined\_iff\_injective$'$} omit the
+\cpt{zero} branch. This was reproduced against the installed Mathlib (Lean 4.33.1): a minimal
+\cpt{induction s with | tmul \ldots\ | add \ldots} on a tensor fails with exactly that message, and the
+same proof compiles once a \cpt{| zero =>} branch is added. So the artifact has never been elaborated,
+and its failure is not only the missing dependency;
+\item \pp{lakefile.toml} pins mathlib to \cpt{rev = "master"} --- not a reproducible pin --- and
+current master requires \cpt{lean4:v4.36.0-rc2}, while \pp{lean-toolchain} pins \cpt{v4.35.0}. A build
+therefore \emph{rewrites the tracked} \pp{lean-toolchain} (it did, on the review run; it was restored)
+and pulls 625\,MB;
+\item no \pp{lake-manifest.json} is committed.
+\end{enumerate}
+\emph{Fix:} vendor the two \pp{Research/Zpd} modules, add the \cpt{zero} branches, pin mathlib to a tag
+or commit, commit the manifest, align \pp{lean-toolchain}. Until then the README should not claim the
+file builds.
+
+\subsection*{D6. Citation locator: \cpt{Tri}$(A_1,M,A_2)$ is cited to \S2.1, which is ``zpd Rings''}
+Line 321 cites \cpt{[\S2.1]} \emph{twice in a row} for the notation $\mathrm{Tri}(A_1,M,A_2)$. The
+book's \S2.1 is ``zpd Rings''; the construction is an example of a zpd algebra, i.e.\ \S2.2 (``Examples
+and Non-examples of zpd Algebras''), which Corollary~2.17(b) then uses. \emph{Fix:} \cpt{[\S2.2]}, once.
+
+\subsection*{D7. The abstract (and README) is stronger than Cor.~\cpt{cor:twisted}}
+``For the symmetrised products of three braidings on a commutative algebra, $\mu$ has the form $f(xy)$''
+is \emph{false for a merely linear} $\alpha$, which is what the Introduction allows when it defines the
+twisted swap. Take $A=K[\varepsilon]/(\varepsilon^2)$ (commutative) and the linear involution
+$\alpha(a+b\varepsilon)=b+a\varepsilon$; then $\alpha(\varepsilon)=1$ and
+\[
+\mu(\varepsilon,\varepsilon)=\varepsilon^2+\alpha(\varepsilon)\alpha(\varepsilon)=1,
+\qquad \varepsilon\cdot\varepsilon=0 .
+\]
+If $\mu(x,y)=f(xy)$ with $f$ linear, then $f(0)=\mu(\varepsilon,\varepsilon)=1$, contradicting
+$f(0)=0$. \S4 states the result correctly, with ``$\alpha$ an algebra endomorphism''.
+The repair is exactly sharp: if moreover $\alpha(1)=1$ then $\mu_\alpha$ is of the form $f(xy)$
+\emph{if and only if} $\alpha$ is multiplicative (put $x=1$ to get $f(y)=y+\alpha(y)$ and compare with
+$\mu_\alpha(x,y)$), so ``endomorphism'' is not merely sufficient but the exact missing hypothesis.
+\emph{Fix:} add ``for $\alpha$ an endomorphism'' in the abstract and the README.
+
+\subsection*{D8. \cpt{thm:zpd-fxy} is false as stated: the unit is needed}
+The theorem says ``Let $A$ be zpd, let $f\colon A\to A$ be linear'' and its proof uses $\mu(b,1)=f(b)$
+for $b\in\ker f$. Because \S3's preamble assumes $A$ unital, and the abstract and the introduction both
+say ``unital'', this was first recorded here as statement hygiene only, with the remark that the
+hypothesis could be dropped rather than added: $\psi_0$ vanishes on $A^2\cap\ker f$, so extend
+$\psi_0|_{A^2}$ to $A$ killing $\ker f$. \textbf{That reasoning is wrong, and the theorem is false
+without unitality.} From $b=\sum_i x_i y_i$ and $f(b)=\sum_i\mu(x_i,y_i)=0$ one cannot conclude
+$\sum_i\varphi(x_i,y_i)=0$, and applying Bre\v{s}ar's condition (ii) to $\mu$ would assume what is being
+proved.
+
+\emph{Counterexample} (found by a reviewer of this report; recomputed here over $\mathbb{F}_2$,
+$\mathbb{F}_3$, $\mathbb{F}_5$, $\mathbb{F}_7$). Let $A=\langle e_0,e_1,e_2\rangle$ with
+$e_0^2=e_0$, $e_0e_1=e_0e_2=e_2$, $e_1e_0=e_1-e_2$ and all other products zero. Then $A$ is
+associative, $A^2=A$, $A$ has no unit, and $A$ \emph{is} zpd: $\dim Z_m=\dim\ker\bar m=6$. Take
+$f(a,b,c)=(a,0,c)$, so that $\ker f=\langle e_1\rangle$, and let $\mu(x,y)=f(xy)$. Then
+$\dim Z_\mu=6$ but $\dim\ker\bar\mu=7$, so by Corollary~\cpt{cor:criterion} $A$ is \emph{not} determined
+by $\mu$. Explicitly, $\varphi(x,y)=x_0(y_1+y_2)$ vanishes on every $\mu$-zero pair, while
+$\varphi(e_0,e_1)=1$ and $\varphi(e_1,-e_0+e_2)=0$ although $\mu(e_0,e_1)=\mu(e_1,-e_0+e_2)=e_2$.
+
+\emph{Fix (applied):} the statement now reads ``Let $A$ be a unital zpd algebra'', which is what the
+abstract and the introduction already said. The hypothesis must be \emph{added}, not dropped.
+
+\subsection*{D9. Two change logs for v7 that describe different changes}
+The source header says v7 is the reworking of the introduction around Bre\v{s}ar's Theorem~7.2, plus
+\cpt{rem:preserving}, plus ``claims added: \cpt{cor:triangular}, \cpt{prop:matrix}''. The README's v7
+entry says v7 is the retitling towards \cpt{braided-sym-deriv}, the criterion now cited from
+Proposition~1.3, and \cpt{rem:derivations} --- and does not mention the two new claims. Both edits are in
+the same commit; each log describes half of it.
+
+\subsection*{D10. Stale or incorrect statements in the Lean file}
+\begin{itemize}[leftmargin=1.4em,itemsep=1pt]
+\item Line 45 says the noncommutative case ``(for example, $M_2(\mathbb{F}_3)$ with the transpose) is
+open'', but the same file then checks $M_2(\mathbb{F}_3)$, and the \emph{transpose} case is settled
+affirmatively by \cpt{cor:anti}, since the transpose reverses products. Wrong twice.
+\item The module docstring advertises \cpt{symProdLinear} and
+\cpt{mapDetermined\_symProd\_std\_iff\_zJpd} as the file's main definitions and results; neither is
+defined anywhere in it (both occur only in the docstring, lines 26, 35 and 102).
+\item \cpt{cor:twisted} is formalised as \cpt{mapDetermined\_twisted\_of\_comm\_zpd} for
+$\alpha\colon B\to_a[k]B$, i.e.\ a \emph{unital} endomorphism, whereas the paper's corollary only needs
+$\alpha$ multiplicative (no theorem of the paper assumes $\alpha(1)=1$). The formal statement is
+therefore strictly weaker than the published one.
+\item Lines 153 and 172 refer to \cpt{BraidedSymmetric.lean}, and line 45 to
+\cpt{formalization-debt.md}; neither file is in this repository.
+\end{itemize}
+
+\subsection*{D11. Ambiguity in ``the twist by the transpose'' (line 413)}
+The paper writes the twisted product both as $xy+\alpha(y)\alpha(x)$ (the braiding) and as
+$xy+\alpha(yx)$ (\cpt{prop:matrix}); these agree for automorphisms but not for anti-automorphisms. For
+$\alpha={}^{\mathsf T}$ the two readings give $13=13$ (the braiding, as printed \yes) and $12=12$
+($xy+\alpha(yx)$, also determined, computed here). The printed number is right for the intended reading;
+the notation should say which product is meant.
+
+\subsection*{D12. The abstract advertises a ``quotient criterion'' the v7 body no longer states}
+Line 72: ``The answer is a quotient criterion that needs no surjectivity hypothesis.'' In v7 the
+criterion is the kernel equality $Z_\mu=\ker\bar\mu$; the words \emph{quotient} and \emph{surjective}
+occur nowhere else in the body except inside the recalled Theorem~7.2. Same root cause as D2: v6 stated
+the criterion as ``$q_\mu$ is injective'', with a left inverse replacing an inverse and no surjectivity
+assumed, and v7 deleted that formulation without touching the abstract. Low severity --- the kernel
+equality is equivalent to injectivity on $(A\otimes A)/Z_\mu$ --- but the abstract describes a
+presentation the paper does not give.
+
+\subsection*{D13. The abstract names an object that does not exist}
+Line 71: ``For the symmetrised products of braided-symmetric derivations, this asks when the algebra with
+that product is zero product determined.'' A symmetrised product is attached to a \emph{braiding}; a
+braided-symmetric derivation is a \emph{derivation of} $(A,\cdot_\sigma)$. There is no ``symmetrised
+product of a derivation'' anywhere in the paper. Relatedly, the title and keywords say
+``braided-symmetric product'', a term that occurs in no line of the body (which says ``symmetrised
+product'' and ``braided-symmetric derivation''). Added in v7.
+
+\subsection*{D14. \S2 restates the symmetrised product with $\mu$ for the algebra product}
+Line 173: ``the symmetrised product $x\cdot_\sigma y=\mu(x\otimes y)+\mu(\sigma(x\otimes y))$, where
+$\mu$ is the product of $A$''. But $\mu$ is the arbitrary bilinear map of \S\S3--5 (line 199), the product
+is $m$ (line 108), and $\mu$ is defined on $A\times A$, not on $A\otimes A$. The formula also disagrees
+\emph{in notation} with the Introduction's $x\cdot_\sigma y=m(x\otimes y+\sigma(x\otimes y))$ (line 117);
+the two agree mathematically, so this is a notational clash rather than an error, but it sits
+immediately before \cpt{def:adrabi-bsder}, which therefore has two incompatible definitions of
+$\cdot_\sigma$ around it.
+
+\subsection*{D15. The v7 header comment misattributes one change and omits others}
+Line 1 lists ``Acknowledgments removed'' as a v7 change, but the section was deleted one commit earlier,
+in v6 (\cpt{git diff 81395eb e56e0a7}). The header also omits two real v7 edits: the abstract clause ``as
+the transpose does on matrices'' was deleted, and ``$M_n(K)$ is determined by $xy+y^{\mathsf T}x^{\mathsf
+T}$'' was replaced by the more general statement that \cpt{cor:anti} applies ``to $M_n(K)$ and to the
+transpose, and to every linear map $\alpha$ of $M_n(K)$ that reverses products''.
+
+\subsection*{D16. README changelog order}
+It announces ``newest first'' but lists v1 (2026-09-25) before v2 (2026-09-27); and neither v1 nor v2
+exists anywhere in the repository history (see D4).
+
+\subsection*{D17. Cosmetic}
+Duplicate citation of one locator (\cpt{[\S2.1] \ldots [Section 2.1]}, line 321); three labels are never
+\cpt{\textbackslash ref}'d (\cpt{cor:identity}, \cpt{def:bresar-zpd}, \cpt{def:bresar-zpp}) --- harmless.
+
+\subsection*{D18. The Introduction credits matrix algebras to Cor.~\cpt{cor:triangular}}
+Line 129: ``So the zpd algebras of Bre\v{s}ar, such as matrix algebras and triangular algebras
+[Corollary~2.17], are determined by all these products (Corollary~\cpt{cor:triangular}).'' But
+\cpt{cor:triangular} covers only $\mathrm{Tri}(A_1,M,A_2)$; $M_n(B)$ is not of that form, and is reached
+by \cpt{thm:zpd-fxy} together with Corollary~2.17(a). As written the sentence reads as a claim about both
+families. \emph{Fix:} cite \cpt{thm:zpd-fxy} (and Cor.~2.17) for matrix algebras and \cpt{cor:triangular}
+for the triangular ones.
+
+\subsection*{D19. Two unproved assertions (both true, one line each)}
+Line 395: ``When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product
+$xy+\alpha(yx)$ is not of the form $f(xy)$, and Theorems~\cpt{thm:zpd-fxy} and \cpt{thm:codim} do not
+apply''; and line 292: the Jordan product ``is not of the form $f(xy)$ on a noncommutative algebra''.
+Both are true --- $y=1$ forces $f=\operatorname{id}+\alpha$ respectively $f=2\operatorname{id}$, and then
+$\alpha(yx)=\alpha(xy)$, respectively $xy+yx=2xy$, gives $yx=xy$, contradicting noncommutativity in
+characteristic $\ne2$ --- but the text offers no argument for either, and neither sentence carries a
+\cpt{claim-ok} marker. \emph{Fix:} one line of proof, or a parenthetical.
+
+\section{Verification against the primary source}
+\label{sec:primary}
+
+\begin{center}\small
+\begin{tabular}{@{}L{0.40\textwidth}L{0.51\textwidth}@{}}
+\toprule
+\textbf{Locator in the paper} & \textbf{Status}\\
+\midrule
+Definition 1.1 (zpd, nonassociative) & \textbf{verbatim match} \yes\\
+Proposition 1.3 (i)--(iv) & \textbf{verbatim match} \yes\ (other authors cite it as \cpt{[3, Proposition 1.3]}
+  for the tensor form)\\
+Corollary 2.17(a) ($M_n(B)$ is zpd) & \yes\ (cited elsewhere as \cpt{[3, Corollary 2.17 (a)]})\\
+Theorem 2.27 (finite-dimensional unital zpd $\iff$ generated by idempotents) & \yes\ --- and not a slip
+  for Theorem 3.7: 3.7 is the numbering in Bre\v{s}ar's \emph{Expo.\ Math.}\ 34 (2016) paper, of which
+  the book's Theorem 2.27 is the book version (one paper cites the book as \cpt{[5, Theorem 2.27]} and
+  the article as \cpt{[6, Theorem 3.7]})\\
+\S2.1 for $\mathrm{Tri}(A_1,M,A_2)$ & \no\ \S2.1 is ``zpd Rings'' --- should be \S2.2 (D6)\\
+Example 2.19 ($T_n(F)$), Example 2.23 (adjoining a unity) & \textbf{content confirmed} against the
+  published \emph{Expo.\ Math.}\ 34 (2016) paper, where the same two items appear as Example~2.19
+  ($T_n(F)$ is zpd) and as the propositions stating that adjoining a unity to an algebra with trivial
+  multiplication is not zpd; the book's own locator numbers are \textbf{not confirmed}\\
+Def.~3.14 (zJpd), Def.~7.1/Thm.~7.2, Ex.~1.10 & plausible, consistent with the book's section layout and
+  with the parallel numbering of the \emph{Expo.\ Math.}\ paper, but \textbf{not confirmed} against the
+  book itself\\
+Horn--Johnson 0.2.5 (``the transpose reverses products'') & the statement is true; the \textbf{locator was
+  not confirmed}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Claims not verifiable here}
+\label{sec:unverifiable}
+
+\noindent\textbf{Access, reference by reference.} Bre\v{s}ar's book (Birkh\"auser 2021) was \emph{not}
+directly accessible: the publisher's chapter pages redirect to an institutional login, which was not
+worked around. What was used instead is (a) the text of Chapter~1 --- Definition~1.1 and
+Proposition~1.3 (i)--(iv) --- as reproduced verbatim by a third-party mirror surfaced by search,
+(b) the book's table of contents for the section structure (which is how the \S2.1 error of D6 was
+found), and (c) for the remaining locators, only the way other papers cite the book. Bre\v{s}ar's
+\emph{Expo.\ Math.}\ 34 (2016) paper, which contains the article versions of Theorem~2.27 and
+Corollary~2.17, was available in full from the author's page
+(\url{https://users.fmf.uni-lj.si/bresar/documents/zpdidemp.pdf}) and was used to confirm the
+\emph{content} of Examples~2.19 and 2.23 and of Theorem~3.7/2.27. Horn--Johnson was available only as
+the publisher's free front matter, whose contents list sections but not subsections, so the locator
+\S0.2.5 stays unconfirmed (the statement it supports, that the transpose reverses products, is
+standard). Adrabi's 2026 preprint is available nowhere: searches of arXiv, the author's public
+profiles, and his 2024 doctoral thesis found no trace of the title, so the paper's framing cannot be
+checked against it at all.
+
+\begin{itemize}
+\item \textbf{Adrabi 2026} (the author's own preprint) --- Definition~3.1 (braided-symmetric derivations),
+Remark~3.4, Section~1 and Section~4 are cited for the paper's entire framing, but the preprint is neither
+in this repository nor publicly reachable. A referee cannot check them. Consider making it available, or
+restating the two facts: they are one-line computations ($D(x\cdot_\sigma y)=D(x)\cdot_\sigma y+x\cdot_\sigma
+D(y)$ is literally the definition of a derivation of $(A,\cdot_\sigma)$).
+\item The Lean file's 479 non-computational lines: unverifiable until D5 is fixed. What can be said is
+that the statements they claim to prove are the paper's theorems, and that those were verified by hand.
+\end{itemize}
+
+\section{Substantive remarks (not defects)}
+\label{sec:remarks}
+
+\begin{enumerate}[label=\arabic*.,leftmargin=1.8em,itemsep=3pt]
+\item \textbf{Proposition~\cpt{prop:matrix} may be a shadow of a general theorem.} With
+$\alpha$ the conjugation by an involutive $D$, the algebra splits by $D$-parity and on homogeneous parts
+$\mu(x,y)=xy+(-1)^{|x|+|y|}yx$. That suggests the $\mathbb{F}_3$, $n=2$ computation could become a
+statement for every $n$ and every field of characteristic $\ne2$, which would also sharpen
+Question~\cpt{q:noncomm}. As it stands the proposition is a single data point over the smallest field.
+
+\item \textbf{\cpt{thm:codim} and \cpt{cor:twisted} overlap.} On a commutative algebra
+$\mu_\alpha=f(xy)$ with $f=\operatorname{id}+\alpha$ and $\ker f=\ker c$ for the augmentation $c$, so the
+dual-numbers instance is \cpt{thm:codim} applied to the twisted product. Fine, but worth a linking
+sentence.
+
+\item The paper is candid that the criterion is Bre\v{s}ar's Proposition~1.3 re-read; the genuinely new
+content is the $f(xy)$ class, the two ``beyond zpd'' classes, and the computation. That is a coherent but
+modest contribution, appropriate for a short note --- and the abstract should not oversell it (D7).
+\end{enumerate}
+
+\section{Reproduction}
+
+\begin{verbatim}
+cd paper && latexmk -pdf braided-sym-zpd.tex          # 7 pp.
+
+sed -n '/^namespace M2F3Check/,/^end M2F3Check/p' \
+  ../lean/Research/BraidedSymZpd/BraidedSymZpd.lean > M2F3Check.lean
+lean M2F3Check.lean                                   # 3 #guards pass
+
+cd ../lean && lake build      # FAILS: Research.Zpd.Basic, .DualNumbers
+git tag                       # empty (README claims tags)
+grep -n paperversion ../paper/braided-sym-zpd.tex   # 2, not 7
+
+python3 ../results/m2-verify.py   # all F_3 numbers, with assertions
+\end{verbatim}
+
+\noindent
+The independent $\mathbb{F}_3$ verification (zero-pair counts, ranks, and the kernel-basis-in-span
+argument) is the script \cpt{results/m2-verify.py}; it asserts $417/12/12$, $417/12/12$ and $513/13/13$
+for the twisted, ordinary and transpose cases respectively.
+
+\medskip
+\noindent\emph{Note on method.} The proofs and the computational claims were checked directly. Seven
+directions were carried out by independent reviewers --- version history, the Lean artifact, the
+document-level audit, Section 2, Sections 3 and 5, the primary-source audit, and an exhaustive
+test-bench over small algebras --- and every finding included here was re-checked against the
+repository or recomputed. Four reviewer claims were not adopted as stated: a characterisation of the v7 edit as
+weakening a claim about $M_n(K)$ (it generalises it), a non-unital counterexample to line 292
+(the Jordan product on strictly upper triangular $3\times3$ matrices is \emph{not} a function
+of $xy$, so the example refutes nothing), a claim that the unit of \cpt{thm:zpd-fxy} is
+dispensable (false, and this review had itself endorsed it in an earlier draft --- see D8),
+and an understated reading of D8 as statement hygiene, which a reviewer's counterexample
+corrected.
+
+\end{document}

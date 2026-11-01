@@ -1,0 +1,291 @@
+diff --git a/README.md b/README.md
+index 58c9351..7951407 100644
+--- a/README.md
++++ b/README.md
+@@ -1,11 +1,11 @@
+ # Algebras Determined by a Braided-Symmetric Product
+ 
+ Author: Abderrahim Adrabi, Mohammed V University in Rabat.  
+-Current version: **v7**.
++Current version: **v8**.
+ 
+ ## The idea of the paper
+ 
+-An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. For the symmetrized products of braided-symmetric derivations, this asks when the algebra with that product is zero product determined. The answer is a quotient criterion that needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, has the form f(xy) with f linear. The same holds on any algebra when the twist reverses products. Every unital zero product determined algebra is determined by every such . The converse holds when f is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined. A computation over F_3 shows that the algebra of 2 2 matrices is determined by a twisted product that has no form f(xy).
++An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product. We replace the product by any bilinear map and ask the same question. For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence when the braided-symmetric derivations of that product can be studied through zero products. The answer is a criterion in terms of the kernel of the induced map $A\otimes A\to A$, and it needs no surjectivity hypothesis. For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear. The same holds on any algebra when the twist reverses products. Every unital zero product determined algebra is determined by every such $\mu$. The converse holds when f is injective, so the identity braiding gives nothing new in characteristic other than 2. The converse fails for the twisted braiding, because the dual numbers are determined by their twisted product but are not zero product determined. A computation over F_3 shows that the algebra of $2\times 2$ matrices is determined by a twisted product that has no form f(xy).
+ 
+ ### Contents
+ 
+@@ -20,22 +20,23 @@ An algebra is zero product determined when every bilinear map that vanishes on t
+ | Path | Content |
+ |---|---|
+ | `paper/braided-sym-zpd.tex` | LaTeX source (class files in `cls/`) |
+-| `pdf/` | the PDF of the latest release |
+-| `lean/Research/BraidedSymZpd/` | Lean 4 files that check computations and lemmas of the paper (mathlib only) |
++| `pdf/` | the PDFs of the released versions |
++| `lean/Research/BraidedSymZpd/` | Lean 4 file that checks the $\mathbb{F}_3$ computation of `prop:matrix`; it also imports `Research.Zpd.Basic` and `Research.Zpd.DualNumbers` from the author's research repository, which are not published here, so it does not build from this repository alone |
+ 
+-Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. Build the Lean files with `cd lean && lake build`.
++Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`. The Lean file's `M2F3Check` block is self-contained and can be checked alone (`sed -n '/^namespace M2F3Check/,/^end M2F3Check/p' … > M2F3Check.lean && lean M2F3Check.lean`); a full `cd lean && lake build` needs the two missing modules and a mathlib revision pinned to the toolchain.
+ 
+ ## Change log
+ 
+-One entry per released version, newest first. Each version is also a tag of this repository.
++One entry per released version, newest first. Only the commits for v3 to v7 are in this repository's history, and no tags have been created.
+ 
+-- **v7** (2026-10-17): the notion is tied to braided-sym-deriv (A is determined by mu exactly when the nonassociative algebra (A, mu) is zpd; braided-symmetric derivations are the derivations of (A, \cdot_sigma), Adrabi2026 Definition 3.1 and Remark 3.4), the criterion is now Corollary cor:criterion of Bresar Proposition 1.3 applied to (A, mu) instead of a reproof, Remark rem:derivations treats derivations through zero products;
++- **v8** (2026-10-31): corrections from an external review, all listed in the header comment of `paper/braided-sym-zpd.tex`: the version stamp, the undefined linearisation of the Jordan product, the hypothesis of the abstract's sentence on the twisted braiding, the `Tri` locator (§2.2), the credit for matrix algebras, `mu` for the product in the definition of the symmetrized product, and one-line proofs for two assertions. Two statements were too strong and are corrected: `thm:zpd-fxy` now assumes $A$ unital (it is false without it), and the abstract's sentence on the twisted braiding now assumes $\alpha$ an endomorphism.
++- **v7** (2026-10-17): the notion is tied to braided-sym-deriv (A is determined by mu exactly when the nonassociative algebra (A, mu) is zpd; braided-symmetric derivations are the derivations of (A, \cdot_sigma), Adrabi2026 Definition 3.1 and Remark 3.4), the criterion is now Corollary cor:criterion of Bresar Proposition 1.3 applied to (A, mu) instead of a reproof, Remark rem:derivations treats derivations through zero products; two claims are added, Corollary `cor:triangular` and Proposition `prop:matrix` (the $\mathbb{F}_3$ computation);
+ - **v6** (2026-10-17): the layout follows braided-sym-deriv (a Preliminaries section recalls the definitions and the equivalent forms of Bresar; the Introduction points to every section), the citation of Bresar Theorem 2.27 carries its locator and the dual numbers example has a linking sentence. No claim changes; sections 2 to 4 are now 3 to 5.
+ - **v5** (2026-10-16): every result recalled from a reference is stated as the source gives it: the source's own kind (proposition, lemma, theorem, corollary, definition), its whole statement, one environment per result, nothing merged or specialized. No claim changes.
+ - **v4** (2026-10-16): the sentences that mention Lean are removed, as the owner rule of 2026-10-15 asks; the Lean file lives in the public repository of the paper. No claim changes.
+ - **v3** (2026-10-16): Bresar Corollary 2.17(a), Theorem 2.27 and Definition 3.14 are stated before use. No claim changes.
+-- **v1** (2026-09-25): first version
+ - **v2** (2026-09-27): introduction defines the three braidings directly and no longer cites braided-sym-deriv; Corollary 3.5 (anti-endomorphism twist) answers the transpose case of Question 4.3; the question is restated for the automorphism conjugation by diag(1,-1)
++- **v1** (2026-09-25): first version
+ 
+ ## References
+ 
+diff --git a/lean/Research/BraidedSymZpd/BraidedSymZpd.lean b/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
+index afd2d50..fbcd6c1 100644
+--- a/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
++++ b/lean/Research/BraidedSymZpd/BraidedSymZpd.lean
+@@ -23,8 +23,9 @@ a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
+ * `mapDetermined k B μ` : the `Research.Zpd.Basic.ZeroProductDetermined`
+   property, generalized from the fixed product `*` to an arbitrary bilinear
+   map `μ`.
+-* `symProdLinear σ` : the σ-symmetrized product, repackaged as a genuine
+-  `k`-bilinear map `B →ₗ[k] B →ₗ[k] B`, given `σ` itself `k`-bilinear.
++* `symProdStd B` and `jordanProd k B` : the standard braiding's symmetrized
++  product `x * y + y * x`, first as a plain function and then as a genuine
++  `k`-bilinear map `B →ₗ[k] B →ₗ[k] B`.
+ 
+ ## Main results
+ 
+@@ -32,17 +33,23 @@ a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
+   `Research.Zpd.zeroProductDetermined_iff_injective`, for an arbitrary
+   bilinear `μ`, given a surjectivity hypothesis in place of the original's
+   built-in `mul_one` unital trick.
+-* `mapDetermined_symProd_std_iff_zJpd` : for the standard braiding, "zero
++* `mapDetermined_iff_injective'` : the same criterion with the surjectivity
++  hypothesis removed.
++* `jordanProd_eq_symProdStd` : for the standard braiding, "zero
+   braided-symmetric-product determined" literally *is* zero-Jordan-product-
+   determined (Brešar–Alaminos–Extremera–Villena's zJpd, arXiv:1902.04846) —
+   not an analogy, a substitution, since `x ·_σ y = xy + yx` on the nose.
++  Turning that into an *iff* with a zJpd predicate would need the predicate
++  itself, which lives in `Research.Zpd`.
+ 
+ ## Twisted braiding
+ 
+ For a commutative algebra the twisted product is `f(xy)` with `f = 1 + α`,
+ so `mapDetermined_comp_mul_of_zpd` and `mapDetermined_comp_mul_of_codim_one`
+-below cover it. The noncommutative case (for example `M₂(F₃)` with the
+-transpose) is open and is logged in `formalization-debt.md`.
++below cover it. The noncommutative case is settled for `M₂(F₃)` by the
++computation in `M2F3Check` at the end of this file, and a product-reversing
++`α` (the transpose on `M₂`, for instance) is covered by
++`mapDetermined_twisted_anti_of_zpd`.
+ -/
+ 
+ namespace Research.BraidedSymZpd
+@@ -57,7 +64,13 @@ variable (k : Type u) (B : Type v) [Field k] [Ring B] [Algebra k B]
+ `μ` — every `k`-bilinear map vanishing on pairs with `μ x y = 0` factors
+ through `μ`. `Research.Zpd.Basic.ZeroProductDetermined` is the special case
+ `μ = LinearMap.mul' k B`; this file's whole point is to run its argument
+-again with `μ` the σ-symmetrized product instead. -/
++again with `μ` the σ-symmetrized product instead.
++
++The target `V` ranges over `Type v`, the universe of `B` — the quantifier used by
++`Research.Zpd.ZeroProductDetermined`, with which this definition has to compose. The paper's
++`def:determined` quantifies over every vector space, so this is a technical restriction inherited
++from the shared definition rather than a mathematical one; removing it means widening that
++definition as well. -/
+ def mapDetermined (μ : B →ₗ[k] B →ₗ[k] B) : Prop :=
+   ∀ (V : Type v) [AddCommGroup V] [Module k V] (φ : B →ₗ[k] B →ₗ[k] V),
+     (∀ x y : B, μ x y = 0 → φ x y = 0) →
+@@ -99,7 +112,7 @@ set_option maxHeartbeats 0 in
+ `mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
+ via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
+ a general `μ` this is a hypothesis, discharged case by case — see
+-`mapDetermined_symProd_std_iff_zJpd` below for the standard-braiding case),
++`mapOfQuot_jordanProd_surjective` below for the standard-braiding case),
+ `mapDetermined k B μ` holds iff `mapOfQuot k B μ` is injective. -/
+ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
+     (hsurj : Function.Surjective (mapOfQuot k B μ)) :
+@@ -122,6 +135,7 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
+         ψ (TensorProduct.lift μ t') := by
+       intro t'
+       induction t' with
++      | zero => simp
+       | tmul x y =>
+         rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
+           TensorProduct.mk_apply, Submodule.mkQ_apply]
+@@ -150,8 +164,9 @@ theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
+ 
+ /-! ## Standard braiding: reduction to Brešar's zJpd -/
+ 
+-/-- `BraidedSymmetric.lean`'s `standardBraiding` (`σ x y := y`) and
+-`symmetrizedProduct` (`x ·_σ y := x*y + σ(x,y)*σ(y,x)`), restated here on the
++/-- The earlier paper's `standardBraiding` (`σ x y := y`) and
++`symmetrizedProduct` (`x ·_σ y := x*y + σ(x,y)*σ(y,x)`), restated here (that
++development is not part of this repository) on the
+ ring `B` directly, without a cross-package `require`, so the transport lemma
+ below connects to the earlier paper's own notation rather than reproving
+ something disconnected from it under a different name. -/
+@@ -169,9 +184,9 @@ def jordanProd : B →ₗ[k] B →ₗ[k] B where
+ @[simp] theorem jordanProd_apply (x y : B) : jordanProd k B x y = x * y + y * x := rfl
+ 
+ /-- The two definitions agree pointwise: `jordanProd`'s underlying function
+-is exactly `symProdStd`, i.e. exactly `BraidedSymmetric.lean`'s
++is exactly `symProdStd`, i.e. exactly the earlier paper's
+ `symmetrizedProduct standardBraiding`. Not `rfl` by accident — it is the
+-literal content of `symmetrizedProduct_std` in the earlier paper's own file,
++literal content of `symmetrizedProduct_std` in that development,
+ re-derived here against this file's independent `symProdStd`. -/
+ theorem jordanProd_eq_symProdStd (x y : B) : jordanProd k B x y = symProdStd B x y := rfl
+ 
+@@ -231,6 +246,7 @@ theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
+         ψ (TensorProduct.lift μ s) := by
+       intro s
+       induction s with
++      | zero => simp
+       | tmul x y =>
+         rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
+           TensorProduct.mk_apply, Submodule.mkQ_apply]
+@@ -354,13 +370,15 @@ theorem mapDetermined_identityBraiding_iff_zpd (h2 : (2 : k) ≠ 0)
+   · intro hB
+     exact mapDetermined_identityBraiding_of_zpd k B hB μ hμ
+ 
+-/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`. -/
++/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`.
++This is the paper's `cor:twisted`, which assumes only that `α` is multiplicative (no unitality),
++so `α` is taken here as a linear map with `α (x * y) = α x * α y` rather than as an `AlgHom`. -/
+ theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
+-    (hB : Research.Zpd.ZeroProductDetermined k B) (α : B →ₐ[k] B)
++    (hB : Research.Zpd.ZeroProductDetermined k B)
++    (α : B →ₗ[k] B) (hα : ∀ x y : B, α (x * y) = α x * α y)
+     (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + α y * α x) : mapDetermined k B μ :=
+-  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α.toLinearMap) μ (fun x y => by
+-    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, AlgHom.toLinearMap_apply, ← map_mul,
+-      hcomm y x])
++  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α) μ (fun x y => by
++    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, ← hα y x, hcomm y x])
+ 
+ /-- **Corollary 3.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
+ then the twisted product is `(id + α)(xy)` on any algebra, commutative or not, so
+diff --git a/paper/braided-sym-zpd.tex b/paper/braided-sym-zpd.tex
+index 17cae99..1016ba3 100644
+--- a/paper/braided-sym-zpd.tex
++++ b/paper/braided-sym-zpd.tex
+@@ -1,4 +1,11 @@
+-% Version: v7 (2026-10-17), the Introduction explains what zero product determined algebras are used for, with Bresar Theorem 7.2 recalled, Remark rem:preserving carries it over to a bilinear map, and the open question on M_2(F_3) is answered by computation (Proposition prop:matrix). Acknowledgments removed. Claims added: Corollary cor:triangular and Proposition prop:matrix.
++% Version: v7 (2026-10-17), the Introduction explains what zero product determined algebras are used for, with Bresar Theorem 7.2 recalled, Remark rem:preserving carries it over to a bilinear map, and the open question on M_2(F_3) is answered by computation (Proposition prop:matrix). Acknowledgments (removed in v6, not in v7). Claims added: Corollary cor:triangular and Proposition prop:matrix.
++% Version: v8 (2026-10-31), corrections from an external review: the version stamp; the linearisation
++% of the Jordan product is written out, so q_circ is no longer undefined; the abstract no longer refers
++% to a quotient criterion and names the endomorphism hypothesis of the twisted braiding; the Tri locator
++% is SS2.2; matrix algebras are credited to Theorem thm:zpd-fxy and Corollary 2.17(a); mu is replaced by m
++% in the definition of the symmetrized product; Theorem thm:zpd-fxy states "unital", without which it is
++% false; the 13 = 13 remark names its product; one-line proofs are added for the two "not of the form
++% f(xy)" assertions. No claim changes except the abstract and Theorem thm:zpd-fxy, which were too strong.
+ \documentclass[]{interact}
+ \usepackage[utf8]{inputenc}
+ 
+@@ -50,7 +57,7 @@
+ \newcommand{\LDer}{\mathrm{LDer}}
+ \newcommand{\Zs}{\mathcal{Z}}
+ 
+-\newcommand{\paperversion}{2}
++\newcommand{\paperversion}{8}
+ 
+ 
+ \begin{document}
+@@ -68,9 +75,9 @@
+ \begin{abstract}
+ An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
+ We replace the product by any bilinear map $\mu$ and ask the same question.
+-For the symmetrized products of braided-symmetric derivations, this asks when the algebra with that product is zero product determined.
+-The answer is a quotient criterion that needs no surjectivity hypothesis.
+-For the symmetrized products of three braidings on a commutative algebra, $\mu$ has the form $f(xy)$ with $f$ linear.
++For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence when the braided-symmetric derivations of that product can be studied through zero products.
++The answer is a criterion in terms of the kernel of the induced map $A \otimes A \to A$, and it needs no surjectivity hypothesis.
++For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear.
+ The same holds on any algebra when the twist reverses products.
+ Every unital zero product determined algebra is determined by every such $\mu$.
+ The converse holds when $f$ is injective, so the identity braiding gives nothing new in characteristic other than $2$.
+@@ -126,7 +133,7 @@ Our first result is a criterion, which is Proposition 1.3 of Bre\v{s}ar for the
+ It says that $A$ is determined by $\mu$ if and only if the tensors $x \otimes y$ with $\mu(x,y) = 0$ span the kernel of the induced map on $A \otimes A$ (Corollary~\ref{cor:criterion}).
+ Our second result concerns products of the form $\mu(x,y) = f(xy)$ with $f$ linear.
+ Every unital zpd algebra is determined by every such $\mu$ (Theorem~\ref{thm:zpd-fxy}).
+-So the zpd algebras of Bre\v{s}ar, such as matrix algebras and triangular algebras \citep[Corollary 2.17]{Bresar2021}, are determined by all these products (Corollary~\ref{cor:triangular}).
++So the zpd algebras of Bre\v{s}ar are determined by all these products: the matrix algebras by Theorem~\ref{thm:zpd-fxy} and Corollary~\ref{cor:bresar-matrix}(a), the triangular algebras by Corollary~\ref{cor:triangular}.
+ The converse holds when $f$ is injective (Proposition~\ref{prop:injective}).
+ The identity braiding has this form, and so does the twisted braiding on a commutative algebra (Corollary~\ref{cor:twisted}) or when $\alpha$ reverses products (Corollary~\ref{cor:anti}). % claim-ok: follows from the definitions just given
+ Our third result shows that the converse fails for non-injective $f$.
+@@ -170,7 +177,7 @@ The following conditions are equivalent.
+ (iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
+ \end{proposition}
+ 
+-The next definition recalls the derivations of the symmetrized product $x \cdot_\sigma y = \mu(x \otimes y) + \mu(\sigma(x \otimes y))$, where $\mu$ is the product of $A$. % claim-ok: linking sentence
++The next definition recalls the derivations of the symmetrized product $x \cdot_\sigma y = m(x \otimes y) + m(\sigma(x \otimes y))$, where $m \colon A \otimes A \to A$ is the linearisation of the product of $A$. % claim-ok: linking sentence
+ 
+ \begin{definition}[{\citep[Definition 3.1]{Adrabi2026}}]\label{def:adrabi-bsder}
+ Let $A$ be a $K$-algebra and let $\sigma$ be a $K$-linear involution of $A \otimes A$.
+@@ -240,7 +247,7 @@ Condition (iii) says that $\sum_i z_i \otimes w_i \in \Zs_\mu$ whenever $\sum_i
+ This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings.
+ 
+ \begin{theorem}\label{thm:zpd-fxy}
+-Let $A$ be zpd, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
++Let $A$ be a unital zpd algebra, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
+ Then $A$ is determined by $\mu$.
+ \end{theorem}
+ 
+@@ -287,9 +294,9 @@ If $\operatorname{char} K \neq 2$ this $f$ is injective, and Proposition~\ref{pr
+ In characteristic $2$ the map $\mu$ is zero, every $\varphi$ in Definition~\ref{def:determined} is zero, and every algebra is determined by $\mu$.
+ 
+ The standard braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
+-When $\operatorname{char} K \neq 2$ the map $q_\circ$ is onto, because $x \circ \tfrac12 = x$.
++When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \otimes A \to A$ with $x \otimes y \mapsto x \circ y$ is onto, because $x \circ \tfrac12 = x$.
+ So Corollary~\ref{cor:criterion} recovers the usual form of the zJpd criterion.
+-It is not of the form $f(xy)$ on a noncommutative algebra, and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
++It is not of the form $f(xy)$ on a noncommutative algebra in characteristic other than $2$ (indeed $x = 1$ forces $f = 2\,\mathrm{id}$, and $xy + yx = 2xy$ then gives $yx = xy$), and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
+ 
+ The twisted braiding has the form $f(xy)$ when $A$ is commutative. % claim-ok: shown by the next lines
+ Let $\alpha$ be an algebra endomorphism of $A$.
+@@ -318,7 +325,7 @@ Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
+ 
+ We use a result of Bre\v{s}ar on matrix algebras.
+ 
+-For a unital algebra $A_1$, a unital algebra $A_2$ and a unital $(A_1, A_2)$-bimodule $M$, the matrices $\left[\begin{smallmatrix} r_1 & m \\ 0 & r_2 \end{smallmatrix}\right]$ with $r_1 \in A_1$, $m \in M$ and $r_2 \in A_2$ form an algebra under the usual matrix operations, which Bre\v{s}ar denotes by $\mathrm{Tri}(A_1, M, A_2)$ \citep[\S2.1]{Bresar2021} \citep[Section 2.1]{Bresar2021}.
++For a unital algebra $A_1$, a unital algebra $A_2$ and a unital $(A_1, A_2)$-bimodule $M$, the matrices $\left[\begin{smallmatrix} r_1 & m \\ 0 & r_2 \end{smallmatrix}\right]$ with $r_1 \in A_1$, $m \in M$ and $r_2 \in A_2$ form an algebra under the usual matrix operations, which Bre\v{s}ar denotes by $\mathrm{Tri}(A_1, M, A_2)$ \citep[\S2.2]{Bresar2021}.
+ 
+ \begin{corollary}[{\citep[Corollary 2.17]{Bresar2021}}]\label{cor:bresar-matrix}
+ The following algebras are zpd:
+@@ -392,7 +399,7 @@ By Theorem~\ref{thm:bresar-idempotents}, $A$ is not zpd.
+ \end{example}
+ 
+ So the twisted braiding determines a class of algebras strictly larger than the zpd ones, even among commutative algebras.
+-When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$, and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
++When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$ (indeed $y = 1$ forces $f = \mathrm{id} + \alpha$, and then $\alpha(yx) = \alpha(xy)$, so $yx = xy$ by injectivity of $\alpha$), and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
+ The criterion of Corollary~\ref{cor:criterion} still applies.
+ The next proposition uses it on the smallest case. % claim-ok: linking sentence
+ 
+@@ -410,7 +417,7 @@ Gaussian elimination over $\mathbb{F}_3$ shows that the $417$ tensors $x \otimes
+ So the two subspaces have the same dimension and are equal.
+ \end{proof}
+ 
+-The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $13 = 13$ for the twist by the transpose. % claim-ok: result of the same computation
++The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $13 = 13$ for the twist by the transpose, taken with the braiding product $xy + y^{\mathsf T} x^{\mathsf T} = xy + (xy)^{\mathsf T}$. % claim-ok: result of the same computation
+ 
+ \begin{question}\label{q:noncomm}
+ Which noncommutative algebras with an involutive automorphism $\alpha$ are determined by their twisted product $xy + \alpha(yx)$? % claim-ok: open question
+diff --git a/paper/latexmkrc b/paper/latexmkrc
+index a91ce6b..e50d7b7 100644
+--- a/paper/latexmkrc
++++ b/paper/latexmkrc
+@@ -15,4 +15,4 @@ $clean_ext = 'aux log out toc bbl blg bcf run.xml';
+ # Build into build/ and name the artifact after the slug and version, so a
+ # built PDF is self-identifying and the project root stays clean.
+ $out_dir = 'build';
+-$jobname = 'braided-sym-zpd-v7';
++$jobname = 'braided-sym-zpd-v8';
