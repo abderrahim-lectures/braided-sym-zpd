@@ -35,6 +35,9 @@ offset in the Brešar file).
 | 20 | §4, Jordan-product paragraph (l. 326–328) | "`∘̄` is onto … So `cor:criterion` recovers the usual form of the zJpd criterion" — the criterion needs no surjectivity, so the "so" does not follow. | "… so that `A² = A`; with this, `cor:criterion` for `μ = ∘` is the usual form of the zJpd criterion" |
 | 21 | §4, end (l. 385–387) | "It is injective only for `α = id`, so `prop:injective` gives no converse" — for `α = id` the map is `2·id`, injective, and the converse *is* available (`cor:identity`(ii)). | "… injective only for `α = id`, where the converse is `cor:identity`(ii), so for `α ≠ id` `prop:injective` gives no converse" |
 | 22 | `ex:dual` (l. 421–422) | the citation of Brešar's Example 2.23 invites the reader to think it proves the dual numbers are not zpd; what it proves is that they are *symmetrically* zpd (and not zpd, by Proposition 1.19), and its product is not the twisted one. | parenthetical naming both facts and saying the product here is not that one |
+| 23 | abstract and Introduction (l. 104, 154) | "the braided-symmetric derivations of that product" — the notion is defined only for an involution `σ`, and two of the advertised products come from non-involutions. | "for an involution `σ`" in both sentences |
+| 24 | Introduction (l. 141) | "The main purpose of this paper is to decide which algebras are determined by which `μ`" — the paper gives a criterion, two sufficient conditions, one counterexample and one computation; it does not decide the general question. | "to give a criterion for determination by `μ` and to settle the question for several classes of algebras and products" |
+| 25 | §4 (l. 327) | "`x ∘ ½ = x`" — `½` is a scalar and `x` an element. | "`x ∘ (½·1) = x`" |
 
 None of these changes a theorem's hypotheses or conclusion except items 5 and 6, which correct a
 sentence of the open question, not a numbered result.

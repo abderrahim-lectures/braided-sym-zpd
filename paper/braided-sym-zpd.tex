@@ -101,7 +101,7 @@
 \begin{abstract}
 An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
 We replace the product by any bilinear map $\mu$ and ask the same question.
-For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence when the braided-symmetric derivations of that product can be studied through zero products.
+For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when the braided-symmetric derivations of that product can be studied through zero products.
 The answer is a criterion in terms of the kernel of the induced map $A \otimes A \to A$, and it needs no surjectivity hypothesis.
 For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear.
 The same holds on any algebra when the twist reverses products.
@@ -138,7 +138,7 @@ The Jordan product $x \circ y = xy + yx$ has its own class, the zero Jordan prod
 The product and the Jordan product are two choices of a bilinear map.
 Bre\v{s}ar defines zpd for nonassociative algebras \citep[Definition 1.1]{Bresar2021}, so any bilinear map $\mu$ on $A$ gives a nonassociative algebra $(A,\mu)$; zpd for such a pair, with $\mu$ an arbitrary bilinear map, is the setting of Brice and Huang \citep{BriceHuang2015}.
 We say that $A$ is \emph{determined by} $\mu$ when $(A,\mu)$ is zpd (Definition~\ref{def:determined}).
-The main purpose of this paper is to decide which algebras are determined by which $\mu$.
+The main purpose of this paper is to give a criterion for determination by $\mu$ and to settle the question for several classes of algebras and products.
 The maps $\mu$ that interest us are the symmetrized products of \citet[Section 1]{Adrabi2026}.
 Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
 In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$, and we do not require $\sigma^2 = \mathrm{id}$, which differs from \citep[Definition 3.1]{Adrabi2026}.
@@ -150,7 +150,7 @@ The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alp
 Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
 For an involution $\sigma$, a \emph{braided-symmetric derivation} is a linear map $D$ with $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ \citep[Definition 3.1]{Adrabi2026}.
 These maps are the derivations of the nonassociative algebra $(A, \cdot_\sigma)$ \citep[Remark 3.4]{Adrabi2026}.
-So an algebra determined by $\mu_\sigma$ is one whose braided-symmetric derivations can be studied through zero products, as local derivations are \citep[Example 1.10]{Bresar2021}.
+So an algebra determined by $\mu_\sigma$, for an involution $\sigma$, is one whose braided-symmetric derivations can be studied through zero products, as local derivations are \citep[Example 1.10]{Bresar2021}.
 Remark~\ref{rem:derivations} takes the first step.
 For $T$ with $\mu(x,y) = 0 \Rightarrow T(x)T(y) = 0$, Remark~\ref{rem:preserving} gives the first part of Theorem~\ref{thm:bresar-zpp} on an algebra determined by $\mu$.
 
@@ -324,7 +324,7 @@ If $\operatorname{char} K \neq 2$ this $f$ is injective, and Proposition~\ref{pr
 In characteristic $2$ the map $\mu$ is zero, every $\varphi$ in Definition~\ref{def:determined} is zero, and every algebra is determined by $\mu$.
 
 The standard braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
-When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \otimes A \to A$ with $x \otimes y \mapsto x \circ y$ is onto, because $x \circ \tfrac12 = x$, so that $A^2 = A$; with this, Corollary~\ref{cor:criterion} for $\mu = \circ$ is the usual form of the zJpd criterion.
+When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \otimes A \to A$ with $x \otimes y \mapsto x \circ y$ is onto, because $x \circ (\tfrac12 \cdot 1) = x$, so that $A^2 = A$; with this, Corollary~\ref{cor:criterion} for $\mu = \circ$ is the usual form of the zJpd criterion.
 It is not of the form $f(xy)$ on a noncommutative algebra (indeed $x = 1$ forces $f = 2\,\mathrm{id}$: if $\operatorname{char} K \neq 2$ then $xy + yx = 2xy$ gives $yx = xy$, while if $\operatorname{char} K = 2$ then $f = 0$, so $xy + yx = 0$ for all $x, y$, which fails as soon as $xy \neq yx$), and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
 
 The twisted braiding has the form $f(xy)$ when $A$ is commutative and $\alpha$ is an endomorphism. % claim-ok: shown by the next lines (commutativity alone is not enough: a merely linear alpha need not give a function of xy)
