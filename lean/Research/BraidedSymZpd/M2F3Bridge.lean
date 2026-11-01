@@ -6,6 +6,8 @@ Authors: Open Math OS review pass
 module
 
 public import ZpdCore.Zpd
+public import Research.BraidedSymZpd.BraidedSymZpd
+public import Research.BraidedSymZpd.ZJpd
 public import Mathlib.Algebra.Field.ZMod
 public import Mathlib.Data.Matrix.Basic
 public import Mathlib.Data.ZMod.Basic
@@ -19,8 +21,8 @@ public import Mathlib.LinearAlgebra.TensorProduct.Basis
 
 The paper's Proposition `prop:matrix` is proved by counting dimensions: for `A = M₂(𝔽₃)` and
 `α` the conjugation by `diag (1, -1)`, the linearisation `μ̄_α` has rank `4`, so its kernel has
-dimension `16 - 4 = 12`, and the `417` pairs `(x, y)` with `μ_α (x, y) = 0` span a subspace of
-dimension `12`. Equal dimensions together with `Z_μ ⊆ ker μ̄` give `Z_μ = ker μ̄`, and by the
+dimension `16 - 4 = 12`, and the `417` pairs `(x, y)` with `μ_α (x, y) = 0` span a subspace
+of dimension `12`. Equal dimensions together with `Z_μ ⊆ ker μ̄` give `Z_μ = ker μ̄`, and by the
 criterion `cor:criterion` this is the determination of `A` by `μ_α`.
 
 `Research.BraidedSymZpd.M2F3` checks the three numbers by kernel evaluation. This file closes the
@@ -184,8 +186,34 @@ theorem linearIndependent_tensors :
   exact linearIndependent_of_cert _ posK posL nInv h
 
 
+/-- `diag (1, -1)` as a unit of `M₂(𝔽₃)`; it is its own inverse. -/
+def diagUnit : Aˣ where
+  val := diagPM
+  inv := diagPM
+  val_inv := diagPM_mul_self
+  inv_val := diagPM_mul_self
+
+/-- The paper's `α` of `prop:matrix` is the inner automorphism of the paper's `rem:inner`: the
+conjugation by the unit `diag (1, -1)`. This is what identifies the two proofs of `prop:matrix` in
+this repository — the finrank proof below and `ZJpd.determined_matrix2` are both about
+`twistMu (conjByUnit diagUnit)`. -/
+theorem conjByUnit_diagUnit :
+    BraidedSymZpd.conjByUnit (K := K) diagUnit = alphaLM := by
+  have hv : (↑diagUnit : A) = diagPM := rfl
+  have hi : (↑diagUnit⁻¹ : A) = diagPM := rfl
+  refine LinearMap.ext fun x => ?_
+  rw [BraidedSymZpd.conjByUnit_apply, hv, hi, ← alpha_eq]
+  rfl
+
+/-- The two descriptions of the unit `diag (1, -1)`: this file's and `ZJpd`'s. -/
+theorem diagUnit_eq_zjpd : diagUnit = ZJpd.diagUnit := Units.ext rfl
+
 /-- The twisted product of the paper: `μ (x, y) = x * y + α y * α x`. -/
 noncomputable def mu : A →ₗ[K] A →ₗ[K] A := ZpdCore.twistMu alphaLM
+
+theorem mu_eq_twistMu_conjByUnit :
+    mu = ZpdCore.twistMu (BraidedSymZpd.conjByUnit (K := K) diagUnit) := by
+  rw [mu, conjByUnit_diagUnit]
 
 @[simp] theorem mu_apply (x y : A) : mu x y = x * y + alphaLM y * alphaLM x := rfl
 
@@ -291,6 +319,14 @@ twisted product of the conjugation by `diag (1, -1)`. -/
 theorem determined : ZpdCore.Determined mu :=
   (ZpdCore.determined_iff mu).mpr Zmu_eq_ker
 
+/-- **`prop:matrix` again, by the Peirce computation**: the statement of `ZJpd.determined_matrix2`
+and the dimension-count statement `determined` are the same statement, so this is a second proof
+of `prop:matrix` that does not enumerate the `417` pairs. -/
+theorem determined_of_peirce :
+    ZpdCore.Determined (ZpdCore.twistMu (BraidedSymZpd.conjByUnit (K := K) ZJpd.diagUnit)) := by
+  rw [← diagUnit_eq_zjpd, ← mu_eq_twistMu_conjByUnit]
+  exact determined
+
 end M2F3Bridge
 
 end BraidedSymZpd
@@ -305,4 +341,7 @@ end BraidedSymZpd
 #print axioms BraidedSymZpd.M2F3Bridge.finrank_range
 #print axioms BraidedSymZpd.M2F3Bridge.finrank_ker
 #print axioms BraidedSymZpd.M2F3Bridge.Zmu_eq_ker
+#print axioms BraidedSymZpd.M2F3Bridge.conjByUnit_diagUnit
+#print axioms BraidedSymZpd.M2F3Bridge.mu_eq_twistMu_conjByUnit
 #print axioms BraidedSymZpd.M2F3Bridge.determined
+#print axioms BraidedSymZpd.M2F3Bridge.determined_of_peirce
