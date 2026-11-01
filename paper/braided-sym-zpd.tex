@@ -1,4 +1,37 @@
-% Version: v7 (2026-10-17), the Introduction explains what zero product determined algebras are used for, with Bresar Theorem 7.2 recalled, Remark rem:preserving carries it over to a bilinear map, and the open question on M_2(F_3) is answered by computation (Proposition prop:matrix). Acknowledgments removed. Claims added: Corollary cor:triangular and Proposition prop:matrix.
+% Version: v7 (2026-10-17), the Introduction explains what zero product determined algebras are used for, with Bresar Theorem 7.2 recalled, Remark rem:preserving carries it over to a bilinear map, and the open question on M_2(F_3) is answered by computation (Proposition prop:matrix). Acknowledgments (removed in v6, not in v7). Claims added: Corollary cor:triangular and Proposition prop:matrix.
+% Version: v8 (2026-10-31), corrections from an external review: the version stamp; the linearisation
+% of the Jordan product is written out, so q_circ is no longer undefined; the abstract no longer refers
+% to a quotient criterion and names the endomorphism hypothesis of the twisted braiding; the Tri locator
+% is SS2.2; matrix algebras are credited to Theorem thm:zpd-fxy and Corollary 2.17(a); mu is replaced by m
+% in the definition of the symmetrized product; Theorem thm:zpd-fxy states "unital", without which it is
+% false; the 13 = 13 remark names its product; one-line proofs are added for the two "not of the form
+% f(xy)" assertions. No claim changes except the abstract and Theorem thm:zpd-fxy, which were too strong.
+% Commits after the first v8 one on this branch: the framework and the criterion are credited to
+% Brice and Huang (Theorem 2.3 of their 2015 paper), which is a claim-level attribution change; the
+% Jordan-product sentence is strengthened to every characteristic; a stress and novelty pass is
+% recorded in results/deep-review-v8.md; and lean/ZpdCore machine-checks the paper's core without
+% the unpublished modules. The "No claim changes" sentence two lines above described only the first
+% v8 commit, and is kept for that reason.
+% Blind-spot pass (third review): the topic sentence of section 4 names the two braidings it covers;
+% cor:anti states "unital" — without it the corollary is false (the counterexample algebra of the
+% first review, with an anti-multiplicative bijection alpha, is zpd but not determined by
+% xy + alpha(y)alpha(x): dim Z = 6 < 7 = dim ker, verified over F_2, F_3, F_5, F_7); the
+% Introduction's twisted-braiding sentence carries the endomorphism hypothesis.
+% Fourth review (this branch): the locator of Tri(A_1,M,A_2) is SS2.1, where Bresar defines it, not
+% SS2.2; Phi in rem:inner is a linear automorphism of A (x) A, not an algebra automorphism; the
+% idempotents that generate M_n(B) in rem:inner are e_ii and e_ii + b e_ij, not (e_ii + b e_ij) - e_ii,
+% which is b e_ij; that sentence also states n >= 2 and the unitality of the algebra to which the
+% An-Li-He theorem is applied; the standing hypothesis that A is unital now names Sections 3 to 5;
+% the remark after prop:matrix spells out the dimensions it compares; and the counterexample
+% recorded in the first paragraph of Section 4 is the pair (e_2,e_2), (e_2,1), which works in every
+% characteristic (the earlier pair (e_1,e_1), (e_1,1) needed characteristic other than 3). The answer
+% recorded in q:noncomm was false: an inner alpha only reduces the twisted product to the Jordan
+% product (rem:inner), so the answer there is affirmative exactly for the zJpd algebras -- true for
+% M_n(B), false for the real quaternions with alpha = id (Bresar Example 3.19) -- and the sentence
+% "every automorphism of a matrix algebra is inner" now names M_n(K) over a field, where it is the
+% Skolem-Noether theorem. The Introduction credits the criterion to Brice and Huang as well as to
+% Bresar. The Lean development was rebuilt: it compiles from this repository alone, without the
+% unpublished modules, and the numbers of prop:matrix are checked by kernel evaluation.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -50,7 +83,7 @@
 \newcommand{\LDer}{\mathrm{LDer}}
 \newcommand{\Zs}{\mathcal{Z}}
 
-\newcommand{\paperversion}{2}
+\newcommand{\paperversion}{8}
 
 
 \begin{document}
@@ -68,9 +101,9 @@
 \begin{abstract}
 An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
 We replace the product by any bilinear map $\mu$ and ask the same question.
-For the symmetrized products of braided-symmetric derivations, this asks when the algebra with that product is zero product determined.
-The answer is a quotient criterion that needs no surjectivity hypothesis.
-For the symmetrized products of three braidings on a commutative algebra, $\mu$ has the form $f(xy)$ with $f$ linear.
+For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when the braided-symmetric derivations of that product can be studied through zero products.
+The answer is a criterion in terms of the kernel of the induced map $A \otimes A \to A$, and it needs no surjectivity hypothesis.
+For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear.
 The same holds on any algebra when the twist reverses products.
 Every unital zero product determined algebra is determined by every such $\mu$.
 The converse holds when $f$ is injective, so the identity braiding gives nothing new in characteristic other than $2$.
@@ -103,9 +136,9 @@ Jordan homomorphisms appear in the study of maps that preserve zero products or 
 The Jordan product $x \circ y = xy + yx$ has its own class, the zero Jordan product determined (zJpd) algebras \citep[Definition 3.14]{Bresar2021}.
 
 The product and the Jordan product are two choices of a bilinear map.
-Bre\v{s}ar defines zpd for nonassociative algebras \citep[Definition 1.1]{Bresar2021}, so any bilinear map $\mu$ on $A$ gives a nonassociative algebra $(A,\mu)$.
+Bre\v{s}ar defines zpd for nonassociative algebras \citep[Definition 1.1]{Bresar2021}, so any bilinear map $\mu$ on $A$ gives a nonassociative algebra $(A,\mu)$; zpd for such a pair, with $\mu$ an arbitrary bilinear map, is the setting of Brice and Huang \citep{BriceHuang2015}.
 We say that $A$ is \emph{determined by} $\mu$ when $(A,\mu)$ is zpd (Definition~\ref{def:determined}).
-The main purpose of this paper is to decide which algebras are determined by which $\mu$.
+The main purpose of this paper is to give a criterion for determination by $\mu$ and to settle the question for several classes of algebras and products.
 The maps $\mu$ that interest us are the symmetrized products of \citet[Section 1]{Adrabi2026}.
 Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
 In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$, and we do not require $\sigma^2 = \mathrm{id}$, which differs from \citep[Definition 3.1]{Adrabi2026}.
@@ -113,22 +146,22 @@ Its symmetrized product is $x \cdot_\sigma y = \mu_\sigma(x,y) = m(x \otimes y +
 We use three braidings.
 The first is the identity. % claim-ok: definition of the first braiding
 The second is the swap $x \otimes y \mapsto y \otimes x$. % claim-ok: definition of the second braiding
-The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alpha(x)$, for a linear map $\alpha \colon A \to A$, which twists the swap \citep[Section 4]{Adrabi2026}.
+The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alpha(x)$, for a linear map $\alpha \colon A \to A$, which twists the swap \citep[Section 4]{Adrabi2026}; \citet{Adrabi2026} takes $\alpha$ involutive, and we do not.
 Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
 For an involution $\sigma$, a \emph{braided-symmetric derivation} is a linear map $D$ with $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ \citep[Definition 3.1]{Adrabi2026}.
 These maps are the derivations of the nonassociative algebra $(A, \cdot_\sigma)$ \citep[Remark 3.4]{Adrabi2026}.
-So an algebra determined by $\mu_\sigma$ is one whose braided-symmetric derivations can be studied through zero products, as local derivations are \citep[Example 1.10]{Bresar2021}.
+So an algebra determined by $\mu_\sigma$, for an involution $\sigma$, is one whose braided-symmetric derivations can be studied through zero products, as local derivations are \citep[Example 1.10]{Bresar2021}.
 Remark~\ref{rem:derivations} takes the first step.
 For $T$ with $\mu(x,y) = 0 \Rightarrow T(x)T(y) = 0$, Remark~\ref{rem:preserving} gives the first part of Theorem~\ref{thm:bresar-zpp} on an algebra determined by $\mu$.
 
 We now describe the main results.
-Our first result is a criterion, which is Proposition 1.3 of Bre\v{s}ar for the algebra $(A,\mu)$.
+We first record the criterion that the later proofs use: it is Proposition 1.3 of Bre\v{s}ar for the algebra $(A,\mu)$, and Theorem 2.3 of Brice and Huang for an arbitrary bilinear $\mu$ over a commutative ring \citep{BriceHuang2015}.
 It says that $A$ is determined by $\mu$ if and only if the tensors $x \otimes y$ with $\mu(x,y) = 0$ span the kernel of the induced map on $A \otimes A$ (Corollary~\ref{cor:criterion}).
 Our second result concerns products of the form $\mu(x,y) = f(xy)$ with $f$ linear.
 Every unital zpd algebra is determined by every such $\mu$ (Theorem~\ref{thm:zpd-fxy}).
-So the zpd algebras of Bre\v{s}ar, such as matrix algebras and triangular algebras \citep[Corollary 2.17]{Bresar2021}, are determined by all these products (Corollary~\ref{cor:triangular}).
+So the zpd algebras of Bre\v{s}ar are determined by all these products: the matrix algebras by Theorem~\ref{thm:zpd-fxy} and Corollary~\ref{cor:bresar-matrix}(a), the triangular algebras by Corollary~\ref{cor:triangular}.
 The converse holds when $f$ is injective (Proposition~\ref{prop:injective}).
-The identity braiding has this form, and so does the twisted braiding on a commutative algebra (Corollary~\ref{cor:twisted}) or when $\alpha$ reverses products (Corollary~\ref{cor:anti}). % claim-ok: follows from the definitions just given
+The identity braiding has this form, and so does the twisted braiding when $A$ is commutative and $\alpha$ is an endomorphism (Corollary~\ref{cor:twisted}), or when $\alpha$ reverses products (Corollary~\ref{cor:anti}). % claim-ok: follows from the definitions just given (commutativity alone is not enough: on K × K, a zpd algebra, with the linear α(x,y) = (x+y,0), the pairs (e_2, e_2) and (e_2, 1) have the same product e_2 but μ = 1 and μ = e_2 + 2e_1)
 Our third result shows that the converse fails for non-injective $f$.
 Theorem~\ref{thm:codim} gives a sufficient condition, and Example~\ref{ex:dual} shows that the dual numbers are determined by the twisted product but are not zpd.
 So the twisted product describes maps on algebras that the zpd theory does not reach.
@@ -137,21 +170,21 @@ Proposition~\ref{prop:matrix} shows by computation that $M_2(\mathbb{F}_3)$ is d
 Question~\ref{q:noncomm} asks for the general case.
 
 We follow this order.
-Section~\ref{sec:prelim} recalls the definitions and the results of Bre\v{s}ar that we use, and it contains no new results.
+Section~\ref{sec:prelim} recalls the definitions and the results of Bre\v{s}ar and of \citet{Adrabi2026} that we use, and it contains no new results.
 Section~\ref{sec:criterion} proves the criterion.
 Section~\ref{sec:fxy} treats products of the form $f(xy)$, with matrix and triangular algebras as applications.
 Section~\ref{sec:beyond} contains the dual numbers, the matrix computation and the open question.
 
 \section{Preliminaries}\label{sec:prelim}
 
-This section recalls the notions of Bre\v{s}ar that we need, and none of it is new.
-We recall two definitions and then the equivalent forms of the first.
+This section recalls the notions of Bre\v{s}ar and of \citet{Adrabi2026} that we need, and none of it is new.
+We recall the two basic definitions of Bre\v{s}ar and the equivalent forms of the first, then Definition~\ref{def:adrabi-bsder} of \citet{Adrabi2026}, and finally Definition~\ref{def:bresar-zpp} and Theorem~\ref{thm:bresar-zpp} of Bre\v{s}ar.
 
 \begin{definition}[{\citep[Definition 1.1]{Bresar2021}}]\label{def:bresar-zpd}
 A nonassociative algebra $A$ over a field $F$ is said to be \emph{zero product determined} if, for every bilinear functional $\varphi \colon A \times A \to F$ satisfying $\varphi(x,y) = 0$ whenever $x, y \in A$ are such that $xy = 0$, there exists a linear functional $\tau$ on $A$ such that $\varphi(x,y) = \tau(xy)$ for all $x, y \in A$.
 \end{definition}
 
-We abbreviate \emph{zero product determined} to zpd, as \citet[Definition 1.1]{Bresar2021} does.
+We abbreviate \emph{zero product determined} to zpd, as \citet[\S1.1]{Bresar2021} does.
 
 \begin{definition}[{\citep[Definition 3.14]{Bresar2021}}]\label{def:bresar-zjpd}
 An associative algebra $A$ is \emph{zero Jordan product determined} if the Jordan algebra $A^+$ is zero product determined.
@@ -170,7 +203,7 @@ The following conditions are equivalent.
 (iv) For every vector space $X$ over $F$ and every bilinear map $\varphi \colon A \times A \to X$ with $\varphi(x,y) = 0$ whenever $xy = 0$, there is a linear map $T \colon A \to X$ with $\varphi(x,y) = T(xy)$ for all $x, y \in A$.
 \end{proposition}
 
-The next definition recalls the derivations of the symmetrized product $x \cdot_\sigma y = \mu(x \otimes y) + \mu(\sigma(x \otimes y))$, where $\mu$ is the product of $A$. % claim-ok: linking sentence
+The next definition recalls the derivations of the symmetrized product $x \cdot_\sigma y = m(x \otimes y) + m(\sigma(x \otimes y))$, where $m \colon A \otimes A \to A$ is the linearisation of the product of $A$. % claim-ok: linking sentence
 
 \begin{definition}[{\citep[Definition 3.1]{Adrabi2026}}]\label{def:adrabi-bsder}
 Let $A$ be a $K$-algebra and let $\sigma$ be a $K$-linear involution of $A \otimes A$.
@@ -194,7 +227,7 @@ Moreover, if both $A$ and $B$ are unital and the range of $T$ contains an invert
 \section{Determined by a bilinear map}\label{sec:criterion}
 
 This section gives the definition and the criterion that later proofs use.
-Throughout, $A$ is a unital associative algebra over a field $K$, and $\mu \colon A \times A \to A$ is $K$-bilinear.
+Throughout Sections~\ref{sec:criterion} to~\ref{sec:beyond}, $A$ is a unital associative algebra over a field $K$, and $\mu \colon A \times A \to A$ is $K$-bilinear.
 
 \begin{definition}\label{def:determined}
 The algebra $A$ is \emph{determined by} $\mu$ if the nonassociative algebra $(A,\mu)$ is zpd.
@@ -230,6 +263,10 @@ Then $\Zs_\mu \subseteq \ker \bar\mu$.
 The algebra $A$ is determined by $\mu$ if and only if $\Zs_\mu = \ker \bar\mu$.
 \end{corollary}
 
+\noindent
+The criterion is stated for an arbitrary bilinear $\mu$, over a commutative ring, by Brice and Huang
+\citep[Theorem 2.3]{BriceHuang2015}; Proposition 1.3 of Bre\v{s}ar, recalled as Proposition~\ref{prop:bresar-zpd}, is the same statement for the product of a nonassociative algebra, and Corollary~\ref{cor:criterion} is that statement applied to $(A,\mu)$.
+
 \begin{proof}
 Apply the equivalence of (i) and (iii) in Proposition~\ref{prop:bresar-zpd} to the nonassociative algebra $(A,\mu)$.
 Condition (iii) says that $\sum_i z_i \otimes w_i \in \Zs_\mu$ whenever $\sum_i \mu(z_i,w_i) = 0$, which is $\ker \bar\mu \subseteq \Zs_\mu$.
@@ -237,10 +274,10 @@ Condition (iii) says that $\sum_i z_i \otimes w_i \in \Zs_\mu$ whenever $\sum_i 
 
 \section{Products of the form \texorpdfstring{$f(xy)$}{f(xy)}}\label{sec:fxy}
 
-This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings.
+This section treats the case $\mu(x,y) = f(xy)$ with $f \colon A \to A$ linear, which includes two of the three braidings: the identity braiding, and the twisted braiding when $\alpha$ is an endomorphism or reverses products (Corollaries~\ref{cor:twisted} and~\ref{cor:anti}).
 
 \begin{theorem}\label{thm:zpd-fxy}
-Let $A$ be zpd, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
+Let $A$ be a unital zpd algebra, let $f \colon A \to A$ be linear, and let $\mu(x,y) = f(xy)$.
 Then $A$ is determined by $\mu$.
 \end{theorem}
 
@@ -287,11 +324,10 @@ If $\operatorname{char} K \neq 2$ this $f$ is injective, and Proposition~\ref{pr
 In characteristic $2$ the map $\mu$ is zero, every $\varphi$ in Definition~\ref{def:determined} is zero, and every algebra is determined by $\mu$.
 
 The standard braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
-When $\operatorname{char} K \neq 2$ the map $q_\circ$ is onto, because $x \circ \tfrac12 = x$.
-So Corollary~\ref{cor:criterion} recovers the usual form of the zJpd criterion.
-It is not of the form $f(xy)$ on a noncommutative algebra, and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
+When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \otimes A \to A$ with $x \otimes y \mapsto x \circ y$ is onto, because $x \circ (\tfrac12 \cdot 1) = x$, so that $A^2 = A$; with this, Corollary~\ref{cor:criterion} for $\mu = \circ$ is the usual form of the zJpd criterion.
+It is not of the form $f(xy)$ on a noncommutative algebra (indeed $x = 1$ forces $f = 2\,\mathrm{id}$: if $\operatorname{char} K \neq 2$ then $xy + yx = 2xy$ gives $yx = xy$, while if $\operatorname{char} K = 2$ then $f = 0$, so $xy + yx = 0$ for all $x, y$, which fails as soon as $xy \neq yx$), and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
 
-The twisted braiding has the form $f(xy)$ when $A$ is commutative. % claim-ok: shown by the next lines
+The twisted braiding has the form $f(xy)$ when $A$ is commutative and $\alpha$ is an endomorphism. % claim-ok: shown by the next lines (commutativity alone is not enough: a merely linear alpha need not give a function of xy)
 Let $\alpha$ be an algebra endomorphism of $A$.
 Then $\alpha(y)\alpha(x) = \alpha(yx) = \alpha(xy)$, so $xy + \alpha(y)\alpha(x) = (\mathrm{id} + \alpha)(xy)$.
 
@@ -307,7 +343,7 @@ Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
 The same holds on a noncommutative algebra when $\alpha$ reverses products. % claim-ok: shown by the next lines
 
 \begin{corollary}\label{cor:anti}
-Let $A$ be zpd, and let $\alpha \colon A \to A$ be linear with $\alpha(xy) = \alpha(y)\alpha(x)$ for all $x, y$.
+Let $A$ be a unital zpd algebra, and let $\alpha \colon A \to A$ be linear with $\alpha(xy) = \alpha(y)\alpha(x)$ for all $x, y$.
 Then $A$ is determined by $\mu_\alpha(x,y) = xy + \alpha(y)\alpha(x)$.
 \end{corollary}
 
@@ -318,7 +354,7 @@ Apply Theorem~\ref{thm:zpd-fxy} with $f = \mathrm{id} + \alpha$.
 
 We use a result of Bre\v{s}ar on matrix algebras.
 
-For a unital algebra $A_1$, a unital algebra $A_2$ and a unital $(A_1, A_2)$-bimodule $M$, the matrices $\left[\begin{smallmatrix} r_1 & m \\ 0 & r_2 \end{smallmatrix}\right]$ with $r_1 \in A_1$, $m \in M$ and $r_2 \in A_2$ form an algebra under the usual matrix operations, which Bre\v{s}ar denotes by $\mathrm{Tri}(A_1, M, A_2)$ \citep[\S2.1]{Bresar2021} \citep[Section 2.1]{Bresar2021}.
+For a unital algebra $A_1$, a unital algebra $A_2$ and a unital $(A_1, A_2)$-bimodule $M$, the matrices $\left[\begin{smallmatrix} r_1 & m \\ 0 & r_2 \end{smallmatrix}\right]$ with $r_1 \in A_1$, $m \in M$ and $r_2 \in A_2$ form an algebra under the usual matrix operations, which Bre\v{s}ar denotes by $\mathrm{Tri}(A_1, M, A_2)$ \citep[\S2.1]{Bresar2021}.
 
 \begin{corollary}[{\citep[Corollary 2.17]{Bresar2021}}]\label{cor:bresar-matrix}
 The following algebras are zpd:
@@ -327,7 +363,7 @@ The following algebras are zpd:
 \end{corollary}
 
 By Corollary~\ref{cor:bresar-matrix}(a) with $B = K$, the matrix algebra $M_n(K)$ is zpd for $n \geq 2$.
-The transpose reverses products \citep[0.2.5]{HornJohnson2013}.
+The transpose reverses products \citep[\S 0.2.5]{HornJohnson2013}.
 So Corollary~\ref{cor:anti} applies to $M_n(K)$ and to the transpose, and to every linear map $\alpha$ of $M_n(K)$ that reverses products.
 
 Part (b) of the same corollary gives a second family, the triangular algebras.
@@ -346,8 +382,8 @@ Apply Theorem~\ref{thm:zpd-fxy}, and then Corollary~\ref{cor:anti} for the last 
 The algebra of upper triangular $n \times n$ matrices over a field is of type (b) \citep[Example 2.19]{Bresar2021}, so Corollary~\ref{cor:triangular} applies to it. % reproof-ok: application of the cited example
 
 When $\alpha$ is an involution and $\operatorname{char} K \neq 2$, the map $\mathrm{id} + \alpha$ is twice the projection onto the fixed points of $\alpha$.
-It is injective only for $\alpha = \mathrm{id}$, so Proposition~\ref{prop:injective} gives no converse.
-The next section shows that the converse is false.
+It is injective only for $\alpha = \mathrm{id}$, where the converse is Corollary~\ref{cor:identity}(ii), so for $\alpha \neq \mathrm{id}$ Proposition~\ref{prop:injective} gives no converse.
+The next section shows that the converse is false for such an $\alpha$.
 
 \section{Determined but not zpd}\label{sec:beyond}
 
@@ -382,7 +418,7 @@ A finite-dimensional unital algebra is zpd if and only if it is generated by ide
 The next example uses this characterization to show that the class of algebras determined by the twisted product is strictly larger. % claim-ok: linking sentence for the example that follows
 
 \begin{example}[Dual numbers]\label{ex:dual}
-Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$, an algebra of the form studied in \citep[Example 2.23]{Bresar2021}, where a unity is adjoined to an algebra with trivial multiplication; here that algebra is $K\varepsilon$. % claim-ok: identification of the dual numbers with the algebra obtained from the one-dimensional algebra $K\varepsilon$ of trivial multiplication
+Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$, an algebra of the form studied in \citep[Example 2.23]{Bresar2021}, where a unity is adjoined to an algebra with trivial multiplication (there it is shown to be symmetrically zpd and not zpd); here that algebra is $K\varepsilon$, and the twisted product below is not the symmetrized product of that example. % claim-ok: identification of the dual numbers with the algebra obtained from the one-dimensional algebra $K\varepsilon$ of trivial multiplication
 The map $\alpha(a + b\varepsilon) = a - b\varepsilon$ is an involutive automorphism.
 Since $A$ is commutative, $\mu_\alpha(x,y) = f(xy)$ with $f = \mathrm{id} + \alpha$, and $f(a + b\varepsilon) = 2a$.
 So $N = K\varepsilon$, which is an ideal, $f(1) = 2 \neq 0$, and $c(a + b\varepsilon) = a$ satisfies the last hypothesis.
@@ -392,9 +428,9 @@ By Theorem~\ref{thm:bresar-idempotents}, $A$ is not zpd.
 \end{example}
 
 So the twisted braiding determines a class of algebras strictly larger than the zpd ones, even among commutative algebras.
-When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$, and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
+When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$ (indeed $y = 1$ forces $f = \mathrm{id} + \alpha$, and then $\alpha(yx) = \alpha(xy)$, so $yx = xy$ by injectivity of $\alpha$), and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
 The criterion of Corollary~\ref{cor:criterion} still applies.
-The next proposition uses it on the smallest case. % claim-ok: linking sentence
+The next proposition uses it on the smallest case over a field of odd characteristic (over $\mathbb{F}_2$, $M_2(\mathbb{F}_2)$ with $\alpha$ the conjugation by $\bigl[\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr]$ is smaller and gives the same conclusion: the kernel has dimension $13$ and the zero pairs span $13$). % claim-ok: linking sentence
 
 \begin{proposition}\label{prop:matrix}
 Let $A = M_2(\mathbb{F}_3)$ and let $\alpha$ be conjugation by $\operatorname{diag}(1,-1)$, an involutive automorphism.
@@ -410,16 +446,43 @@ Gaussian elimination over $\mathbb{F}_3$ shows that the $417$ tensors $x \otimes
 So the two subspaces have the same dimension and are equal.
 \end{proof}
 
-The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $13 = 13$ for the twist by the transpose. % claim-ok: result of the same computation
+The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $\dim \Zs = \dim \ker = 13$ for the twist by the transpose, taken with the braiding product $xy + y^{\mathsf T} x^{\mathsf T} = xy + (xy)^{\mathsf T}$. % claim-ok: result of the same computation
+
+\begin{remark}\label{rem:inner}
+If $\alpha$ is inner, that is $\alpha(x) = DxD^{-1}$ for an invertible $D$, the twisted product is a
+Jordan product in disguise: for all $x$ and $y$,
+\[
+xy + \alpha(yx) = xy + (Dy)(xD^{-1}) = (xD^{-1})(Dy) + (Dy)(xD^{-1}) = (xD^{-1}) \circ (Dy) .
+\]
+Let $\Phi$ be the linear automorphism $x \otimes y \mapsto xD^{-1} \otimes Dy$ of $A \otimes A$. The identity above
+says $\bar\mu_\alpha = \bar\circ \circ\, \Phi$, so $\ker \bar\mu_\alpha = \Phi^{-1}(\ker \bar\circ)$, and
+since $\Phi$ carries pure tensors to pure tensors, $\Zs_{\mu_\alpha} = \Phi^{-1}(\Zs_\circ)$. Hence $A$ is
+determined by $\mu_\alpha$ if and only if $A$ is determined by the Jordan product, and the answer does not
+depend on $D$.
+In particular, for a unital algebra $B$ and $n \ge 2$ the matrix algebra $M_n(B)$ is generated by the idempotents $e_{ii}$ and
+$e_{ii} + be_{ij}$ for $i \ne j$ with $b \in B$ (indeed $be_{ij} = (e_{ii} + be_{ij}) - e_{ii}$ and
+$be_{ii} = (be_{ij})e_{ji}$), and a unital algebra generated by idempotents is zJpd in characteristic
+other than $2$ \citep[Theorem 3.15]{Bresar2021}, originally \citep[Theorem 2.1]{AnLiHe2015}. So $M_n(B)$ is determined by $\mu_\alpha$ for every inner $\alpha$, in
+characteristic other than $2$, and Proposition~\ref{prop:matrix} is the case $n = 2$ and
+$D = \operatorname{diag}(1,-1)$: its computation checks the criterion of Corollary~\ref{cor:criterion}
+directly in a small case, and $\mu_\alpha$ has no form $f(xy)$ by the argument above.
+\end{remark}
 
 \begin{question}\label{q:noncomm}
 Which noncommutative algebras with an involutive automorphism $\alpha$ are determined by their twisted product $xy + \alpha(yx)$? % claim-ok: open question
+By Remark~\ref{rem:inner} an inner $\alpha$ makes the twisted product a Jordan product in disguise, so the answer is affirmative exactly for the zJpd algebras: it is affirmative for $M_n(B)$ and for the triangular algebras of Corollary~\ref{cor:bresar-matrix}(b), in characteristic other than $2$, since these are zJpd \citep[Corollary 3.17]{Bresar2021}, and negative for the real quaternions with $\alpha = \mathrm{id}$, which are not zJpd \citep[Example 3.19]{Bresar2021}. Every automorphism of $M_n(K)$, for a field $K$ and $n \ge 2$, is inner (Skolem--Noether), so in characteristic other than $2$ the matrix algebras over a field are settled; the question is about algebras admitting an involutive automorphism that is not inner.
 \end{question}
 
 \begin{thebibliography}{9}
 
 \bibitem[Adrabi(2026)]{Adrabi2026}
 A.~Adrabi, Braided-symmetric derivations of algebras, preprint, Mohammed V University in Rabat, 2026.
+
+\bibitem[An et al.(2015)]{AnLiHe2015}
+An, G., Li, J., He, J.: Zero Jordan product determined algebras. Linear Algebra Appl. \textbf{475}, 90--93 (2015).
+
+\bibitem[Brice and Huang(2015)]{BriceHuang2015}
+Brice, D., Huang, H.: On zero product determined algebras. Linear and Multilinear Algebra \textbf{63}, 326--342 (2015).
 
 \bibitem[Bre\v{s}ar(2021)]{Bresar2021}
 Bre\v{s}ar, M.: Zero Product Determined Algebras. Frontiers in Mathematics. Birkh\"auser, Cham (2021).

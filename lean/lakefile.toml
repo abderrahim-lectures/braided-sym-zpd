@@ -1,11 +1,19 @@
 name = "BraidedSymZpd"
-defaultTargets = ["Research"]
+defaultTargets = ["BraidedSymZpd"]
 
+# The Lean code of the paper: the general theory of a bilinear map in `ZpdCore`, the paper's
+# statements in `Research`. Everything imports Mathlib only; there are no unpublished
+# dependencies. `globs` is authoritative: `lake build` builds every module below.
+[[lean_lib]]
+name = "BraidedSymZpd"
+globs = ["ZpdCore.*", "Research.*"]
+
+# Mathlib's `rev` stays on "master"; `lake-manifest.json` carries the exact commit of a build.
+# This repository ships no manifest, so a `lake build` first runs `lake update` (a few minutes
+# and several GB). The supported check of this directory is `./check.sh`, which needs a built
+# Mathlib on `LEAN_PATH` and elaborates the three modules directly; that is how the code was
+# verified (Lean v4.33.1).
 [[require]]
 name = "mathlib"
 git = "https://github.com/leanprover-community/mathlib4"
 rev = "master"
-
-[[lean_lib]]
-name = "Research"
-roots = ["Research.BraidedSymZpd.BraidedSymZpd"]

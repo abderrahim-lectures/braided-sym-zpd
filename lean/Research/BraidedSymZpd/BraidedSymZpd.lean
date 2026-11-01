@@ -1,545 +1,404 @@
-import Mathlib.LinearAlgebra.BilinearMap
-import Mathlib.Algebra.Algebra.Basic
-import Mathlib.Algebra.Algebra.Bilinear
-import Mathlib.LinearAlgebra.TensorProduct.Basic
-import Mathlib.LinearAlgebra.Quotient.Basic
-import Mathlib.LinearAlgebra.Projection
-import Mathlib.Tactic.NoncommRing
-import Research.Zpd.Basic
-import Research.Zpd.DualNumbers
-import Mathlib.Algebra.DualNumber
-import Mathlib.LinearAlgebra.Isomorphisms
-import Mathlib.LinearAlgebra.Basis.VectorSpace
+/-
+Copyright (c) 2026 The BraidedSymZpd contributors. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Open Math OS review pass
+-/
+module
+
+public import ZpdCore.Zpd
+public import Mathlib.Algebra.DualNumber
 
 /-!
-# Zero braided-symmetric-product determined algebras
+# Algebras determined by a braided-symmetric product
 
-Imports Brešar's zero-product-determined (zpd) machinery, already generalized
-once in `Research.Zpd.Basic` for the ordinary product `*`, and reapplies it to
-a product symmetrized by a braiding, such as `xy + yx` or `xy + α(y)α(x)`.
-
-## Main definitions
-
-* `mapDetermined k B μ` : the `Research.Zpd.Basic.ZeroProductDetermined`
-  property, generalized from the fixed product `*` to an arbitrary bilinear
-  map `μ`.
-* `symProdLinear σ` : the σ-symmetrized product, repackaged as a genuine
-  `k`-bilinear map `B →ₗ[k] B →ₗ[k] B`, given `σ` itself `k`-bilinear.
+This file formalises the paper "Algebras Determined by a Braided-Symmetric Product". The general
+theory — `Determined`, the criterion `cor:criterion`, `thm:zpd-fxy`, `prop:injective`,
+`cor:identity`, `thm:codim`, `cor:twisted` and `cor:anti` — is proved in `ZpdCore.Zpd` with the
+paper's hypotheses. This file adds the results that mention the symmetrized products explicitly.
 
 ## Main results
 
-* `mapDetermined_iff_injective` : the same quotient-injectivity criterion as
-  `Research.Zpd.zeroProductDetermined_iff_injective`, for an arbitrary
-  bilinear `μ`, given a surjectivity hypothesis in place of the original's
-  built-in `mul_one` unital trick.
-* `mapDetermined_symProd_std_iff_zJpd` : for the standard braiding, "zero
-  braided-symmetric-product determined" literally *is* zero-Jordan-product-
-  determined (Brešar–Alaminos–Extremera–Villena's zJpd, arXiv:1902.04846) —
-  not an analogy, a substitution, since `x ·_σ y = xy + yx` on the nose.
+* `BraidedSymZpd.preserving`: `rem:preserving`, zero-product-preserving maps carried over to `μ`.
+* `BraidedSymZpd.derivation`: `rem:derivations`, the same for derivations.
+* `BraidedSymZpd.dualAlpha`: the involution `a + bε ↦ a - bε` of `ex:dual`.
+* `BraidedSymZpd.dualNumbers_determined`: the dual numbers are determined by the twisted
+  product (`ex:dual`, via `thm:codim`).
+* `BraidedSymZpd.dualNumbers_not_zpd`: the dual numbers are not zpd.
+* `BraidedSymZpd.twistMu_conjByUnit` and `BraidedSymZpd.determined_twist_conj_iff`: `rem:inner`,
+  the twisted product of an inner automorphism is a Jordan product in disguise, and it determines
+  `A` exactly when the Jordan product does.
 
-## Twisted braiding
-
-For a commutative algebra the twisted product is `f(xy)` with `f = 1 + α`,
-so `mapDetermined_comp_mul_of_zpd` and `mapDetermined_comp_mul_of_codim_one`
-below cover it. The noncommutative case (for example `M₂(F₃)` with the
-transpose) is open and is logged in `formalization-debt.md`.
+The numerical content of `prop:matrix` is checked in `Research.BraidedSymZpd.M2F3`.
 -/
 
-namespace Research.BraidedSymZpd
+@[expose] public section
 
-open scoped TensorProduct
+open TensorProduct
 
-universe u v
+namespace BraidedSymZpd
 
-variable (k : Type u) (B : Type v) [Field k] [Ring B] [Algebra k B]
+open ZpdCore
 
-/-- `mapDetermined k B μ` : `B` is determined, over `k`, by the bilinear map
-`μ` — every `k`-bilinear map vanishing on pairs with `μ x y = 0` factors
-through `μ`. `Research.Zpd.Basic.ZeroProductDetermined` is the special case
-`μ = LinearMap.mul' k B`; this file's whole point is to run its argument
-again with `μ` the σ-symmetrized product instead. -/
-def mapDetermined (μ : B →ₗ[k] B →ₗ[k] B) : Prop :=
-  ∀ (V : Type v) [AddCommGroup V] [Module k V] (φ : B →ₗ[k] B →ₗ[k] V),
-    (∀ x y : B, μ x y = 0 → φ x y = 0) →
-    ∃ ψ : B →ₗ[k] V, ∀ x y : B, φ x y = ψ (μ x y)
+universe u
 
-/-- The zero-set of `μ`, linearized: the submodule of `B ⊗[k] B` spanned by
-every pure tensor `x ⊗ y` with `μ x y = 0`. Generalizes
-`Research.Zpd.zeroProductSpan` from `μ = mul'` to arbitrary `μ`. -/
-def mapZeroSpan (μ : B →ₗ[k] B →ₗ[k] B) : Submodule k (B ⊗[k] B) :=
-  Submodule.span k {t : B ⊗[k] B | ∃ x y : B, μ x y = 0 ∧ t = x ⊗ₜ[k] y}
+/-! ## `rem:preserving` and `rem:derivations` -/
 
-/-- Every generator of `mapZeroSpan k B μ` is killed by the linearization of
-`μ`, so the whole span lies in its kernel — the fact that makes `mapOfQuot`
-below well-defined. Same proof shape as
-`Research.Zpd.zeroProductSpan_le_ker_mul'`, with `μ` in place of `mul'`. -/
-theorem mapZeroSpan_le_ker_lift (μ : B →ₗ[k] B →ₗ[k] B) :
-    mapZeroSpan k B μ ≤ LinearMap.ker (TensorProduct.lift μ) := by
-  apply Submodule.span_le.mpr
-  rintro t ⟨x, y, hxy, rfl⟩
-  rw [SetLike.mem_coe, LinearMap.mem_ker, TensorProduct.lift.tmul]
-  exact hxy
+variable {K : Type u} [Field K] {A : Type u} [AddCommGroup A] [Module K A]
 
-/-- Named once, exactly as `Research.Zpd.Basic.ZQuot` does for the plain
-product, so `⧸` never needs to be parsed inline against a `≃ₗ[k]`/`→ₗ[k]`
-on the same line (a genuine parser ambiguity, not just a style choice). -/
-abbrev MapQuot (μ : B →ₗ[k] B →ₗ[k] B) : Type v := (B ⊗[k] B) ⧸ mapZeroSpan k B μ
+/-- **`rem:preserving`**: if `A` is determined by `μ` and `T` sends `μ`-zero pairs to zero
+products, then `T (x) T (y)` factors through `μ`. This is the first part of Theorem 7.2 of the
+reference, with the product replaced by `μ`. -/
+theorem preserving {B : Type u} [Ring B] [Algebra K B] (μ : A →ₗ[K] A →ₗ[K] A)
+    (h : Determined μ) (T : A →ₗ[K] B) (hT : ∀ x y : A, μ x y = 0 → T x * T y = 0) :
+    ∃ S : A →ₗ[K] B, ∀ x y : A, T x * T y = S (μ x y) :=
+  h B (LinearMap.mk₂ K (fun x y => T x * T y)
+    (fun x₁ x₂ y => by simp only [map_add, add_mul])
+    (fun c x y => by simp only [map_smul, smul_mul_assoc])
+    (fun x y₁ y₂ => by simp only [map_add, mul_add])
+    (fun c x y => by simp only [map_smul, mul_smul_comm])) hT
 
-/-- `μ`, redefined on the quotient of `B ⊗[k] B` by `mapZeroSpan k B μ`. -/
-noncomputable def mapOfQuot (μ : B →ₗ[k] B →ₗ[k] B) :
-    MapQuot k B μ →ₗ[k] B :=
-  (mapZeroSpan k B μ).liftQ (TensorProduct.lift μ) (mapZeroSpan_le_ker_lift k B μ)
+/-- **`rem:derivations`**: if `A` is determined by `μ` and `D` satisfies the derivation
+identity on the `μ`-zero pairs, then the Leibniz defect of `D` factors through `μ`. With
+`μ = μ_σ` this says that a braided-symmetric derivation is one whose defect vanishes on the
+span of the products, as the paper states. -/
+theorem derivation (μ : A →ₗ[K] A →ₗ[K] A) (h : Determined μ) (D : A →ₗ[K] A)
+    (hD : ∀ x y : A, μ x y = 0 → μ (D x) y + μ x (D y) = 0) :
+    ∃ S : A →ₗ[K] A, ∀ x y : A, μ (D x) y + μ x (D y) = S (μ x y) :=
+  h A (LinearMap.mk₂ K (fun x y => μ (D x) y + μ x (D y))
+    (fun x₁ x₂ y => by simp only [map_add, LinearMap.add_apply]; abel)
+    (fun c x y => by simp only [map_smul, LinearMap.smul_apply, smul_add])
+    (fun x y₁ y₂ => by simp only [map_add]; abel)
+    (fun c x y => by simp only [map_smul]; rw [smul_add])) hD
 
-theorem mapOfQuot_mk (μ : B →ₗ[k] B →ₗ[k] B) (x y : B) :
-    mapOfQuot k B μ (Submodule.Quotient.mk (x ⊗ₜ[k] y)) = μ x y := by
-  rw [mapOfQuot, Submodule.liftQ_apply, TensorProduct.lift.tmul]
-
-set_option maxHeartbeats 0 in
-/-- **The working criterion, for an arbitrary bilinear `μ`.** Given that
-`mapOfQuot k B μ` is surjective (automatic for `μ = mul'` on a unital ring
-via `mul_one`, as in `Research.Zpd.zeroProductDetermined_iff_injective`; for
-a general `μ` this is a hypothesis, discharged case by case — see
-`mapDetermined_symProd_std_iff_zJpd` below for the standard-braiding case),
-`mapDetermined k B μ` holds iff `mapOfQuot k B μ` is injective. -/
-theorem mapDetermined_iff_injective (μ : B →ₗ[k] B →ₗ[k] B)
-    (hsurj : Function.Surjective (mapOfQuot k B μ)) :
-    mapDetermined k B μ ↔ Function.Injective (mapOfQuot k B μ) := by
+/-- **`rem:derivations`**, second half: with `μ = μ_σ`, a linear map `D` is a derivation of
+`(A, μ)` exactly when its Leibniz defect factors through `μ` by a map that agrees with `D` on the
+span of the products — the paper's "`S = D` on the span of the products `x ·_σ y`". -/
+theorem derivation_iff (μ : A →ₗ[K] A →ₗ[K] A) (h : Determined μ) (D : A →ₗ[K] A) :
+    (∃ S : A →ₗ[K] A, (∀ x y : A, μ (D x) y + μ x (D y) = S (μ x y)) ∧
+        ∀ z ∈ LinearMap.range (muBar μ), S z = D z) ↔
+      ∀ x y : A, D (μ x y) = μ (D x) y + μ x (D y) := by
   constructor
-  · intro hdet
-    rw [← LinearMap.ker_eq_bot]
-    rw [Submodule.eq_bot_iff]
-    intro t ht
-    obtain ⟨t', rfl⟩ := Submodule.Quotient.mk_surjective (mapZeroSpan k B μ) t
-    set φ : B →ₗ[k] B →ₗ[k] (B ⊗[k] B) ⧸ mapZeroSpan k B μ :=
-      (TensorProduct.mk k B B).compr₂ (mapZeroSpan k B μ).mkQ with hφdef
-    have hφ : ∀ x y : B, μ x y = 0 → φ x y = 0 := by
+  · rintro ⟨S, hS, hSD⟩ x y
+    rw [hS x y, hSD (μ x y) ⟨x ⊗ₜ[K] y, muBar_tmul μ x y⟩]
+  · intro hD
+    have h0 : ∀ x y : A, μ x y = 0 → μ (D x) y + μ x (D y) = 0 := by
       intro x y hxy
-      rw [hφdef, LinearMap.compr₂_apply, TensorProduct.mk_apply,
-        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-      exact Submodule.subset_span ⟨x, y, hxy, rfl⟩
-    obtain ⟨ψ, hψ⟩ := hdet ((B ⊗[k] B) ⧸ mapZeroSpan k B μ) φ hφ
-    have hmk : ∀ t' : B ⊗[k] B, Submodule.Quotient.mk t' =
-        ψ (TensorProduct.lift μ t') := by
-      intro t'
-      induction t' with
-      | tmul x y =>
-        rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
-          TensorProduct.mk_apply, Submodule.mkQ_apply]
-      | add a b ha hb =>
-        rw [Submodule.Quotient.mk_add, ha, hb, map_add, map_add]
-    have ht' : TensorProduct.lift μ t' = 0 := by
-      rw [LinearMap.mem_ker, mapOfQuot, Submodule.liftQ_apply] at ht
-      exact ht
-    rw [hmk t', ht', map_zero]
-  · intro hinj V _ _ φ hφ
-    have hspan : mapZeroSpan k B μ ≤ LinearMap.ker (TensorProduct.lift φ) := by
-      apply Submodule.span_le.mpr
-      rintro t ⟨x, y, hxy, rfl⟩
-      rw [SetLike.mem_coe, LinearMap.mem_ker, TensorProduct.lift.tmul]
-      exact hφ x y hxy
-    set e : MapQuot k B μ ≃ₗ[k] B :=
-      LinearEquiv.ofBijective (mapOfQuot k B μ) ⟨hinj, hsurj⟩ with hedef
-    refine ⟨?_, ?_⟩
-    · exact Submodule.liftQ (mapZeroSpan k B μ) (TensorProduct.lift φ) hspan ∘ₗ
-        (e.symm : B →ₗ[k] MapQuot k B μ)
-    intro x y
-    rw [← mapOfQuot_mk k B μ x y, LinearMap.comp_apply, LinearEquiv.coe_coe,
-      show mapOfQuot k B μ (Submodule.Quotient.mk (x ⊗ₜ[k] y)) =
-        e (Submodule.Quotient.mk (x ⊗ₜ[k] y)) from rfl,
-      e.symm_apply_apply, Submodule.liftQ_apply, TensorProduct.lift.tmul]
+      rw [← hD, hxy, map_zero]
+    obtain ⟨S, hS⟩ := derivation μ h D h0
+    refine ⟨S, hS, ?_⟩
+    rintro z ⟨w, rfl⟩
+    induction w using TensorProduct.induction_on with
+    | zero => simp
+    | tmul x y =>
+      show S (μ x y) = D (μ x y)
+      rw [← hS x y, hD x y]
+    | add a b ha hb => simp only [map_add, ha, hb]
 
-/-! ## Standard braiding: reduction to Brešar's zJpd -/
+/-! ## `ex:dual`: the dual numbers
 
-/-- `BraidedSymmetric.lean`'s `standardBraiding` (`σ x y := y`) and
-`symmetrizedProduct` (`x ·_σ y := x*y + σ(x,y)*σ(y,x)`), restated here on the
-ring `B` directly, without a cross-package `require`, so the transport lemma
-below connects to the earlier paper's own notation rather than reproving
-something disconnected from it under a different name. -/
-def symProdStd (x y : B) : B := x * y + y * x
-
-/-- The Jordan product `x ∘ y = xy + yx`, packaged as a `k`-bilinear map. -/
-def jordanProd : B →ₗ[k] B →ₗ[k] B where
-  toFun x :=
-    { toFun := fun y => x * y + y * x
-      map_add' := fun a b => by show x * (a + b) + (a + b) * x = x * a + a * x + (x * b + b * x); noncomm_ring
-      map_smul' := fun r y => by simp }
-  map_add' := fun x y => by ext z; simp only [LinearMap.add_apply, LinearMap.coe_mk, AddHom.coe_mk]; noncomm_ring
-  map_smul' := fun r x => by ext y; simp
-
-@[simp] theorem jordanProd_apply (x y : B) : jordanProd k B x y = x * y + y * x := rfl
-
-/-- The two definitions agree pointwise: `jordanProd`'s underlying function
-is exactly `symProdStd`, i.e. exactly `BraidedSymmetric.lean`'s
-`symmetrizedProduct standardBraiding`. Not `rfl` by accident — it is the
-literal content of `symmetrizedProduct_std` in the earlier paper's own file,
-re-derived here against this file's independent `symProdStd`. -/
-theorem jordanProd_eq_symProdStd (x y : B) : jordanProd k B x y = symProdStd B x y := rfl
-
--- **Reading `jordanProd_eq_symProdStd`.** "Zero braided-symmetric-product
--- determined for the standard braiding" is not an analogue of Brešar's
--- zero-Jordan-product-determined property — it *is* that property, since
--- the two products agree pointwise as just proved. So `mapDetermined k B
--- (jordanProd k B)` already *is* the σ-standard-braiding statement, and
--- every zJpd theorem in the literature (Alaminos–Brešar–Extremera–Villena,
--- arXiv:1902.04846) transports for free to it — with nothing left to prove
--- beyond the lemma above.
-
-/-- Char ≠ 2 is exactly what makes `jordanProd`, and hence the standard
-σ-symmetrized product, surjective (`jordanProd x 1 = 2x`), which is what the
-converse direction of `mapDetermined_iff_injective` needs in place of the
-`mul_one` unital trick `Research.Zpd.Basic` uses for the plain product. -/
-theorem mapOfQuot_jordanProd_surjective (h2 : (2 : k) ≠ 0) :
-    Function.Surjective (mapOfQuot k B (jordanProd k B)) := by
-  intro b
-  have h2' : IsUnit (2 : k) := (isUnit_iff_ne_zero).mpr h2
-  obtain ⟨u, hu⟩ := h2'
-  set c : B := algebraMap k B (↑u⁻¹ : k) * b with hcdef
-  refine ⟨Submodule.Quotient.mk (c ⊗ₜ[k] 1), ?_⟩
-  rw [mapOfQuot_mk, jordanProd_apply, mul_one, one_mul, hcdef]
-  rw [← two_mul, show (2 : B) = algebraMap k B (2 : k) from (map_ofNat _ _).symm,
-    ← mul_assoc, ← map_mul, ← hu, ← Units.val_mul, mul_inv_cancel, Units.val_one, map_one, one_mul]
-
-end Research.BraidedSymZpd
-
-/-! ## Products of the form `f(xy)` and the twisted braiding
-
-The criterion without a surjectivity hypothesis, the transfer from zpd to
-every product `μ(x,y) = f(xy)`, and the dual numbers as an algebra that is
-determined by the twisted product but is not zpd. -/
-
-namespace Research.BraidedSymZpd
-open scoped TensorProduct
-variable (k : Type*) (B : Type*) [Field k] [Ring B] [Algebra k B]
-
-/-- Theorem A: no surjectivity hypothesis. -/
-theorem mapDetermined_iff_injective' (μ : B →ₗ[k] B →ₗ[k] B) :
-    mapDetermined k B μ ↔ Function.Injective (mapOfQuot k B μ) := by
-  constructor
-  · intro hdet
-    rw [← LinearMap.ker_eq_bot, Submodule.eq_bot_iff]
-    intro t ht
-    obtain ⟨t', rfl⟩ := Submodule.Quotient.mk_surjective (mapZeroSpan k B μ) t
-    set φ : B →ₗ[k] B →ₗ[k] MapQuot k B μ :=
-      (TensorProduct.mk k B B).compr₂ (mapZeroSpan k B μ).mkQ with hφdef
-    have hφ : ∀ x y : B, μ x y = 0 → φ x y = 0 := by
-      intro x y hxy
-      rw [hφdef, LinearMap.compr₂_apply, TensorProduct.mk_apply,
-        Submodule.mkQ_apply, Submodule.Quotient.mk_eq_zero]
-      exact Submodule.subset_span ⟨x, y, hxy, rfl⟩
-    obtain ⟨ψ, hψ⟩ := hdet (MapQuot k B μ) φ hφ
-    have hmk : ∀ s : B ⊗[k] B, (Submodule.Quotient.mk s : MapQuot k B μ) =
-        ψ (TensorProduct.lift μ s) := by
-      intro s
-      induction s with
-      | tmul x y =>
-        rw [TensorProduct.lift.tmul, ← hψ x y, hφdef, LinearMap.compr₂_apply,
-          TensorProduct.mk_apply, Submodule.mkQ_apply]
-      | add a b ha hb =>
-        rw [Submodule.Quotient.mk_add, ha, hb, map_add, map_add]
-    have ht' : TensorProduct.lift μ t' = 0 := by
-      rw [LinearMap.mem_ker, mapOfQuot, Submodule.liftQ_apply] at ht
-      exact ht
-    rw [hmk t', ht', map_zero]
-  · intro hinj V _ _ φ hφ
-    have hspan : mapZeroSpan k B μ ≤ LinearMap.ker (TensorProduct.lift φ) := by
-      apply Submodule.span_le.mpr
-      rintro t ⟨x, y, hxy, rfl⟩
-      rw [SetLike.mem_coe, LinearMap.mem_ker, TensorProduct.lift.tmul]
-      exact hφ x y hxy
-    obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective (mapOfQuot k B μ)
-      (LinearMap.ker_eq_bot.mpr hinj)
-    refine ⟨(mapZeroSpan k B μ).liftQ (TensorProduct.lift φ) hspan ∘ₗ g, ?_⟩
-    intro x y
-    rw [← mapOfQuot_mk k B μ x y, LinearMap.comp_apply,
-      ← LinearMap.comp_apply g, hg, LinearMap.id_apply,
-      Submodule.liftQ_apply, TensorProduct.lift.tmul]
-
-/-- Theorem B. -/
-theorem mapDetermined_comp_mul_of_zpd (hB : Research.Zpd.ZeroProductDetermined k B)
-    (f : B →ₗ[k] B) (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = f (x * y)) :
-    mapDetermined k B μ := by
-  intro V _ _ φ hφ
-  have h0 : ∀ x y : B, x * y = 0 → φ x y = 0 := by
-    intro x y hxy
-    apply hφ
-    rw [hμ, hxy, map_zero]
-  obtain ⟨ψ0, hψ0⟩ := hB V φ h0
-  have hker : LinearMap.ker f ≤ LinearMap.ker ψ0 := by
-    intro b hb
-    rw [LinearMap.mem_ker] at hb ⊢
-    rw [← mul_one b, ← hψ0 b 1]
-    apply hφ
-    rw [hμ, mul_one, hb]
-  obtain ⟨ψ, hψ⟩ := LinearMap.exists_extend
-    ((LinearMap.ker f).liftQ ψ0 hker ∘ₗ ((LinearMap.quotKerEquivRange f).symm : LinearMap.range f →ₗ[k] B ⧸ LinearMap.ker f))
-  refine ⟨ψ, fun x y => ?_⟩
-  rw [hμ, hψ0 x y]
-  have hmem : f (x * y) ∈ LinearMap.range f := LinearMap.mem_range_self f (x * y)
-  have := LinearMap.congr_fun hψ ⟨f (x * y), hmem⟩
-  rw [LinearMap.comp_apply, Submodule.subtype_apply, LinearMap.comp_apply,
-    LinearEquiv.coe_coe, LinearMap.quotKerEquivRange_symm_apply_image,
-    Submodule.mkQ_apply, Submodule.liftQ_apply] at this
-  exact this.symm
-
-/-- Theorem D: an injective `f` changes nothing. -/
-theorem zpd_of_mapDetermined_comp_mul (f : B →ₗ[k] B) (hf : Function.Injective f)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = f (x * y)) (h : mapDetermined k B μ) :
-    Research.Zpd.ZeroProductDetermined k B := by
-  intro V _ _ φ hφ
-  obtain ⟨ψ, hψ⟩ := h V φ (fun x y hxy => by
-    apply hφ
-    rw [hμ] at hxy
-    exact hf (hxy.trans (map_zero f).symm))
-  refine ⟨ψ ∘ₗ f, fun x y => ?_⟩
-  rw [hψ x y, hμ, LinearMap.comp_apply]
-
-/-- Theorem E. -/
-theorem mapDetermined_comp_mul_of_codim_one (f : B →ₗ[k] B) (h1 : f 1 ≠ 0)
-    (hL : ∀ n b : B, f n = 0 → f (b * n) = 0) (hR : ∀ n b : B, f n = 0 → f (n * b) = 0)
-    (c : B →ₗ[k] k) (hc : ∀ x : B, f (x - c x • 1) = 0)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = f (x * y)) :
-    mapDetermined k B μ := by
-  intro V _ _ φ hφ
-  have hφL : ∀ n y : B, f n = 0 → φ n y = 0 := fun n y hn => hφ n y (by
-    rw [hμ]; exact hR n y hn)
-  have hφR : ∀ x n : B, f n = 0 → φ x n = 0 := fun x n hn => hφ x n (by
-    rw [hμ]; exact hL n x hn)
-  have hfy : ∀ y : B, f y = c y • f 1 := fun y => by
-    calc f y = f ((y - c y • 1) + c y • 1) := by rw [sub_add_cancel]
-      _ = c y • f 1 := by rw [map_add, map_smul, hc y, zero_add]
-  have key1 : ∀ x y : B, φ x y = c x • c y • φ 1 1 := fun x y => by
-    have hy : φ 1 y = c y • φ 1 1 := by
-      calc φ 1 y = φ 1 ((y - c y • 1) + c y • 1) := by rw [sub_add_cancel]
-        _ = c y • φ 1 1 := by rw [map_add, map_smul, hφR 1 _ (hc y), zero_add]
-    calc φ x y = φ ((x - c x • 1) + c x • 1) y := by rw [sub_add_cancel]
-      _ = c x • φ 1 y := by
-        rw [LinearMap.map_add₂, LinearMap.map_smul₂, hφL _ y (hc x), zero_add]
-      _ = c x • c y • φ 1 1 := by rw [hy]
-  have key2 : ∀ x y : B, f (x * y) = (c x * c y) • f 1 := fun x y => by
-    calc f (x * y) = f ((x - c x • 1) * y + c x • y) := by
-          rw [sub_mul, smul_mul_assoc, one_mul, sub_add_cancel]
-      _ = c x • f y := by rw [map_add, map_smul, hR _ y (hc x), zero_add]
-      _ = (c x * c y) • f 1 := by rw [hfy y, mul_smul]
-  have hinj : LinearMap.ker (LinearMap.toSpanSingleton k B (f 1)) = ⊥ := by
-    rw [LinearMap.ker_eq_bot]
-    intro a b hab
-    rw [LinearMap.toSpanSingleton_apply, LinearMap.toSpanSingleton_apply,
-      ← sub_eq_zero, ← sub_smul, smul_eq_zero] at hab
-    exact sub_eq_zero.mp (hab.resolve_right h1)
-  obtain ⟨g, hg⟩ := LinearMap.exists_leftInverse_of_injective _ hinj
-  have hg1 : ∀ a : k, g (a • f 1) = a := fun a => by
-    have := LinearMap.congr_fun hg a
-    rwa [LinearMap.comp_apply, LinearMap.toSpanSingleton_apply, LinearMap.id_apply] at this
-  refine ⟨LinearMap.smulRight g (φ 1 1), fun x y => ?_⟩
-  rw [hμ, key2, LinearMap.smulRight_apply, hg1,
-    key1, mul_smul]
-
-/-- Identity braiding: `x ·_id y = xy + xy`. A zpd algebra is determined by it. -/
-theorem mapDetermined_identityBraiding_of_zpd (hB : Research.Zpd.ZeroProductDetermined k B)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + x * y) : mapDetermined k B μ :=
-  mapDetermined_comp_mul_of_zpd k B hB ((2 : k) • LinearMap.id) μ (fun x y => by
-    rw [hμ, LinearMap.smul_apply, LinearMap.id_apply, two_smul])
-
-/-- In characteristic not 2 the identity braiding determines exactly the zpd algebras. -/
-theorem mapDetermined_identityBraiding_iff_zpd (h2 : (2 : k) ≠ 0)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + x * y) :
-    mapDetermined k B μ ↔ Research.Zpd.ZeroProductDetermined k B := by
-  have hμ' : ∀ x y, μ x y = ((2 : k) • LinearMap.id : B →ₗ[k] B) (x * y) := fun x y => by
-    rw [hμ, LinearMap.smul_apply, LinearMap.id_apply, two_smul]
-  constructor
-  · intro h
-    refine zpd_of_mapDetermined_comp_mul k B _ (fun a b hab => ?_) μ hμ' h
-    rw [LinearMap.smul_apply, LinearMap.smul_apply, LinearMap.id_apply, LinearMap.id_apply] at hab
-    exact smul_right_injective B h2 hab
-  · intro hB
-    exact mapDetermined_identityBraiding_of_zpd k B hB μ hμ
-
-/-- Twisted braiding on a commutative zpd algebra: `x ·_α y = xy + α(y)α(x)`. -/
-theorem mapDetermined_twisted_of_comm_zpd (hcomm : ∀ x y : B, x * y = y * x)
-    (hB : Research.Zpd.ZeroProductDetermined k B) (α : B →ₐ[k] B)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + α y * α x) : mapDetermined k B μ :=
-  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α.toLinearMap) μ (fun x y => by
-    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, AlgHom.toLinearMap_apply, ← map_mul,
-      hcomm y x])
-
-/-- **Corollary 3.5.** If `α` is a linear anti-endomorphism, `α (x * y) = α y * α x`,
-then the twisted product is `(id + α)(xy)` on any algebra, commutative or not, so
-every zpd algebra is determined by it. The transpose on `M₂(F₃)` is such an `α`. -/
-theorem mapDetermined_twisted_anti_of_zpd
-    (hB : Research.Zpd.ZeroProductDetermined k B)
-    (α : B →ₗ[k] B) (hα : ∀ x y : B, α (x * y) = α y * α x)
-    (μ : B →ₗ[k] B →ₗ[k] B) (hμ : ∀ x y, μ x y = x * y + α y * α x) :
-    mapDetermined k B μ :=
-  mapDetermined_comp_mul_of_zpd k B hB (LinearMap.id + α) μ (fun x y => by
-    rw [hμ, LinearMap.add_apply, LinearMap.id_apply, hα x y])
+`A = K[ε]/(ε²)` with `α (a + bε) = a - bε`. By `thm:codim`, `A` is determined by
+`μ_α (x, y) = x * y + α y * α x`, and `A` is not zpd.
+-/
 
 section Dual
-open Research.Zpd TrivSqZeroExt
-variable (K : Type) [Field K]
 
-/-- The involution `a + bε ↦ a - bε` of the dual numbers. -/
-noncomputable def dualAlpha : DualNumbers K →ₗ[K] DualNumbers K :=
-  Algebra.linearMap K (DualNumbers K) ∘ₗ dualFst K - inrHom K K ∘ₗ dualSnd K
+/-- The projection `a + bε ↦ a` of the dual numbers, as a linear map. -/
+def dualFst : DualNumber K →ₗ[K] K where
+  toFun x := TrivSqZeroExt.fst x
+  map_add' _ _ := rfl
+  map_smul' _ _ := rfl
 
-theorem dualAlpha_fst (x : DualNumbers K) : fst (dualAlpha K x) = fst x := by
-  rw [dualAlpha, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.comp_apply,
-    fst_sub, Algebra.linearMap_apply, algebraMap_eq_inl, fst_inl, inrHom_apply, fst_inr,
-    sub_zero, dualFst_apply]
+@[simp]
+theorem dualFst_apply (x : DualNumber K) : dualFst (K := K) x = TrivSqZeroExt.fst x := rfl
 
-theorem dualAlpha_snd (x : DualNumbers K) : snd (dualAlpha K x) = - snd x := by
-  rw [dualAlpha, LinearMap.sub_apply, LinearMap.comp_apply, LinearMap.comp_apply,
-    snd_sub, Algebra.linearMap_apply, algebraMap_eq_inl, snd_inl, inrHom_apply, snd_inr,
-    zero_sub, dualSnd_apply]
+/-- The involution `a + bε ↦ a - bε` of the dual numbers (`ex:dual`). -/
+noncomputable def dualAlpha : DualNumber K →ₗ[K] DualNumber K where
+  toFun x := TrivSqZeroExt.inl (TrivSqZeroExt.fst x) - TrivSqZeroExt.inr (TrivSqZeroExt.snd x)
+  map_add' _ _ := by
+    ext <;> simp [TrivSqZeroExt.fst_add, TrivSqZeroExt.snd_add]
+    abel
+  map_smul' _ _ := by ext <;> simp [TrivSqZeroExt.fst_smul, TrivSqZeroExt.snd_smul]
 
-theorem dualAlpha_mul (x y : DualNumbers K) :
-    dualAlpha K (x * y) = dualAlpha K x * dualAlpha K y := by
+@[simp]
+theorem dualAlpha_fst (x : DualNumber K) :
+    TrivSqZeroExt.fst (dualAlpha (K := K) x) = TrivSqZeroExt.fst x := by
+  simp [dualAlpha]
+
+@[simp]
+theorem dualAlpha_snd (x : DualNumber K) :
+    TrivSqZeroExt.snd (dualAlpha (K := K) x) = -TrivSqZeroExt.snd x := by
+  simp [dualAlpha]
+
+theorem dualAlpha_involutive : Function.Involutive (dualAlpha (K := K)) := by
+  intro x
+  ext <;> simp
+
+/-- The involution `a + bε ↦ a - bε` is multiplicative. -/
+theorem dualAlpha_mul (x y : DualNumber K) :
+    dualAlpha (K := K) (x * y) = dualAlpha (K := K) x * dualAlpha (K := K) y := by
   ext
-  · rw [dualAlpha_fst, fst_mul, fst_mul, dualAlpha_fst, dualAlpha_fst]
-  · rw [dualAlpha_snd, snd_mul, snd_mul, dualAlpha_fst, dualAlpha_fst, dualAlpha_snd,
-      dualAlpha_snd, smul_eq_mul, smul_eq_mul, op_smul_eq_mul, op_smul_eq_mul]
+  · simp
+  · simp only [dualAlpha_fst, dualAlpha_snd, DualNumber.snd_mul]
     ring
 
-/-- `f = 1 + α`, so that `μ_α(x,y) = xy + α(y)α(x) = f(xy)`. -/
-noncomputable def dualF : DualNumbers K →ₗ[K] DualNumbers K := LinearMap.id + dualAlpha K
+end Dual
 
-theorem twisted_eq_dualF (x y : DualNumbers K) :
-    x * y + dualAlpha K y * dualAlpha K x = dualF K (x * y) := by
-  rw [← dualAlpha_mul, mul_comm y x, dualF, LinearMap.add_apply, LinearMap.id_apply]
+/-! ## `ex:dual`, continued: determined but not zpd -/
 
-theorem dualF_eq_zero_iff (h2 : (2 : K) ≠ 0) (x : DualNumbers K) :
-    dualF K x = 0 ↔ fst x = 0 := by
+/-- `f = id + α`, so that `μ_α (x, y) = f (x * y)`. -/
+noncomputable def dualF : DualNumber K →ₗ[K] DualNumber K := LinearMap.id + dualAlpha
+
+theorem dualF_fst (x : DualNumber K) :
+    TrivSqZeroExt.fst (dualF (K := K) x) = 2 * TrivSqZeroExt.fst x := by
+  simp [dualF, two_mul]
+
+theorem dualF_snd (x : DualNumber K) : TrivSqZeroExt.snd (dualF (K := K) x) = 0 := by
+  simp [dualF]
+
+theorem dualF_eq_zero_iff (h2 : (2 : K) ≠ 0) (x : DualNumber K) :
+    dualF (K := K) x = 0 ↔ TrivSqZeroExt.fst x = 0 := by
   constructor
   · intro h
-    have := congrArg fst h
-    rw [dualF, LinearMap.add_apply, LinearMap.id_apply, fst_add, dualAlpha_fst, fst_zero,
-      ← two_mul] at this
-    exact (mul_eq_zero.mp this).resolve_left h2
+    have h1 : TrivSqZeroExt.fst (dualF (K := K) x) = 0 := by rw [h, TrivSqZeroExt.fst_zero]
+    rw [dualF_fst] at h1
+    rcases mul_eq_zero.1 h1 with h' | h'
+    · exact absurd h' h2
+    · exact h'
   · intro h
     ext
-    · rw [dualF, LinearMap.add_apply, LinearMap.id_apply, fst_add, dualAlpha_fst, h, add_zero,
-        fst_zero]
-    · rw [dualF, LinearMap.add_apply, LinearMap.id_apply, snd_add, dualAlpha_snd, add_neg_cancel,
-        snd_zero]
+    · rw [dualF_fst, h, mul_zero, TrivSqZeroExt.fst_zero]
+    · rw [dualF_snd, TrivSqZeroExt.snd_zero]
 
+/-- The bilinear form `(x, y) ↦ fst x * snd y` used to show that the dual numbers are not zpd. -/
+def dualPhi : DualNumber K →ₗ[K] DualNumber K →ₗ[K] K :=
+  LinearMap.mk₂ K (fun x y => TrivSqZeroExt.fst x * TrivSqZeroExt.snd y)
+    (fun x₁ x₂ y => by simp only [TrivSqZeroExt.fst_add, add_mul])
+    (fun c x y => by simp only [TrivSqZeroExt.fst_smul, smul_eq_mul, mul_assoc])
+    (fun x y₁ y₂ => by simp only [TrivSqZeroExt.snd_add, mul_add])
+    (fun c x y => by simp only [TrivSqZeroExt.snd_smul, smul_eq_mul]; ring)
 
-theorem dual_smul_mul (c : K) (x y : DualNumbers K) : (c • x) * y = c • (x * y) := by
-  ext
-  · rw [fst_mul, fst_smul, fst_smul, fst_mul, smul_eq_mul, smul_eq_mul, mul_assoc]
-  · rw [snd_mul, snd_smul, snd_smul, snd_mul, fst_smul, smul_eq_mul, smul_eq_mul, smul_eq_mul,
-      smul_eq_mul, smul_eq_mul, op_smul_eq_mul, op_smul_eq_mul]
-    ring
+@[simp]
+theorem dualPhi_apply (x y : DualNumber K) :
+    dualPhi (K := K) x y = TrivSqZeroExt.fst x * TrivSqZeroExt.snd y := rfl
 
-theorem dual_mul_smul (c : K) (x y : DualNumbers K) : x * (c • y) = c • (x * y) := by
-  ext
-  · rw [fst_mul, fst_smul, fst_smul, fst_mul, smul_eq_mul, smul_eq_mul, mul_left_comm]
-  · rw [snd_mul, snd_smul, snd_smul, snd_mul, fst_smul, smul_eq_mul, smul_eq_mul, smul_eq_mul,
-      smul_eq_mul, smul_eq_mul, op_smul_eq_mul, op_smul_eq_mul]
-    ring
+theorem dualPhi_vanishes {x y : DualNumber K} (hxy : x * y = 0) :
+    dualPhi (K := K) x y = 0 := by
+  have h1 : TrivSqZeroExt.fst x * TrivSqZeroExt.fst y = 0 := by
+    have := congrArg TrivSqZeroExt.fst hxy
+    simpa using this
+  rcases mul_eq_zero.1 h1 with hx | hy
+  · rw [dualPhi_apply, hx, zero_mul]
+  · have h2 : TrivSqZeroExt.fst x * TrivSqZeroExt.snd y = 0 := by
+      have := congrArg TrivSqZeroExt.snd hxy
+      simp only [DualNumber.snd_mul, TrivSqZeroExt.snd_zero, hy, mul_zero, add_zero] at this
+      exact this
+    rw [dualPhi_apply, h2]
 
-/-- The twisted product `μ_α(x,y) = f(xy)` as a bilinear map. -/
-noncomputable def dualMu : DualNumbers K →ₗ[K] DualNumbers K →ₗ[K] DualNumbers K :=
-  LinearMap.mk₂ K (fun x y => dualF K (x * y))
-    (fun x y z => by rw [add_mul, map_add])
-    (fun c x y => by rw [dual_smul_mul, map_smul])
-    (fun x y z => by rw [mul_add, map_add])
-    (fun c x y => by rw [dual_mul_smul, map_smul])
+/-- **`ex:dual`**: the dual numbers are not zpd. The bilinear form `(x, y) ↦ fst x * snd y`
+vanishes on zero products but does not factor through the product, since `1 * ε = ε * 1`. -/
+theorem dualNumbers_not_zpd : ¬ ZeroProductDetermined K (DualNumber K) := by
+  intro h
+  obtain ⟨ψ, hψ⟩ := h K (dualPhi (K := K)) (fun x y hxy => dualPhi_vanishes hxy)
+  have h1 : ψ (DualNumber.eps) = 1 := by
+    have := (hψ 1 DualNumber.eps).symm
+    simpa [dualPhi_apply] using this
+  have h2 : ψ (DualNumber.eps) = 0 := by
+    have := (hψ DualNumber.eps 1).symm
+    simpa [dualPhi_apply] using this
+  rw [h1] at h2
+  exact one_ne_zero h2
 
-/-- The dual numbers are determined by the twisted product, yet not zpd. -/
-theorem dualNumbers_mapDetermined (h2 : (2 : K) ≠ 0) :
-    mapDetermined K (DualNumbers K) (dualMu K) := by
-  refine mapDetermined_comp_mul_of_codim_one K (DualNumbers K) (dualF K) ?_ ?_ ?_ (dualFst K) ?_
-    (dualMu K) (fun x y => by rw [dualMu, LinearMap.mk₂_apply])
-  · rw [Ne, dualF_eq_zero_iff K h2, fst_one]
-    exact one_ne_zero
-  · intro n b hn
-    rw [dualF_eq_zero_iff K h2] at hn ⊢
-    rw [fst_mul, hn, mul_zero]
-  · intro n b hn
-    rw [dualF_eq_zero_iff K h2] at hn ⊢
-    rw [fst_mul, hn, zero_mul]
-  · intro x
-    rw [dualF_eq_zero_iff K h2, fst_sub, fst_smul, fst_one, smul_eq_mul, mul_one, dualFst_apply,
-      sub_self]
-/-- The dual numbers: determined by the twisted product, yet not zpd. -/
+/-- **`ex:dual`**: in characteristic other than `2`, the dual numbers are determined by the
+twisted product `μ_α (x, y) = x * y + α y * α x` of the involution `α (a + bε) = a - bε`,
+although they are not zpd. -/
 theorem dualNumbers_determined_not_zpd (h2 : (2 : K) ≠ 0) :
-    mapDetermined K (DualNumbers K) (dualMu K) ∧
-      ¬ Research.Zpd.ZeroProductDetermined K (DualNumbers K) :=
-  ⟨dualNumbers_mapDetermined K h2, not_zeroProductDetermined_dualNumbers K⟩
-end Dual
-end Research.BraidedSymZpd
+    Determined (twistMu (dualAlpha (K := K))) ∧ ¬ ZeroProductDetermined K (DualNumber K) := by
+  refine ⟨?_, dualNumbers_not_zpd⟩
+  have hα : ∀ x y : DualNumber K,
+      dualAlpha (K := K) (x * y) = dualAlpha (K := K) y * dualAlpha (K := K) x := by
+    intro x y
+    rw [dualAlpha_mul]
+    exact mul_comm _ _
+  rw [twistMu_eq_compMu_of_anti (dualAlpha (K := K)) hα]
+  refine codim_determined (dualF (K := K)) ?_ ⟨dualFst (K := K), ?_⟩ ?_
+  · intro n hn b
+    rw [dualF_eq_zero_iff h2] at hn
+    constructor
+    · rw [dualF_eq_zero_iff h2]
+      simp only [TrivSqZeroExt.fst_mul, hn, zero_mul]
+    · rw [dualF_eq_zero_iff h2]
+      simp only [TrivSqZeroExt.fst_mul, hn, mul_zero]
+  · intro x
+    rw [dualF_eq_zero_iff h2]
+    simp only [dualFst_apply, TrivSqZeroExt.fst_sub, TrivSqZeroExt.fst_smul, smul_eq_mul,
+      TrivSqZeroExt.fst_one, mul_one, sub_self]
+  · intro h
+    have := congrArg TrivSqZeroExt.fst h
+    rw [dualF_fst, TrivSqZeroExt.fst_one, mul_one, TrivSqZeroExt.fst_zero] at this
+    exact h2 this
 
-/-!
-## Proposition `prop:matrix`: `M₂(𝔽₃)` is determined by `xy + α(yx)`
+/-! ## `rem:inner`: an inner twisted product is a Jordan product in disguise -/
 
-`α` is conjugation by `diag(1,-1)`. By the criterion `Z_μ = ker μ̄` the algebra is
-determined exactly when the tensors `x ⊗ y` with `μ(x,y) = 0` span a subspace of
-`A ⊗ A` of dimension `16 - rank μ̄`. The program below lists the 417 pairs with
-`μ(x,y) = 0` among the 81 · 81 pairs, finds the dimension of the span of their
-tensors over `𝔽₃` by Gaussian elimination, and finds the rank of `μ̄`.
--/
-namespace M2F3Check
+section Inner
 
-abbrev Mat2 := Array Nat  -- [a,b,c,d] entries mod p
+variable {R : Type u} [Ring R] [Algebra K R]
 
-def p : Nat := 3
-def md (a : Nat) : Nat := a % p
-def neg (a : Nat) : Nat := (p - a % p) % p
+/-- Conjugation `x ↦ D * x * D⁻¹` by a unit, as a linear map. -/
+def conjByUnit (D : Rˣ) : R →ₗ[K] R where
+  toFun x := ↑D * x * ↑D⁻¹
+  map_add' x y := by simp only [mul_add, add_mul]
+  map_smul' c x := by simp [mul_assoc]
 
-def mul (x y : Mat2) : Mat2 :=
-  #[md (x[0]! * y[0]! + x[1]! * y[2]!), md (x[0]! * y[1]! + x[1]! * y[3]!),
-    md (x[2]! * y[0]! + x[3]! * y[2]!), md (x[2]! * y[1]! + x[3]! * y[3]!)]
+theorem conjByUnit_apply (D : Rˣ) (x : R) :
+    conjByUnit (K := K) D x = ↑D * x * ↑D⁻¹ := rfl
 
-def alpha (x : Mat2) : Mat2 := #[x[0]!, neg x[1]!, neg x[2]!, x[3]!]
+theorem conjByUnit_mul (D : Rˣ) (x y : R) :
+    conjByUnit (K := K) D (x * y) = conjByUnit (K := K) D x * conjByUnit (K := K) D y := by
+  simp only [conjByUnit_apply, mul_assoc]
+  rw [← mul_assoc (↑D⁻¹) (↑D) (y * ↑D⁻¹), Units.inv_mul, one_mul]
 
-def mu (x y : Mat2) : Mat2 :=
-  let u := mul x y
-  let v := alpha (mul y x)
-  #[md (u[0]! + v[0]!), md (u[1]! + v[1]!), md (u[2]! + v[2]!), md (u[3]! + v[3]!)]
+/-- **`rem:inner`**: for an inner `α = conj D`, the twisted product of `x` and `y` is the Jordan
+product of `x * D⁻¹` and `D * y`. -/
+theorem twistMu_conjByUnit (D : Rˣ) (x y : R) :
+    twistMu (conjByUnit (K := K) D) x y =
+      (x * ↑D⁻¹) * (↑D * y) + (↑D * y) * (x * ↑D⁻¹) := by
+  rw [twistMu_apply, ← conjByUnit_mul]
+  simp only [conjByUnit_apply, mul_assoc]
+  rw [← mul_assoc (↑D⁻¹) (↑D) y, Units.inv_mul, one_mul]
 
-def allM : List Mat2 := Id.run do
-  let mut l := []
-  for a in [0:p] do for b in [0:p] do for c in [0:p] do for d in [0:p] do
-    l := #[a,b,c,d] :: l
-  return l
+/-! ### The equivalence with the Jordan product -/
 
-def inv (a : Nat) : Nat := (List.range p).find? (fun t => (a * t) % p == 1) |>.getD 0
+/-- Left multiplication by a unit, as a `K`-linear equivalence. -/
+def mulLeftEquiv (D : Rˣ) : R ≃ₗ[K] R where
+  toFun x := ↑D * x
+  map_add' x y := mul_add _ _ _
+  map_smul' c x := by simp [Algebra.mul_smul_comm]
+  invFun x := ↑D⁻¹ * x
+  left_inv x := by simp [← mul_assoc]
+  right_inv x := by simp [← mul_assoc]
 
-/-- rank over F_p of a list of row vectors, by Gaussian elimination -/
-def rank (rows : List (Array Nat)) (n : Nat) : Nat := Id.run do
-  let mut basis : Array (Array Nat) := #[]   -- reduced rows with pivots
-  let mut pivots : Array Nat := #[]
-  for r0 in rows do
-    let mut r := r0
-    for i in [0:basis.size] do
-      let pv := pivots[i]!
-      let f := r[pv]!
-      if f != 0 then
-        let b := basis[i]!
-        r := (List.range n).toArray.map fun j => md (r[j]! + (p - f) * b[j]!)
-    match (List.range n).find? (fun j => r[j]! != 0) with
-    | none => pure ()
-    | some pv =>
-      let s := inv r[pv]!
-      r := r.map fun t => md (t * s)
-      basis := basis.push r
-      pivots := pivots.push pv
-  return basis.size
+/-- Right multiplication by a unit, as a `K`-linear equivalence. -/
+def mulRightEquiv (D : Rˣ) : R ≃ₗ[K] R where
+  toFun x := x * ↑D
+  map_add' x y := add_mul _ _ _
+  map_smul' c x := by simp [Algebra.smul_mul_assoc]
+  invFun x := x * ↑D⁻¹
+  left_inv x := by simp [mul_assoc]
+  right_inv x := by simp [mul_assoc]
 
-def tensor (x y : Mat2) : Array Nat :=
-  (List.range 16).toArray.map fun k => md (x[k / 4]! * y[k % 4]!)
+/-- The linear automorphism `x ⊗ y ↦ x D⁻¹ ⊗ D y` of `rem:inner`. -/
+noncomputable def innerPhi (D : Rˣ) : (R ⊗[K] R) ≃ₗ[K] (R ⊗[K] R) :=
+  TensorProduct.congr (mulRightEquiv (K := K) D⁻¹) (mulLeftEquiv (K := K) D)
 
-def zeroPairs : List (Array Nat) :=
-  allM.foldl (fun acc x => allM.foldl (fun acc y => if mu x y == #[0,0,0,0] then tensor x y :: acc else acc) acc) []
+@[simp]
+theorem innerPhi_tmul (D : Rˣ) (x y : R) :
+    innerPhi (K := K) D (x ⊗ₜ[K] y) = (x * ↑D⁻¹) ⊗ₜ[K] ((↑D : R) * y) :=
+  TensorProduct.congr_tmul _ _ x y
 
-def basisE : List Mat2 := [#[1,0,0,0], #[0,1,0,0], #[0,0,1,0], #[0,0,0,1]]
+theorem innerPhi_symm_tmul (D : Rˣ) (u v : R) :
+    (innerPhi (K := K) D).symm.toLinearMap (u ⊗ₜ[K] v) =
+      (u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v) := by
+  apply (innerPhi (K := K) D).injective
+  simp only [LinearEquiv.coe_toLinearMap, LinearEquiv.apply_symm_apply, innerPhi_tmul]
+  simp [mul_assoc]
 
-/-- columns of mu-bar: row k = mu(e_i, e_j) for k = 4i+j; rank = dim image -/
-def rankMu : Nat :=
-  rank (basisE.foldl (fun acc x => basisE.foldl (fun acc y => acc ++ [mu x y]) acc) []) 4
+/-- `rem:inner`, as an identity of linear maps: `μ̄_α = ∘̄ ∘ Φ`. -/
+theorem muBar_twist_conj (D : Rˣ) (w : R ⊗[K] R) :
+    muBar (twistMu (conjByUnit (K := K) D)) w =
+      muBar (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)) (innerPhi (K := K) D w) := by
+  induction w using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x y =>
+    rw [innerPhi_tmul, muBar_tmul, muBar_tmul]
+    simp only [twistMu_apply, LinearMap.id_apply]
+    exact twistMu_conjByUnit (K := K) D x y
+  | add a b ha hb => simp [map_add, ha, hb]
 
+/-- `Z_{μ_α} = Φ⁻¹ (Z_∘)`. -/
+theorem Zmu_twist_conj (D : Rˣ) :
+    Zmu (twistMu (conjByUnit (K := K) D)) =
+      Submodule.map (innerPhi (K := K) D).symm.toLinearMap
+        (Zmu (twistMu (K := K) (LinearMap.id : R →ₗ[K] R))) := by
+  apply le_antisymm
+  · rw [Zmu, Submodule.span_le]
+    rintro t ⟨x, y, hxy, rfl⟩
+    refine Submodule.mem_map.mpr ⟨innerPhi (K := K) D (x ⊗ₜ[K] y), ?_, ?_⟩
+    · apply tmul_mem_Zmu
+      have h := muBar_twist_conj (K := K) D (x ⊗ₜ[K] y)
+      rw [muBar_tmul, hxy] at h
+      exact h.symm
+    · have h2 : (innerPhi (K := K) D).symm.toLinearMap ((x * ↑D⁻¹) ⊗ₜ[K] (↑D * y)) =
+          x ⊗ₜ[K] y := by
+        rw [innerPhi_symm_tmul]
+        simp [mul_assoc]
+      simpa using h2
+  · rw [Zmu, Submodule.map_span, Submodule.span_le]
+    rintro _ ⟨t, ⟨u, v, huv, rfl⟩, rfl⟩
+    rw [innerPhi_symm_tmul]
+    apply tmul_mem_Zmu
+    have h := muBar_twist_conj (K := K) D ((u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v))
+    rw [muBar_tmul, innerPhi_tmul, muBar_tmul] at h
+    rw [show (u * ↑D) * ↑D⁻¹ = u from by rw [mul_assoc, Units.mul_inv, mul_one],
+      show (↑D : R) * (↑D⁻¹ * v) = v from by rw [← mul_assoc, Units.mul_inv, one_mul]] at h
+    rw [h, ← muBar_tmul]
+    exact huv
 
-#guard zeroPairs.length == 417
-#guard rank zeroPairs 16 == 12
-#guard rankMu == 4
+/-- `ker μ̄_α = Φ⁻¹ (ker ∘̄)`. -/
+theorem ker_twist_conj (D : Rˣ) :
+    LinearMap.ker (muBar (twistMu (conjByUnit (K := K) D))) =
+      Submodule.map (innerPhi (K := K) D).symm.toLinearMap
+        (LinearMap.ker (muBar (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)))) := by
+  ext w
+  constructor
+  · intro hw
+    refine Submodule.mem_map.mpr ⟨innerPhi (K := K) D w, ?_, ?_⟩
+    · rw [LinearMap.mem_ker, ← muBar_twist_conj, hw]
+    · simp
+  · rintro ⟨v, hv, rfl⟩
+    simp only [LinearMap.mem_ker] at hv ⊢
+    rw [muBar_twist_conj]
+    simpa using hv
 
-end M2F3Check
+/-- **`rem:inner`**: for an inner `α`, `A` is determined by the twisted product if and only if
+`A` is determined by the Jordan product; the answer does not depend on `D`. -/
+theorem determined_twist_conj_iff (D : Rˣ) :
+    Determined (twistMu (conjByUnit (K := K) D)) ↔
+      Determined (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)) := by
+  rw [determined_iff, determined_iff]
+  have hZ := Zmu_twist_conj (K := K) D
+  have hK := ker_twist_conj (K := K) D
+  constructor
+  · intro h
+    refine Submodule.map_injective_of_injective
+      (f := (innerPhi (K := K) D).symm.toLinearMap)
+      (innerPhi (K := K) D).symm.injective ?_
+    rw [← hZ, h, hK]
+  · intro h
+    rw [hZ, hK, h]
+
+end Inner
+
+end BraidedSymZpd
+
+/-! ## Axiom audit
+
+Every declaration below is checked to depend only on Lean's three standard axioms. -/
+
+#print axioms ZpdCore.determined_iff
+#print axioms ZpdCore.determined_comp_of_right_id
+#print axioms ZpdCore.determined_of_injective_comp
+#print axioms ZpdCore.identity_determined_iff
+#print axioms ZpdCore.jordan_forces_comm
+#print axioms ZpdCore.twisted_forces_comm
+#print axioms ZpdCore.three_braidings_commutative
+#print axioms ZpdCore.codim_determined
+#print axioms ZpdCore.twisted_determined
+#print axioms ZpdCore.anti_twisted_determined
+#print axioms BraidedSymZpd.preserving
+#print axioms BraidedSymZpd.derivation
+#print axioms BraidedSymZpd.derivation_iff
+#print axioms BraidedSymZpd.dualAlpha_mul
+#print axioms BraidedSymZpd.dualNumbers_not_zpd
+#print axioms BraidedSymZpd.dualNumbers_determined_not_zpd
+#print axioms BraidedSymZpd.twistMu_conjByUnit
+#print axioms BraidedSymZpd.determined_twist_conj_iff
