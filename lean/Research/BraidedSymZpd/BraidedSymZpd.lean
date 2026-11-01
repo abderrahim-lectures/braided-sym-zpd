@@ -24,8 +24,9 @@ paper's hypotheses. This file adds the results that mention the symmetrized prod
 * `BraidedSymZpd.dualNumbers_determined`: the dual numbers are determined by the twisted
   product (`ex:dual`, via `thm:codim`).
 * `BraidedSymZpd.dualNumbers_not_zpd`: the dual numbers are not zpd.
-* `BraidedSymZpd.twistMu_conjByUnit`: `rem:inner`, the twisted product of an inner automorphism
-  is a Jordan product in disguise.
+* `BraidedSymZpd.twistMu_conjByUnit` and `BraidedSymZpd.determined_twist_conj_iff`: `rem:inner`,
+  the twisted product of an inner automorphism is a Jordan product in disguise, and it determines
+  `A` exactly when the Jordan product does.
 
 The numerical content of `prop:matrix` is checked in `Research.BraidedSymZpd.M2F3`.
 -/
@@ -241,6 +242,115 @@ theorem twistMu_conjByUnit (D : Rˣ) (x y : R) :
   simp only [conjByUnit_apply, mul_assoc]
   rw [← mul_assoc (↑D⁻¹) (↑D) y, Units.inv_mul, one_mul]
 
+/-! ### The equivalence with the Jordan product -/
+
+/-- Left multiplication by a unit, as a `K`-linear equivalence. -/
+def mulLeftEquiv (D : Rˣ) : R ≃ₗ[K] R where
+  toFun x := ↑D * x
+  map_add' x y := mul_add _ _ _
+  map_smul' c x := by simp [Algebra.mul_smul_comm]
+  invFun x := ↑D⁻¹ * x
+  left_inv x := by simp [← mul_assoc]
+  right_inv x := by simp [← mul_assoc]
+
+/-- Right multiplication by a unit, as a `K`-linear equivalence. -/
+def mulRightEquiv (D : Rˣ) : R ≃ₗ[K] R where
+  toFun x := x * ↑D
+  map_add' x y := add_mul _ _ _
+  map_smul' c x := by simp [Algebra.smul_mul_assoc]
+  invFun x := x * ↑D⁻¹
+  left_inv x := by simp [mul_assoc]
+  right_inv x := by simp [mul_assoc]
+
+/-- The linear automorphism `x ⊗ y ↦ x D⁻¹ ⊗ D y` of `rem:inner`. -/
+noncomputable def innerPhi (D : Rˣ) : (R ⊗[K] R) ≃ₗ[K] (R ⊗[K] R) :=
+  TensorProduct.congr (mulRightEquiv (K := K) D⁻¹) (mulLeftEquiv (K := K) D)
+
+@[simp]
+theorem innerPhi_tmul (D : Rˣ) (x y : R) :
+    innerPhi (K := K) D (x ⊗ₜ[K] y) = (x * ↑D⁻¹) ⊗ₜ[K] ((↑D : R) * y) :=
+  TensorProduct.congr_tmul _ _ x y
+
+theorem innerPhi_symm_tmul (D : Rˣ) (u v : R) :
+    (innerPhi (K := K) D).symm.toLinearMap (u ⊗ₜ[K] v) = (u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v) := by
+  apply (innerPhi (K := K) D).injective
+  simp only [LinearEquiv.coe_toLinearMap, LinearEquiv.apply_symm_apply, innerPhi_tmul]
+  simp [mul_assoc]
+
+/-- `rem:inner`, as an identity of linear maps: `μ̄_α = ∘̄ ∘ Φ`. -/
+theorem muBar_twist_conj (D : Rˣ) (w : R ⊗[K] R) :
+    muBar (twistMu (conjByUnit (K := K) D)) w =
+      muBar (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)) (innerPhi (K := K) D w) := by
+  induction w using TensorProduct.induction_on with
+  | zero => simp
+  | tmul x y =>
+    rw [innerPhi_tmul, muBar_tmul, muBar_tmul]
+    simp only [twistMu_apply, LinearMap.id_apply]
+    exact twistMu_conjByUnit (K := K) D x y
+  | add a b ha hb => simp [map_add, ha, hb]
+
+/-- `Z_{μ_α} = Φ⁻¹ (Z_∘)`. -/
+theorem Zmu_twist_conj (D : Rˣ) :
+    Zmu (twistMu (conjByUnit (K := K) D)) =
+      Submodule.map (innerPhi (K := K) D).symm.toLinearMap
+        (Zmu (twistMu (K := K) (LinearMap.id : R →ₗ[K] R))) := by
+  apply le_antisymm
+  · rw [Zmu, Submodule.span_le]
+    rintro t ⟨x, y, hxy, rfl⟩
+    refine Submodule.mem_map.mpr ⟨innerPhi (K := K) D (x ⊗ₜ[K] y), ?_, ?_⟩
+    · apply tmul_mem_Zmu
+      have h := muBar_twist_conj (K := K) D (x ⊗ₜ[K] y)
+      rw [muBar_tmul, hxy] at h
+      exact h.symm
+    · have h2 : (innerPhi (K := K) D).symm.toLinearMap ((x * ↑D⁻¹) ⊗ₜ[K] (↑D * y)) =
+          x ⊗ₜ[K] y := by
+        rw [innerPhi_symm_tmul]
+        simp [mul_assoc]
+      simpa using h2
+  · rw [Zmu, Submodule.map_span, Submodule.span_le]
+    rintro _ ⟨t, ⟨u, v, huv, rfl⟩, rfl⟩
+    rw [innerPhi_symm_tmul]
+    apply tmul_mem_Zmu
+    have h := muBar_twist_conj (K := K) D ((u * ↑D) ⊗ₜ[K] (↑D⁻¹ * v))
+    rw [muBar_tmul, innerPhi_tmul, muBar_tmul] at h
+    rw [show (u * ↑D) * ↑D⁻¹ = u from by rw [mul_assoc, Units.mul_inv, mul_one],
+      show (↑D : R) * (↑D⁻¹ * v) = v from by rw [← mul_assoc, Units.mul_inv, one_mul]] at h
+    rw [h, ← muBar_tmul]
+    exact huv
+
+/-- `ker μ̄_α = Φ⁻¹ (ker ∘̄)`. -/
+theorem ker_twist_conj (D : Rˣ) :
+    LinearMap.ker (muBar (twistMu (conjByUnit (K := K) D))) =
+      Submodule.map (innerPhi (K := K) D).symm.toLinearMap
+        (LinearMap.ker (muBar (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)))) := by
+  ext w
+  constructor
+  · intro hw
+    refine Submodule.mem_map.mpr ⟨innerPhi (K := K) D w, ?_, ?_⟩
+    · rw [LinearMap.mem_ker, ← muBar_twist_conj, hw]
+    · simp
+  · rintro ⟨v, hv, rfl⟩
+    simp only [LinearMap.mem_ker] at hv ⊢
+    rw [muBar_twist_conj]
+    simpa using hv
+
+/-- **`rem:inner`**: for an inner `α`, `A` is determined by the twisted product if and only if
+`A` is determined by the Jordan product; the answer does not depend on `D`. -/
+theorem determined_twist_conj_iff (D : Rˣ) :
+    Determined (twistMu (conjByUnit (K := K) D)) ↔
+      Determined (twistMu (K := K) (LinearMap.id : R →ₗ[K] R)) := by
+  rw [determined_iff, determined_iff]
+  have hZ := Zmu_twist_conj (K := K) D
+  have hK := ker_twist_conj (K := K) D
+  constructor
+  · intro h
+    refine Submodule.map_injective_of_injective
+      (f := (innerPhi (K := K) D).symm.toLinearMap)
+      (innerPhi (K := K) D).symm.injective ?_
+    rw [← hZ, h, hK]
+  · intro h
+    rw [hZ, hK, h]
+
 end Inner
 
 end BraidedSymZpd
@@ -265,3 +375,4 @@ Every declaration below is checked to depend only on Lean's three standard axiom
 #print axioms BraidedSymZpd.dualNumbers_not_zpd
 #print axioms BraidedSymZpd.dualNumbers_determined_not_zpd
 #print axioms BraidedSymZpd.twistMu_conjByUnit
+#print axioms BraidedSymZpd.determined_twist_conj_iff

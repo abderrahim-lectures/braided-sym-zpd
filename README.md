@@ -22,7 +22,7 @@ An algebra is zero product determined when every bilinear map that vanishes on t
 | `paper/braided-sym-zpd.tex` | LaTeX source (class files in `cls/`) |
 | `pdf/` | the PDFs of the released versions |
 | `lean/ZpdCore/Zpd.lean` | Lean 4: the general theory of `def:determined`, the criterion `cor:criterion`, `thm:zpd-fxy`, `prop:injective`, `cor:identity`, `thm:codim`, `cor:twisted` and `cor:anti` |
-| `lean/Research/BraidedSymZpd/` | Lean 4: `ex:dual`, `rem:inner`, and `M2F3.lean`, the kernel-checked computation of `prop:matrix` |
+| `lean/Research/BraidedSymZpd/` | Lean 4: `ex:dual`, `rem:inner` with its equivalence with the Jordan product, and `M2F3.lean`, the kernel-checked computation of `prop:matrix` |
 
 Build the paper with `cd paper && latexmk -pdf braided-sym-zpd.tex`.
 

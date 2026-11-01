@@ -70,7 +70,7 @@ After:
 | File | Content |
 |---|---|
 | `lean/ZpdCore/Zpd.lean` | `muBar`, `Zmu`, `Determined`, `determined_iff` (`cor:criterion`), `determined_comp_of_right_id` (`thm:zpd-fxy`, right identity only), `determined_of_injective_comp` (`prop:injective`), `identity_determined_iff` (`cor:identity`), `codim_determined` (`thm:codim`), `twisted_determined` (`cor:twisted`), `anti_twisted_determined` (`cor:anti`), `jordan_forces_comm`, `twisted_forces_comm`, `three_braidings_commutative` |
-| `lean/Research/BraidedSymZpd/BraidedSymZpd.lean` | `preserving` (`rem:preserving`), `derivation` (`rem:derivations`), the dual numbers: `dualAlpha`, `dualNumbers_determined_not_zpd` (`ex:dual`), `dualNumbers_not_zpd`, `twistMu_conjByUnit` (`rem:inner`, the identity) |
+| `lean/Research/BraidedSymZpd/BraidedSymZpd.lean` | `preserving` (`rem:preserving`), `derivation` (`rem:derivations`), the dual numbers: `dualAlpha`, `dualNumbers_determined_not_zpd` (`ex:dual`), `dualNumbers_not_zpd`, and `rem:inner` in full: the identity `twistMu_conjByUnit`, the tensor automorphism `innerPhi`, and the equivalence `determined_twist_conj_iff` |
 | `lean/Research/BraidedSymZpd/M2F3.lean` | the three numbers of `prop:matrix`, proved by `decide` |
 | `lean/check.sh` | builds the three modules in order against a Mathlib on `LEAN_PATH` |
 
@@ -88,8 +88,9 @@ What is **not** formalised, and why:
   and the criterion is proved, but the bridge between them (a `finrank` computation for
   `Z_{μ_α}` and `ker μ̄_α` inside `M₂(𝔽₃) ⊗ M₂(𝔽₃)`) is not written. `prop:matrix` therefore
   remains checked by computation, as in the paper.
-* `rem:inner` is formalised only as the identity `twistMu (conj D) x y = (xD⁻¹)(Dy) + (Dy)(xD⁻¹)`;
-  the equivalence "determined by `μ_α` iff determined by the Jordan product" is not formalised.
+* `rem:inner` is formalised as the identity `twistMu (conj D) x y = (xD⁻¹)(Dy) + (Dy)(xD⁻¹)` and the
+  equivalence `determined_twist_conj_iff` (determined by `μ_α` iff determined by the Jordan product,
+  for every unit `D`), with the transport of `Z_μ` and of `ker μ̄` along `Φ`.
 * `cor:triangular` is not formalised: it needs Brešar's Corollary 2.17(b), i.e. the zpd-ness of
   `Tri(A₁,M,A₂)`, which is not part of this development.
 
