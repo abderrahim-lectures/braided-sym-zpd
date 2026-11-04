@@ -23,8 +23,8 @@
 % which is b e_ij; that sentence also states n >= 2 and the unitality of the algebra to which the
 % An-Li-He theorem is applied; the standing hypothesis that A is unital now names Sections 3 to 5;
 % the remark after prop:matrix spells out the dimensions it compares; and the counterexample
-% recorded in the first paragraph of Section 4 is the pair (e_2,e_2), (e_2,1), which works in every
-% characteristic (the earlier pair (e_1,e_1), (e_1,1) needed characteristic other than 3). The answer
+% recorded in the comment on the twisted braiding in the Introduction is the pair (e_2,e_2),
+% (e_2,1), which works in every characteristic (the earlier pair (e_1,e_1), (e_1,1) needed characteristic other than 3). The answer
 % recorded in q:noncomm was false: an inner alpha only reduces the twisted product to the Jordan
 % product (rem:inner), so the answer there is affirmative exactly for the zJpd algebras -- true for
 % M_n(B), false for the real quaternions with alpha = id (Bresar Example 3.19) -- and the sentence
@@ -38,6 +38,26 @@
 % mu_alpha-zero pairs and its defect factors through mu_alpha, but D is not a derivation.  Both
 % sentences now state what the remark proves -- the defect factors through the product, and the map
 % is a derivation exactly when the factor is the map itself.
+% Version 10: the two version 9 sentences named the wrong factor.  They sent the Leibniz defect
+% D(x . y) - D(x) . y - x . D(y) through the product and asked its factor to agree with D.  The
+% factor of the defect is D - S, where S is the factor of the Leibniz sum D(x) . y + x . D(y) that
+% rem:derivations produces, so the condition reads S = 0 on the products, not S = D, and it fails
+% for every derivation that is not zero on the products: ad_{e_11} on M_2(F_3) with the Jordan
+% product is a braided-symmetric derivation whose defect vanishes, while the factor of its defect
+% is 0.  Both sentences now say that the factor of the defect vanishes on the products, which is
+% equivalent to S = D there and is what rem:derivations proves.  Also in this version: q:noncomm
+% says "for inner alpha" where its zJpd justification is used, since a matrix algebra M_n(B) over a
+% non-field B can have an involutive automorphism that is not inner; the Introduction names the
+% braided-symmetric product of the title; and the locator of the (e_2,e_2), (e_2,1) counterexample
+% in this header is corrected.  The Introduction also stops calling the derivation property a criterion: it is
+% necessary for determination and not sufficient, since the dual numbers with the identity braiding satisfy it
+% (every linear D whose Leibniz sum vanishes on the mu-zero pairs has its defect factor through mu) and are not
+% determined by 2xy; and "the smallest case over a field of odd characteristic" now says "the smallest matrix
+% algebra", since T_2(F_3) = Tri(F_3,F_3,F_3) is smaller (27 elements), is determined by its twisted product,
+% and that product has no form f(xy).  Three terms that the paper used without defining them are gone or
+% defined: "the standard braiding" is "the swap braiding" (the paper's own name for it), "the braiding
+% product" is "the symmetrized product ... of the transpose braiding", and "symmetrically zpd" carries
+% its definition from Bresar Definition 1.12.
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -89,7 +109,7 @@
 \newcommand{\LDer}{\mathrm{LDer}}
 \newcommand{\Zs}{\mathcal{Z}}
 
-\newcommand{\paperversion}{9}
+\newcommand{\paperversion}{10}
 
 
 \begin{document}
@@ -107,7 +127,7 @@
 \begin{abstract}
 An algebra is zero product determined when every bilinear map that vanishes on the pairs with zero product factors through the product.
 We replace the product by any bilinear map $\mu$ and ask the same question.
-For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when a linear map $D$ that satisfies $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ on the pairs with $x \cdot_\sigma y = 0$ is a braided-symmetric derivation: its defect then factors through the product, and $D$ is such a derivation exactly when the factor agrees with $D$ on the products.
+For the symmetrized products $\mu_\sigma$, this asks when the algebra with that product is zero product determined, and hence, for an involution $\sigma$, when a linear map $D$ that satisfies $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ on the pairs with $x \cdot_\sigma y = 0$ is a braided-symmetric derivation: its defect then factors through the product, and $D$ is such a derivation exactly when that factor vanishes on the products.
 The answer is a criterion in terms of the kernel of the induced map $A \otimes A \to A$, and it needs no surjectivity hypothesis.
 For the symmetrized products of three braidings on a commutative algebra, with $\alpha$ an endomorphism in the twisted case, $\mu$ has the form $f(xy)$ with $f$ linear.
 The same holds on any algebra when the twist reverses products.
@@ -148,7 +168,7 @@ The main purpose of this paper is to give a criterion for determination by $\mu$
 The maps $\mu$ that interest us are the symmetrized products of \citet[Section 1]{Adrabi2026}.
 Let $m \colon A \otimes A \to A$ be the linear map with $m(x \otimes y) = xy$.
 In this paper a \emph{braiding} is a linear map $\sigma$ of $A \otimes A$, and we do not require $\sigma^2 = \mathrm{id}$, which differs from \citep[Definition 3.1]{Adrabi2026}.
-Its symmetrized product is $x \cdot_\sigma y = \mu_\sigma(x,y) = m(x \otimes y + \sigma(x \otimes y))$.
+Its symmetrized product, the \emph{braided-symmetric product} of the title, is $x \cdot_\sigma y = \mu_\sigma(x,y) = m(x \otimes y + \sigma(x \otimes y))$.
 We use three braidings.
 The first is the identity. % claim-ok: definition of the first braiding
 The second is the swap $x \otimes y \mapsto y \otimes x$. % claim-ok: definition of the second braiding
@@ -156,7 +176,7 @@ The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alp
 Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
 For an involution $\sigma$, a \emph{braided-symmetric derivation} is a linear map $D$ with $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ \citep[Definition 3.1]{Adrabi2026}.
 These maps are the derivations of the nonassociative algebra $(A, \cdot_\sigma)$ \citep[Remark 3.4]{Adrabi2026}.
-For an involution $\sigma$, an algebra determined by $\mu_\sigma$ is one on which the following criterion holds: if the Leibniz defect $D(x \cdot_\sigma y) - D(x) \cdot_\sigma y - x \cdot_\sigma D(y)$ of a linear map $D$ vanishes on the pairs with $x \cdot_\sigma y = 0$, then it factors through the product, and $D$ is a braided-symmetric derivation exactly when the factor agrees with $D$ on the products.
+For an involution $\sigma$, if $A$ is determined by $\mu_\sigma$, then the Leibniz defect $D(x \cdot_\sigma y) - D(x) \cdot_\sigma y - x \cdot_\sigma D(y)$ of a linear map $D$ that vanishes on the pairs with $x \cdot_\sigma y = 0$ factors through the product, and $D$ is a braided-symmetric derivation exactly when that factor vanishes on the products.
 This is the same use of zero products as in the study of local derivations \citep[Example 1.10]{Bresar2021}.
 Remark~\ref{rem:derivations} takes the first step.
 For $T$ with $\mu(x,y) = 0 \Rightarrow T(x)T(y) = 0$, Remark~\ref{rem:preserving} gives the first part of Theorem~\ref{thm:bresar-zpp} on an algebra determined by $\mu$.
@@ -330,7 +350,7 @@ If $\operatorname{char} K \neq 2$ this $f$ is injective, and Proposition~\ref{pr
 
 In characteristic $2$ the map $\mu$ is zero, every $\varphi$ in Definition~\ref{def:determined} is zero, and every algebra is determined by $\mu$.
 
-The standard braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
+The swap braiding gives the Jordan product, and determination by it is the zJpd property, as noted after Definition~\ref{def:determined}.
 When $\operatorname{char} K \neq 2$ the linear map $\overline{\circ} \colon A \otimes A \to A$ with $x \otimes y \mapsto x \circ y$ is onto, because $x \circ (\tfrac12 \cdot 1) = x$, so that $A^2 = A$; with this, Corollary~\ref{cor:criterion} for $\mu = \circ$ is the usual form of the zJpd criterion.
 It is not of the form $f(xy)$ on a noncommutative algebra (indeed $x = 1$ forces $f = 2\,\mathrm{id}$: if $\operatorname{char} K \neq 2$ then $xy + yx = 2xy$ gives $yx = xy$, while if $\operatorname{char} K = 2$ then $f = 0$, so $xy + yx = 0$ for all $x, y$, which fails as soon as $xy \neq yx$), and we refer to \citet[Section 3.3]{Bresar2021} for its theory.
 
@@ -425,7 +445,7 @@ A finite-dimensional unital algebra is zpd if and only if it is generated by ide
 The next example uses this characterization to show that the class of algebras determined by the twisted product is strictly larger. % claim-ok: linking sentence for the example that follows
 
 \begin{example}[Dual numbers]\label{ex:dual}
-Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$, an algebra of the form studied in \citep[Example 2.23]{Bresar2021}, where a unity is adjoined to an algebra with trivial multiplication (there it is shown to be symmetrically zpd and not zpd); here that algebra is $K\varepsilon$, and the twisted product below is not the symmetrized product of that example. % claim-ok: identification of the dual numbers with the algebra obtained from the one-dimensional algebra $K\varepsilon$ of trivial multiplication
+Let $\operatorname{char} K \neq 2$ and let $A = K[\varepsilon]/(\varepsilon^2)$, an algebra of the form studied in \citep[Example 2.23]{Bresar2021}, where a unity is adjoined to an algebra with trivial multiplication (there it is shown to be symmetrically zpd, that is zpd for symmetric bilinear functionals \citep[Definition 1.12]{Bresar2021}, and not zpd); here that algebra is $K\varepsilon$, and the twisted product below is not the symmetrized product of that example. % claim-ok: identification of the dual numbers with the algebra obtained from the one-dimensional algebra $K\varepsilon$ of trivial multiplication
 The map $\alpha(a + b\varepsilon) = a - b\varepsilon$ is an involutive automorphism.
 Since $A$ is commutative, $\mu_\alpha(x,y) = f(xy)$ with $f = \mathrm{id} + \alpha$, and $f(a + b\varepsilon) = 2a$.
 So $N = K\varepsilon$, which is an ideal, $f(1) = 2 \neq 0$, and $c(a + b\varepsilon) = a$ satisfies the last hypothesis.
@@ -437,7 +457,7 @@ By Theorem~\ref{thm:bresar-idempotents}, $A$ is not zpd.
 So the twisted braiding determines a class of algebras strictly larger than the zpd ones, even among commutative algebras.
 When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$ (indeed $y = 1$ forces $f = \mathrm{id} + \alpha$, and then $\alpha(yx) = \alpha(xy)$, so $yx = xy$ by injectivity of $\alpha$), and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
 The criterion of Corollary~\ref{cor:criterion} still applies.
-The next proposition uses it on the smallest case over a field of odd characteristic (over $\mathbb{F}_2$, $M_2(\mathbb{F}_2)$ with $\alpha$ the conjugation by $\bigl[\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr]$ is smaller and gives the same conclusion: the kernel has dimension $13$ and the zero pairs span $13$). % claim-ok: linking sentence
+The next proposition uses it on the smallest matrix algebra over a field of odd characteristic (over $\mathbb{F}_2$, $M_2(\mathbb{F}_2)$ with $\alpha$ the conjugation by $\bigl[\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr]$ is smaller and gives the same conclusion: the kernel has dimension $13$ and the zero pairs span $13$). % claim-ok: linking sentence
 
 \begin{proposition}\label{prop:matrix}
 Let $A = M_2(\mathbb{F}_3)$ and let $\alpha$ be conjugation by $\operatorname{diag}(1,-1)$, an involutive automorphism.
@@ -453,7 +473,7 @@ Gaussian elimination over $\mathbb{F}_3$ shows that the $417$ tensors $x \otimes
 So the two subspaces have the same dimension and are equal.
 \end{proof}
 
-The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $\dim \Zs = \dim \ker = 13$ for the twist by the transpose, taken with the braiding product $xy + y^{\mathsf T} x^{\mathsf T} = xy + (xy)^{\mathsf T}$. % claim-ok: result of the same computation
+The same computation gives $\dim \Zs = \dim \ker = 12$ for the ordinary product, as expected since $M_2(\mathbb{F}_3)$ is zpd by Corollary~\ref{cor:bresar-matrix}(a), and $\dim \Zs = \dim \ker = 13$ for the twist by the transpose, taken with the symmetrized product $xy + y^{\mathsf T} x^{\mathsf T} = xy + (xy)^{\mathsf T}$ of the transpose braiding. % claim-ok: result of the same computation
 
 \begin{remark}\label{rem:inner}
 If $\alpha$ is inner, that is $\alpha(x) = DxD^{-1}$ for an invertible $D$, the twisted product is a
@@ -477,7 +497,7 @@ directly in a small case, and $\mu_\alpha$ has no form $f(xy)$ by the argument a
 
 \begin{question}\label{q:noncomm}
 Which noncommutative algebras with an involutive automorphism $\alpha$ are determined by their twisted product $xy + \alpha(yx)$? % claim-ok: open question
-By Remark~\ref{rem:inner} an inner $\alpha$ makes the twisted product a Jordan product in disguise, so the answer is affirmative exactly for the zJpd algebras: it is affirmative for $M_n(B)$ and for the triangular algebras of Corollary~\ref{cor:bresar-matrix}(b), in characteristic other than $2$, since these are zJpd \citep[Corollary 3.17]{Bresar2021}, and negative for the real quaternions with $\alpha = \mathrm{id}$, which are not zJpd \citep[Example 3.19]{Bresar2021}. Every automorphism of $M_n(K)$, for a field $K$ and $n \ge 2$, is inner (Skolem--Noether), so in characteristic other than $2$ the matrix algebras over a field are settled; the question is about algebras admitting an involutive automorphism that is not inner.
+By Remark~\ref{rem:inner} an inner $\alpha$ makes the twisted product a Jordan product in disguise, so the answer is affirmative exactly for the zJpd algebras: it is affirmative, for inner $\alpha$, for $M_n(B)$ and for the triangular algebras of Corollary~\ref{cor:bresar-matrix}(b), in characteristic other than $2$, since these are zJpd \citep[Corollary 3.17]{Bresar2021}, and negative for the real quaternions with $\alpha = \mathrm{id}$, which are not zJpd \citep[Example 3.19]{Bresar2021}. Every automorphism of $M_n(K)$, for a field $K$ and $n \ge 2$, is inner (Skolem--Noether), so in characteristic other than $2$ the matrix algebras over a field are settled; the question is about algebras admitting an involutive automorphism that is not inner.
 \end{question}
 
 \begin{thebibliography}{9}
