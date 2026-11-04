@@ -49,7 +49,12 @@
 % says "for inner alpha" where its zJpd justification is used, since a matrix algebra M_n(B) over a
 % non-field B can have an involutive automorphism that is not inner; the Introduction names the
 % braided-symmetric product of the title; and the locator of the (e_2,e_2), (e_2,1) counterexample
-% in this header is corrected.
+% in this header is corrected.  The Introduction also stops calling the derivation property a criterion: it is
+% necessary for determination and not sufficient, since the dual numbers with the identity braiding satisfy it
+% (every linear D whose Leibniz sum vanishes on the mu-zero pairs has its defect factor through mu) and are not
+% determined by 2xy; and "the smallest case over a field of odd characteristic" now says "the smallest matrix
+% algebra", since T_2(F_3) = Tri(F_3,F_3,F_3) is smaller (27 elements), is determined by its twisted product,
+% and that product has no form f(xy).
 \documentclass[]{interact}
 \usepackage[utf8]{inputenc}
 
@@ -168,7 +173,7 @@ The third is the \emph{twisted} swap $x \otimes y \mapsto \alpha(y) \otimes \alp
 Their symmetrized products are $2xy$, $xy + yx$ and $xy + \alpha(y)\alpha(x)$. % claim-ok: the formulas follow from the definitions given here
 For an involution $\sigma$, a \emph{braided-symmetric derivation} is a linear map $D$ with $D(x \cdot_\sigma y) = D(x) \cdot_\sigma y + x \cdot_\sigma D(y)$ \citep[Definition 3.1]{Adrabi2026}.
 These maps are the derivations of the nonassociative algebra $(A, \cdot_\sigma)$ \citep[Remark 3.4]{Adrabi2026}.
-For an involution $\sigma$, an algebra determined by $\mu_\sigma$ is one on which the following criterion holds: if the Leibniz defect $D(x \cdot_\sigma y) - D(x) \cdot_\sigma y - x \cdot_\sigma D(y)$ of a linear map $D$ vanishes on the pairs with $x \cdot_\sigma y = 0$, then it factors through the product, and $D$ is a braided-symmetric derivation exactly when that factor vanishes on the products.
+For an involution $\sigma$, if $A$ is determined by $\mu_\sigma$, then the Leibniz defect $D(x \cdot_\sigma y) - D(x) \cdot_\sigma y - x \cdot_\sigma D(y)$ of a linear map $D$ that vanishes on the pairs with $x \cdot_\sigma y = 0$ factors through the product, and $D$ is a braided-symmetric derivation exactly when that factor vanishes on the products.
 This is the same use of zero products as in the study of local derivations \citep[Example 1.10]{Bresar2021}.
 Remark~\ref{rem:derivations} takes the first step.
 For $T$ with $\mu(x,y) = 0 \Rightarrow T(x)T(y) = 0$, Remark~\ref{rem:preserving} gives the first part of Theorem~\ref{thm:bresar-zpp} on an algebra determined by $\mu$.
@@ -449,7 +454,7 @@ By Theorem~\ref{thm:bresar-idempotents}, $A$ is not zpd.
 So the twisted braiding determines a class of algebras strictly larger than the zpd ones, even among commutative algebras.
 When $\alpha$ is an automorphism of a noncommutative algebra, the twisted product $xy + \alpha(yx)$ is not of the form $f(xy)$ (indeed $y = 1$ forces $f = \mathrm{id} + \alpha$, and then $\alpha(yx) = \alpha(xy)$, so $yx = xy$ by injectivity of $\alpha$), and Theorems~\ref{thm:zpd-fxy} and~\ref{thm:codim} do not apply.
 The criterion of Corollary~\ref{cor:criterion} still applies.
-The next proposition uses it on the smallest case over a field of odd characteristic (over $\mathbb{F}_2$, $M_2(\mathbb{F}_2)$ with $\alpha$ the conjugation by $\bigl[\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr]$ is smaller and gives the same conclusion: the kernel has dimension $13$ and the zero pairs span $13$). % claim-ok: linking sentence
+The next proposition uses it on the smallest matrix algebra over a field of odd characteristic (over $\mathbb{F}_2$, $M_2(\mathbb{F}_2)$ with $\alpha$ the conjugation by $\bigl[\begin{smallmatrix}1&1\\0&1\end{smallmatrix}\bigr]$ is smaller and gives the same conclusion: the kernel has dimension $13$ and the zero pairs span $13$). % claim-ok: linking sentence
 
 \begin{proposition}\label{prop:matrix}
 Let $A = M_2(\mathbb{F}_3)$ and let $\alpha$ be conjugation by $\operatorname{diag}(1,-1)$, an involutive automorphism.
